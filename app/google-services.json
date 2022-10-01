@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "842719909943",
+    "firebase_url": "https://nonogram-3c2f3.firebaseio.com",
+    "project_id": "nonogram-3c2f3",
+    "storage_bucket": "nonogram-3c2f3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842719909943:android:a30cfa5bbdc70a79",
+        "android_client_info": {
+          "package_name": "com.white.black.nonogram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "842719909943-aendlosoccj1ohtiv6ar5id6p5fcn49g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.white.black.nonogram",
+            "certificate_hash": "852cc79e809359a8aa19b80dbc2a75f55688b6d4"
+          }
+        },
+        {
+          "client_id": "842719909943-3t48up578lib6p1jv6co4ruueqcnd5gp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3KoiQM-WatOFoT1wJb2ky7yJN0R4SdPU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "842719909943-3t48up578lib6p1jv6co4ruueqcnd5gp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

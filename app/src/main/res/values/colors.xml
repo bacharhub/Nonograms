@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="smallPuzzleGreen1">#91F48E</color>
+    <color name="smallPuzzleGreen2">#37771B</color>
+    <color name="smallPuzzleGreen3">#23510E</color>
+    <color name="normalPuzzleOrange1">#FCEB12</color>
+    <color name="normalPuzzleOrange2">#A0740E</color>
+    <color name="normalPuzzleOrange3">#775507</color>
+    <color name="largePuzzleRed1">#ED1C24</color>
+    <color name="largePuzzleRed2">#841133</color>
+    <color name="largePuzzleRed3">#600923</color>
+    <color name="complexPuzzleLightBlue1">#92CBD1</color>
+    <color name="complexPuzzleLightBlue2">#67898C</color>
+    <color name="complexPuzzleLightBlue3">#425E60</color>
+    <color name="colorfulPuzzlePink1">#FDC4F3</color>
+    <color name="colorfulPuzzlePink2">#DDA1D2</color>
+    <color name="colorfulPuzzlePink3">#AF77A5</color>
+    <color name="settingsBrown1">#C8857D</color>
+    <color name="settingsBrown2">#A45046</color>
+    <color name="settingsBrown3">#733731</color>
+    <color name="menuBackground">#FCFBE3</color>
+    <color name="lotteryBackground">#EDEDED</color>
+    <color name="gameSettingsBackground">#BB000000</color>
+    <color name="gameSettingsWindowGradientTo">#C6C5AB</color>
+    <color name="gameSettingsWindowBackground">#9B9A81</color>
+    <color name="puzzleSelectionBackground">#FCE6E3</color>
+    <color name="gameBackground">#E3FCFC</color>
+</resources>
