@@ -1,0 +1,7 @@
+privatekey (alias blackout-key) was created from blackout-keystore.jks
+upload_certificate.pem (alias blackout-certificate) was created from blackout-certificate.jks
+
+how to upload a new version?
+(1) - pass: ******11
+(2) - use blackout-certificate.jks with alias: blackout-certificate (same pass as above)
+(3) - select both signature options (small boxes)
