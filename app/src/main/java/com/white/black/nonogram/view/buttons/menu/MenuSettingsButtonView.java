@@ -6,14 +6,14 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-import com.white.black.nonogram.view.buttons.LabeledPicButtonView;
+import com.white.black.nonogram.view.buttons.PicButtonView;
 import com.white.black.nonogram.view.listeners.MenuOptionsViewListener;
 import com.white.black.nonogram.view.listeners.ViewListener;
 
-public class MenuSettingsButtonView extends LabeledPicButtonView {
+public class MenuSettingsButtonView extends PicButtonView {
 
-    public MenuSettingsButtonView(ViewListener viewListener, RectF bounds, String description, int color1, int color2, int color3, Bitmap[] innerImages, Context context, Paint paint) {
-        super(viewListener, bounds, description, color1, color2, color3, innerImages, new RectF(
+    public MenuSettingsButtonView(ViewListener viewListener, RectF bounds, int color1, int color2, int color3, Bitmap[] innerImages, Context context, Paint paint) {
+        super(viewListener, bounds, color1, color2, color3, innerImages, new RectF(
                 bounds.left + bounds.width() * 1 / 10,
                 bounds.top + bounds.height() * 1 / 10,
                 bounds.right - bounds.width() * 1 / 10,

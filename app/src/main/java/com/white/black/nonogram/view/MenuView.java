@@ -35,7 +35,7 @@ import com.white.black.nonogram.view.listeners.ViewListener;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
+public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
 
     private volatile boolean initDone;
 
@@ -72,7 +72,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
 
     public MenuView(Context context) {
         super(context);
-        menuViewListener = (MenuViewListener)context;
+        menuViewListener = (MenuViewListener) context;
         getHolder().addCallback(this);
         setFocusable(true);
     }
@@ -89,7 +89,8 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
                 if (canvas != null) {
                     try {
                         getHolder().unlockCanvasAndPost(canvas);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }
@@ -126,7 +127,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
             tempCanvas.drawBitmap(pencil, null, pencilBounds, paint);
             paint.setAlpha(30);
             int foodItemDrawnCounter = 0;
-            for(int x = 0; x < ApplicationSettings.INSTANCE.getScreenWidth(); x += 150) {
+            for (int x = 0; x < ApplicationSettings.INSTANCE.getScreenWidth(); x += 150) {
                 for (int y = 0; y < ApplicationSettings.INSTANCE.getScreenHeight(); y += 150) {
                     tempCanvas.drawBitmap(food.get((foodItemDrawnCounter++) % food.size()), x, y, paint);
                 }
@@ -170,7 +171,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
             canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
 
             canvas.save();
-            canvas.rotate((System.currentTimeMillis() / 10) % 360 , loadingGearBigBounds.centerX(), loadingGearBigBounds.centerY());
+            canvas.rotate((System.currentTimeMillis() / 10) % 360, loadingGearBigBounds.centerX(), loadingGearBigBounds.centerY());
             canvas.drawBitmap(loadingGear, null, loadingGearBigBounds, null);
             canvas.restore();
 
@@ -213,7 +214,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
         if (Puzzles.isFirstLoadingDone() && initDone) {
             menuViewListener.onViewTouched(event);
             if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED) && YesNoQuestion.INSTANCE.getAppearance().equals(Appearance.MINIMIZED) && !isShowVipPopup()) {
-                for(PicButtonView picButtonView : picButtonViews) {
+                for (PicButtonView picButtonView : picButtonViews) {
                     if (picButtonView.wasPressed()) {
                         TouchMonitor.INSTANCE.setTouchUp(false);
                         picButtonView.onButtonPressed();
@@ -269,13 +270,13 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
                 ApplicationSettings.INSTANCE.getScreenHeight() / 2 - ApplicationSettings.INSTANCE.getScreenWidth() * 32 / 100,
                 ApplicationSettings.INSTANCE.getScreenWidth() * 80 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() / 2 - ApplicationSettings.INSTANCE.getScreenWidth() * 8 / 100);
-        sun =  BitmapLoader.INSTANCE.getImage(context, R.drawable.sun_black_white_512);
+        sun = BitmapLoader.INSTANCE.getImage(context, R.drawable.sun_black_white_512);
         sunBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenWidth() / 12,
                 ApplicationSettings.INSTANCE.getScreenHeight() / 10,
                 ApplicationSettings.INSTANCE.getScreenWidth() * 6 / 12,
                 ApplicationSettings.INSTANCE.getScreenHeight() / 10 + ApplicationSettings.INSTANCE.getScreenWidth() * 5 / 12);
-        pencil =  BitmapLoader.INSTANCE.getImage(context, R.drawable.pencil_color_512);
+        pencil = BitmapLoader.INSTANCE.getImage(context, R.drawable.pencil_color_512);
         pencilBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenWidth() * 27 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() / 11,
@@ -302,15 +303,22 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
             picButtonViews.add(lotteryButtonView);
         }*/
 
-        LeaderboardButtonView leaderboardButtonView = new LeaderboardButtonView(
-                menuViewListener, context.getString(R.string.leaderboard),
+        MenuSettingsButtonView settingsButtonView = new MenuSettingsButtonView(
+                menuViewListener,
                 new RectF(
                         ApplicationSettings.INSTANCE.getScreenWidth() - lineLeft - (buttonEdgeLength * 2 / 3),
                         lineLeft + lineLeft / 2 + (buttonEdgeLength * 2 / 3),
                         ApplicationSettings.INSTANCE.getScreenWidth() - lineLeft,
                         lineLeft + (buttonEdgeLength * 2 / 3) + lineLeft / 2 + (buttonEdgeLength * 2 / 3)
-                ), Color.LTGRAY, Color.DKGRAY, Color.BLACK, new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.leaderboards_100)}, context, paint);
-        picButtonViews.add(leaderboardButtonView);
+                ),
+                Color.LTGRAY,
+                Color.DKGRAY,
+                Color.BLACK,
+                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.settings_512)},
+                context,
+                paint);
+
+        picButtonViews.add(settingsButtonView);
 
         RectF promoteVipButtonBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenWidth() - lineLeft - (buttonEdgeLength * 2 / 3) * 94 / 70,
@@ -320,9 +328,9 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
         );
 
         picButtonViews.add(new PromoteVipButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 promoteVipButtonBounds,
-                Color.LTGRAY, Color.DKGRAY, Color.BLACK, new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.vip_100)}, context, paint));
+                Color.LTGRAY, Color.DKGRAY, Color.BLACK, new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.vip_100)}, context, paint));
 
         /*picButtonViews.add(new PrivacyPolicyButtonView(
                 menuViewListener,
@@ -338,61 +346,70 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback{
         picButtonViews.add(new SmallPuzzleButtonView(
                 menuViewListener,
                 new RectF(
-                lineLeft,
-                lineTop,
-                lineLeft + buttonEdgeLength,
-                lineTop + buttonEdgeLength
-        ), context.getString(R.string.small_puzzle_description), ContextCompat.getColor(context, R.color.smallPuzzleGreen1), ContextCompat.getColor(context, R.color.smallPuzzleGreen2), ContextCompat.getColor(context, R.color.smallPuzzleGreen3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_green_512)}, context, paint));
+                        lineLeft,
+                        lineTop,
+                        lineLeft + buttonEdgeLength,
+                        lineTop + buttonEdgeLength
+                ), context.getString(R.string.small_puzzle_description), ContextCompat.getColor(context, R.color.smallPuzzleGreen1), ContextCompat.getColor(context, R.color.smallPuzzleGreen2), ContextCompat.getColor(context, R.color.smallPuzzleGreen3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_green_512)}, context, paint));
         picButtonViews.add(new NormalPuzzleButtonView(
                 menuViewListener,
                 new RectF(
-                lineLeft + (buttonEdgeLength + horizontalGap),
-                lineTop,
-                lineLeft + (buttonEdgeLength + horizontalGap) + buttonEdgeLength,
-                lineTop + buttonEdgeLength
-        ), context.getString(R.string.normal_puzzle_description), ContextCompat.getColor(context, R.color.normalPuzzleOrange1), ContextCompat.getColor(context, R.color.normalPuzzleOrange2), ContextCompat.getColor(context, R.color.normalPuzzleOrange3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_yellow_512)}, context, paint));
+                        lineLeft + (buttonEdgeLength + horizontalGap),
+                        lineTop,
+                        lineLeft + (buttonEdgeLength + horizontalGap) + buttonEdgeLength,
+                        lineTop + buttonEdgeLength
+                ), context.getString(R.string.normal_puzzle_description), ContextCompat.getColor(context, R.color.normalPuzzleOrange1), ContextCompat.getColor(context, R.color.normalPuzzleOrange2), ContextCompat.getColor(context, R.color.normalPuzzleOrange3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_yellow_512)}, context, paint));
         picButtonViews.add(new LargePuzzleButtonView(
                 menuViewListener,
                 new RectF(
-                lineLeft + (buttonEdgeLength + horizontalGap) * 2,
-                lineTop,
-                lineLeft + (buttonEdgeLength + horizontalGap) * 2 + buttonEdgeLength,
-                lineTop + buttonEdgeLength
-        ), context.getString(R.string.large_puzzle_description), ContextCompat.getColor(context, R.color.largePuzzleRed1), ContextCompat.getColor(context, R.color.largePuzzleRed2), ContextCompat.getColor(context, R.color.largePuzzleRed3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_red_512)}, context, paint));
+                        lineLeft + (buttonEdgeLength + horizontalGap) * 2,
+                        lineTop,
+                        lineLeft + (buttonEdgeLength + horizontalGap) * 2 + buttonEdgeLength,
+                        lineTop + buttonEdgeLength
+                ), context.getString(R.string.large_puzzle_description), ContextCompat.getColor(context, R.color.largePuzzleRed1), ContextCompat.getColor(context, R.color.largePuzzleRed2), ContextCompat.getColor(context, R.color.largePuzzleRed3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_red_512)}, context, paint));
         picButtonViews.add(new ComplexPuzzleButtonView(
                 menuViewListener,
                 new RectF(
-                lineLeft,
-                lineTop + (buttonEdgeLength + verticalGap),
-                lineLeft + buttonEdgeLength,
-                lineTop + (buttonEdgeLength + verticalGap) + buttonEdgeLength
-        ), context.getString(R.string.complex_puzzle_description), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue1), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue2), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_dark_512)}, context, paint));
+                        lineLeft,
+                        lineTop + (buttonEdgeLength + verticalGap),
+                        lineLeft + buttonEdgeLength,
+                        lineTop + (buttonEdgeLength + verticalGap) + buttonEdgeLength
+                ), context.getString(R.string.complex_puzzle_description), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue1), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue2), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_dark_512)}, context, paint));
         picButtonViews.add(new ColorfulPuzzleButtonView(
                 menuViewListener,
                 new RectF(
-                lineLeft + (buttonEdgeLength + horizontalGap),
-                lineTop + (buttonEdgeLength + verticalGap),
-                lineLeft + (buttonEdgeLength + horizontalGap) + buttonEdgeLength,
-                lineTop + (buttonEdgeLength + verticalGap) + buttonEdgeLength
-        ), context.getString(R.string.colorful_puzzle_description), ContextCompat.getColor(context, R.color.colorfulPuzzlePink1), ContextCompat.getColor(context, R.color.colorfulPuzzlePink2), ContextCompat.getColor(context, R.color.colorfulPuzzlePink3), new Bitmap[] {
+                        lineLeft + (buttonEdgeLength + horizontalGap),
+                        lineTop + (buttonEdgeLength + verticalGap),
+                        lineLeft + (buttonEdgeLength + horizontalGap) + buttonEdgeLength,
+                        lineTop + (buttonEdgeLength + verticalGap) + buttonEdgeLength
+                ), context.getString(R.string.colorful_puzzle_description), ContextCompat.getColor(context, R.color.colorfulPuzzlePink1), ContextCompat.getColor(context, R.color.colorfulPuzzlePink2), ContextCompat.getColor(context, R.color.colorfulPuzzlePink3), new Bitmap[]{
                 BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_red_512),
                 BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_blue_512),
                 BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_yellow_512),
                 BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_green_512)
         }, context, paint));
-        picButtonViews.add(new MenuSettingsButtonView(
-                menuViewListener,
-                new RectF(
-                lineLeft + (buttonEdgeLength + horizontalGap) * 2,
-                lineTop + (buttonEdgeLength + verticalGap),
-                lineLeft + (buttonEdgeLength + horizontalGap) * 2 + buttonEdgeLength,
-                lineTop + (buttonEdgeLength + verticalGap) + buttonEdgeLength
-        ), context.getString(R.string.settings_description), ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.settings_512)}, context, paint));
+        picButtonViews.add(
+                new LeaderboardButtonView(
+                        menuViewListener,
+                        new RectF(
+                                lineLeft + (buttonEdgeLength + horizontalGap) * 2,
+                                lineTop + (buttonEdgeLength + verticalGap),
+                                lineLeft + (buttonEdgeLength + horizontalGap) * 2 + buttonEdgeLength,
+                                lineTop + (buttonEdgeLength + verticalGap) + buttonEdgeLength
+                        ),
+                        ContextCompat.getColor(context, R.color.settingsBrown1),
+                        ContextCompat.getColor(context, R.color.settingsBrown2),
+                        ContextCompat.getColor(context, R.color.settingsBrown3),
+                        new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.leaderboards_100)},
+                        context,
+                        paint
+                )
+        );
 
         menuOptionsView = new MenuOptionsView();
         menuOptionsView.init(context, paint);
 
-        this.vipPopup = new VipPopup((Context)menuViewListener, paint, new Runnable() {
+        this.vipPopup = new VipPopup((Context) menuViewListener, paint, new Runnable() {
             @Override
             public void run() {
                 menuViewListener.onPurchaseVipPressed();
