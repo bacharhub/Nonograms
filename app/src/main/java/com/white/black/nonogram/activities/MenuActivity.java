@@ -406,7 +406,7 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
                     ).addOnSuccessListener(scoreAnnotatedData -> {
                         LeaderboardScore score = scoreAnnotatedData.get();
                         if (score != null) {
-                            String scoreAsString = score.getRawScore() + " (#" + score.getRank() + ")";
+                            String scoreAsString = "#" + score.getRank();
                             writeScoreToSharedPreferences(scoreAsString);
                         }
                     });
