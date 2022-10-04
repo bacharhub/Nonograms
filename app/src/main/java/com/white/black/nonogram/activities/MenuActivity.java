@@ -36,10 +36,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.LeaderboardsClient;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayersClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.games.leaderboard.LeaderboardScore;
+import com.google.android.gms.games.leaderboard.LeaderboardVariant;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.white.black.nonogram.AdManager;
@@ -121,12 +122,9 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
                 if (signedInAccount != null) {
                     PlayersClient playersClient = Games.getPlayersClient(MenuActivity.this, signedInAccount);
                     Task<Player> player = playersClient.getCurrentPlayer();
-                    player.addOnCompleteListener(new OnCompleteListener<Player>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Player> task) {
-                            updateLeaderboard();
-                            showLeaderboard();
-                        }
+                    player.addOnCompleteListener(task -> {
+                        updateLeaderboard();
+                        showLeaderboard();
                     });
                 }
             } else {
@@ -156,12 +154,7 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         if (googleSignInAccount != null) {
             Games.getLeaderboardsClient(this, googleSignInAccount)
                     .getLeaderboardIntent(getString(R.string.most_puzzles_solved))
-                    .addOnSuccessListener(new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            startActivityForResult(intent, RC_LEADERBOARD_UI);
-                        }
-                    });
+                    .addOnSuccessListener(intent -> startActivityForResult(intent, RC_LEADERBOARD_UI));
         }
     }
 
@@ -404,8 +397,19 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
     private void updateLeaderboard() {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(MenuActivity.this);
         if (googleSignInAccount != null) {
-            Games.getLeaderboardsClient(MenuActivity.this, googleSignInAccount)
-                    .submitScore(getString(R.string.most_puzzles_solved), numOfPuzzlesSolvedSoFar());
+            LeaderboardsClient client = Games.getLeaderboardsClient(MenuActivity.this, googleSignInAccount);
+            client.submitScore(getString(R.string.most_puzzles_solved), numOfPuzzlesSolvedSoFar());
+            client.loadCurrentPlayerLeaderboardScore(
+                    getString(R.string.most_puzzles_solved),
+                            LeaderboardVariant.TIME_SPAN_ALL_TIME,
+                            LeaderboardVariant.COLLECTION_PUBLIC
+                    ).addOnSuccessListener(scoreAnnotatedData -> {
+                        LeaderboardScore score = scoreAnnotatedData.get();
+                        if (score != null) {
+                            String scoreAsString = score.getRawScore() + " (#" + score.getRank() + ")";
+                            writeScoreToSharedPreferences(scoreAsString);
+                        }
+                    });
         }
     }
 
@@ -413,6 +417,14 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MenuActivity.this);
         int numOfPuzzlesSolved = sharedPreferences.getInt(MenuActivity.this.getString(R.string.most_puzzles_solved), /*-1*/ 0);
         return numOfPuzzlesSolved;
+    }
+
+    private void writeScoreToSharedPreferences(String scoreAsString) {
+        try {
+            SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(MenuActivity.this).edit();
+            prefsEditor.putString(MenuActivity.this.getString(R.string.leaderboards_score), scoreAsString);
+            prefsEditor.apply();
+        } catch (Exception ignored) { }
     }
 
     @Override

@@ -22,20 +22,20 @@ public class PicButtonView extends ButtonView {
     RectF pressedBounds;
     protected RectF pressedInnerBackgroundBounds;
 
-    LinearGradient gradient;
-    RectF backgroundBounds;
+    protected LinearGradient gradient;
+    protected RectF backgroundBounds;
     protected RectF innerBackgroundBounds;
 
     protected final RectF innerImageBounds;
     protected RectF pressedInnerImageBounds;
 
-    float padding;
+    protected float padding;
     protected int curve;
-    int innerBackgroundColor;
+    protected int innerBackgroundColor;
     protected int backgroundColor;
-    int textHeight;
+    protected int textHeight;
 
-    float labeledPicFontSizeFactor;
+    protected float labeledPicFontSizeFactor;
 
     public RectF getBackgroundBounds() {
         return backgroundBounds;

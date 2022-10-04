@@ -1,11 +1,13 @@
 package com.white.black.nonogram.view;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -20,6 +22,7 @@ import com.white.black.nonogram.MemoryManager;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
+import com.white.black.nonogram.activities.MenuActivity;
 import com.white.black.nonogram.view.buttons.menu.ColorfulPuzzleButtonView;
 import com.white.black.nonogram.view.buttons.menu.ComplexPuzzleButtonView;
 import com.white.black.nonogram.view.buttons.menu.LargePuzzleButtonView;
@@ -34,6 +37,7 @@ import com.white.black.nonogram.view.listeners.ViewListener;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -388,38 +392,38 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
                 BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_yellow_512),
                 BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_green_512)
         }, context, paint));
-        picButtonViews.add(
-                new LeaderboardButtonView(
-                        menuViewListener,
-                        new RectF(
-                                lineLeft + (buttonEdgeLength + horizontalGap) * 2,
-                                lineTop + (buttonEdgeLength + verticalGap),
-                                lineLeft + (buttonEdgeLength + horizontalGap) * 2 + buttonEdgeLength,
-                                lineTop + (buttonEdgeLength + verticalGap) + buttonEdgeLength
-                        ),
-                        ContextCompat.getColor(context, R.color.settingsBrown1),
-                        ContextCompat.getColor(context, R.color.settingsBrown2),
-                        ContextCompat.getColor(context, R.color.settingsBrown3),
-                        new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.leaderboards_100)},
-                        context,
-                        paint
-                )
+
+        Supplier<String> leaderboardDescription = () -> {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String leaderboardScore = sharedPreferences.getString(context.getString(R.string.leaderboards_score), "#1");
+            return leaderboardScore;
+        };
+
+        LeaderboardButtonView leaderboardButtonView = new LeaderboardButtonView(
+                menuViewListener,
+                leaderboardDescription,
+                new RectF(
+                        lineLeft + (buttonEdgeLength + horizontalGap) * 2,
+                        lineTop + (buttonEdgeLength + verticalGap),
+                        lineLeft + (buttonEdgeLength + horizontalGap) * 2 + buttonEdgeLength,
+                        lineTop + (buttonEdgeLength + verticalGap) + buttonEdgeLength
+                ),
+                ContextCompat.getColor(context, R.color.settingsBrown1),
+                ContextCompat.getColor(context, R.color.settingsBrown2),
+                ContextCompat.getColor(context, R.color.settingsBrown3),
+                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.leaderboards_100)},
+                context,
+                paint
         );
+
+        picButtonViews.add(leaderboardButtonView);
 
         menuOptionsView = new MenuOptionsView();
         menuOptionsView.init(context, paint);
 
-        this.vipPopup = new VipPopup((Context) menuViewListener, paint, new Runnable() {
-            @Override
-            public void run() {
-                menuViewListener.onPurchaseVipPressed();
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                setShowVipPopup(false);
-                render();
-            }
+        this.vipPopup = new VipPopup((Context) menuViewListener, paint, menuViewListener::onPurchaseVipPressed, () -> {
+            setShowVipPopup(false);
+            render();
         });
 
         this.initDone = true;
