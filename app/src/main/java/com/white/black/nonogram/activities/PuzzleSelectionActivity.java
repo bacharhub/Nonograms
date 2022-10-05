@@ -44,6 +44,7 @@ import com.white.black.nonogram.R;
 import com.white.black.nonogram.RewardedInstanceHandler;
 import com.white.black.nonogram.SubPuzzle;
 import com.white.black.nonogram.TouchMonitor;
+import com.white.black.nonogram.utils.VipPromotionUtils;
 import com.white.black.nonogram.view.YesNoQuestion;
 import com.white.black.nonogram.view.Appearance;
 import com.white.black.nonogram.view.PaintManager;
@@ -57,7 +58,7 @@ import com.white.black.nonogram.view.listeners.VipPromoter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PuzzleSelectionActivity extends Activity implements PuzzleSelectionViewListener, MenuOptionsViewListener, Renderable, VipPromoter, PurchasesUpdatedListener {
+public class PuzzleSelectionActivity extends Activity implements PuzzleSelectionViewListener, MenuOptionsViewListener, Renderable, VipPromoter {
 
     private void onRewarded() {
         puzzleCategorySelectionView.refreshPuzzleSelectionButtonView(PuzzleSelectionView.INSTANCE.getPuzzleReference());
@@ -68,19 +69,14 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
     private void onRewardedVideoAdClosed() {
         puzzleCategorySelectionView.setShowPopupFalse();
         puzzleCategorySelectionView.initPopup(PuzzleSelectionActivity.this);
-        puzzleCategorySelectionView.render();
         rewardedInstanceHandler.setRewardedVideoAd(null);
+        puzzleCategorySelectionView.render();
     }
 
     private final OnUserEarnedRewardListener userEarnedRewardListener = rewardItem -> onRewarded();
 
     private final FullScreenContentCallback fullScreenContentCallback =
             new FullScreenContentCallback() {
-                @Override
-                public void onAdShowedFullScreenContent() {
-                    // Code to be invoked when the ad showed full screen content.
-                }
-
                 @Override
                 public void onAdDismissedFullScreenContent() {
                     // Code to be invoked when the ad dismissed full screen content.
@@ -120,10 +116,6 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
     private PuzzleCategorySelectionView puzzleCategorySelectionView;
 
     private RewardedInstanceHandler rewardedInstanceHandler;
-
-    private SkuDetails removeAdsDetails;
-    // create new Person
-    private BillingClient mBillingClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -493,136 +485,49 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
             puzzleCategorySelectionView.setShowVipPopup(true);
             puzzleCategorySelectionView.render();
         } else {
-            onPromoteVipPressed();
+            puzzleCategorySelectionView.getVipPopup().setPrice("Loading..");
+            puzzleCategorySelectionView.setShowVipPopup(true);
+            puzzleCategorySelectionView.render();
+            onPromoteVipPressed(PuzzleSelectionActivity.this);
         }
     }
 
-    @Override
-    public void onPromoteVipPressed() {
-        puzzleCategorySelectionView.getVipPopup().setPrice("Loading..");
-        puzzleCategorySelectionView.setShowVipPopup(true);
+    private void onBillingSetupFailed(Context context) {
+        puzzleCategorySelectionView.setShowVipPopup(false);
         puzzleCategorySelectionView.render();
-        mBillingClient = BillingClient.newBuilder(PuzzleSelectionActivity.this).enablePendingPurchases().setListener(this).build();
-        mBillingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                int billingResponseCode = billingResult.getResponseCode();
-                if (billingResponseCode == BillingClient.BillingResponseCode.OK) {
-                    // The billing client is ready. You can query purchases here.
-                    queryRemoveAdsSkuDetails();
-                }  else {
-                    puzzleCategorySelectionView.setShowVipPopup(false);
-                    puzzleCategorySelectionView.render();
-                    Handler mainHandler = new Handler(PuzzleSelectionActivity.this.getMainLooper());
-                    mainHandler.post(
-                            () -> new AlertDialog.Builder(PuzzleSelectionActivity.this).setMessage(R.string.no_internet_connection)
-                                    .setNeutralButton(android.R.string.ok, null).show()
-                    );
-                }
-            }
-            @Override
-            public void onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to
-                // Google Play by calling the startConnection() method.
-                if (!isFinishing() && !isDestroyed()) {
-                    new AlertDialog.Builder(PuzzleSelectionActivity.this).setMessage(R.string.no_internet_connection)
-                            .setNeutralButton(android.R.string.ok, null).show();
-                }
-            }
-        });
-    }
-
-    private void queryRemoveAdsSkuDetails() {
-        List<String> skuList = new ArrayList<>();
-        skuList.add("remove_ads");
-        SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-        params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
-        mBillingClient.querySkuDetailsAsync(params.build(),
-                new SkuDetailsResponseListener() {
-                    @Override
-                    public void onSkuDetailsResponse(@NonNull BillingResult billingResult, List<SkuDetails> skuDetailsList) {
-                        int responseCode = billingResult.getResponseCode();
-                        if (responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList != null) {
-                            for (SkuDetails skuDetails : skuDetailsList) {
-                                String sku = skuDetails.getSku();
-                                String price = skuDetails.getPrice();
-                                if ("remove_ads".equals(sku)) {
-                                    removeAdsDetails = skuDetails; //purchaseRemoveAds(skuDetails);
-                                    puzzleCategorySelectionView.getVipPopup().setPrice(price);
-                                    puzzleCategorySelectionView.setShowVipPopup(true);
-                                    puzzleCategorySelectionView.render();
-                                }
-                            }
-                        } else if (responseCode == BillingClient.BillingResponseCode.BILLING_UNAVAILABLE ||
-                                responseCode == BillingClient.BillingResponseCode.ERROR ||
-                                responseCode == BillingClient.BillingResponseCode.SERVICE_DISCONNECTED ||
-                                responseCode == BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE) {
-                            if (!isFinishing()) {
-                                new AlertDialog.Builder(PuzzleSelectionActivity.this).setMessage(R.string.no_internet_connection)
-                                        .setNeutralButton(android.R.string.ok, null).show();
-                            }
-
-                            Bundle bundle = new Bundle();
-                            bundle.putString(GameMonitoring.VIP, GameMonitoring.REMOVE_ADS_NO_INTERNET_CONNECTION);
-                            mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
-                        }
-                        // Process the result.
-                    }
-                }
+        Handler mainHandler = new Handler(context.getMainLooper());
+        mainHandler.post(
+                () -> new AlertDialog.Builder(context).setMessage(R.string.no_internet_connection)
+                        .setNeutralButton(android.R.string.ok, null).show()
         );
     }
 
+    @Override
+    public void onPromoteVipPressed(Context context) {
+        VipPromotionUtils.INSTANCE.onPromoteVipPressed(
+                context,
+                () -> onBillingSetupFailed(PuzzleSelectionActivity.this),
+                this::onRemoveAdsPurchaseFound,
+                () -> {
+                    puzzleCategorySelectionView.setShowVipPopup(false);
+                    puzzleCategorySelectionView.setShowPopupFalse();
+                    puzzleCategorySelectionView.clearAllBitmaps();
+                    puzzleCategorySelectionView.render();
+                },
+                this::itemAlreadyOwned,
+                () -> puzzleCategorySelectionView.getVipPopup().getPopup().setAnswered(AdManager.isRemoveAds()),
+                mFirebaseAnalytics
+        );
+    }
+
+    private void onRemoveAdsPurchaseFound(String price) {
+        puzzleCategorySelectionView.getVipPopup().setPrice(price);
+        puzzleCategorySelectionView.setShowVipPopup(true);
+        puzzleCategorySelectionView.render();
+    }
+
     public void onPurchaseVipPressed() {
-        if (removeAdsDetails != null) {
-            BillingFlowParams flowParams = BillingFlowParams.newBuilder()
-                    .setSkuDetails(removeAdsDetails)
-                    .build();
-            BillingResult billingResult = mBillingClient.launchBillingFlow(PuzzleSelectionActivity.this, flowParams);
-            int responseCode = billingResult.getResponseCode();
-            if (responseCode != BillingClient.BillingResponseCode.OK && !isFinishing()) {
-                new AlertDialog.Builder(PuzzleSelectionActivity.this).setMessage(R.string.no_internet_connection)
-                        .setNeutralButton(android.R.string.ok, null).show();
-            }
-        }
-    }
-
-    @Override
-    public void onPurchasesUpdated(@NonNull BillingResult billingResult, List<Purchase> purchases) {
-        int responseCode = billingResult.getResponseCode();
-        if (responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-            AdManager.setRemoveAdsTrue(PuzzleSelectionActivity.this.getApplicationContext());
-            puzzleCategorySelectionView.setShowVipPopup(false);
-            puzzleCategorySelectionView.setShowPopupFalse();
-            puzzleCategorySelectionView.clearAllBitmaps();
-            puzzleCategorySelectionView.render();
-            Bundle bundle = new Bundle();
-            bundle.putString(GameMonitoring.VIP, GameMonitoring.REMOVE_ADS_PURCHASED);
-            mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
-        } else if (responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-            // Handle an error caused by a user cancelling the purchase flow.
-            Bundle bundle = new Bundle();
-            bundle.putString(GameMonitoring.VIP, GameMonitoring.REMOVE_ADS_CANCELED);
-            mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
-        } else if (responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-            itemAlreadyOwned();
-        } else {
-            // Handle any other error codes.
-            if (!isFinishing()) {
-                new AlertDialog.Builder(this).setMessage(R.string.no_internet_connection)
-                        .setNeutralButton(android.R.string.ok, null).show();
-            }
-
-            Bundle bundle = new Bundle();
-            bundle.putString(GameMonitoring.VIP, GameMonitoring.REMOVE_ADS_NO_INTERNET_CONNECTION);
-            mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
-        }
-
-        puzzleCategorySelectionView.getVipPopup().getPopup().setAnswered(AdManager.isRemoveAds());
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-        super.onPointerCaptureChanged(hasCapture);
+        VipPromotionUtils.INSTANCE.onPurchaseVipPressed(PuzzleSelectionActivity.this);
     }
 
     private void itemAlreadyOwned() {

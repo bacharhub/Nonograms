@@ -6,14 +6,18 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.ads.LoadAdError;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.white.black.nonogram.AdManager;
 import com.white.black.nonogram.ApplicationSettings;
 import com.white.black.nonogram.BitmapLoader;
+import com.white.black.nonogram.GameMonitoring;
 import com.white.black.nonogram.GameSettings;
 import com.white.black.nonogram.GameState;
 import com.white.black.nonogram.MemoryManager;
@@ -23,6 +27,7 @@ import com.white.black.nonogram.PuzzleReference;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
+import com.white.black.nonogram.activities.PuzzleSelectionActivity;
 import com.white.black.nonogram.view.buttons.CloseWindowButtonView;
 import com.white.black.nonogram.view.buttons.PicButtonView;
 import com.white.black.nonogram.view.buttons.PuzzleSelectionButtonView;
@@ -65,140 +70,40 @@ public class PuzzleCategorySelectionView extends ScrollableView {
     private Bitmap newPuzzleIcon;
     private Bitmap background;
 
-    private ExecutorService pool = Executors.newFixedThreadPool(4);
-
-    //vip
-
-    private VipPopup vipPopup;
-    private boolean showVipPopup;
+    private final ExecutorService pool = Executors.newFixedThreadPool(4);
 
     public VipPopup getVipPopup() {
-        return vipPopup;
+        return popup.getVipPopup();
     }
 
     public boolean isShowVipPopup() {
-        return showVipPopup;
+        return popup.isShowingVipPopup();
     }
 
     public void setShowVipPopup(boolean showVipPopup) {
-        this.showVipPopup = showVipPopup;
+        popup.setShowVipPopup(showVipPopup);
     }
 
-    // watch video to unlock a puzzle question
-    private int darkBackgroundColor;
-    private Popup popup;
-    private RectF popupBounds;
-    private boolean showPopup;
+    private WatchAdPopup popup;
 
     public void setShowPopupFalse() {
-        this.showPopup = false;
+        this.popup.setShowPopup(false);
     }
 
     public boolean isShowPopup() {
-        return showPopup;
+        return popup.isShowingPopup();
     }
-
-    private CloseWindowButtonView closeWindowButtonView;
-    private PromoteVipButtonView promoteVipButtonView;
 
     public void clearPool() {
         pool.shutdown();
     }
 
     public void initPopup(Context context) {
-        popup.setMessage(context.getString(R.string.freePuzzle));
-        popup.setTopLeftImage(BitmapLoader.INSTANCE.getImage(context, R.drawable.gift_100));
-        popup.setAnswered(false);
-
-        setShowVipPopup(false);
+        popup.initPopup(context);
     }
 
     public Popup getPopup() {
-        return popup;
-    }
-
-    private void setUpPopup(Context context, Paint paint) {
-        popupBounds = new RectF(
-                ApplicationSettings.INSTANCE.getScreenWidth() * 16 / 100,
-                ApplicationSettings.INSTANCE.getScreenHeight() * 41 / 100,
-                ApplicationSettings.INSTANCE.getScreenWidth() * 84 / 100,
-                ApplicationSettings.INSTANCE.getScreenHeight() * 59 / 100
-        );
-
-        String message = context.getString(R.string.freePuzzle);
-
-        RectF yesButtonBounds = new RectF(
-                popupBounds.centerX() - popupBounds.width() / 3,
-                popupBounds.bottom - popupBounds.height() * 4 / 10,
-                popupBounds.centerX() + popupBounds.width() / 3,
-                popupBounds.bottom - popupBounds.height() / 8
-        );
-
-        YesNoButtonView yesButtonView = new YesNoButtonView(
-                (ViewListener) context,
-                context.getString(R.string.watchAd),
-                yesButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1),
-                ContextCompat.getColor(context, R.color.settingsBrown2),
-                ContextCompat.getColor(context, R.color.settingsBrown3),
-                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.play_512)},
-                context,
-                paint);
-
-        Runnable onNoAnswer = () -> {
-            setShowPopupFalse();
-            initPopup(context);
-            MyMediaPlayer.play("blop");
-            render();
-        };
-
-        Runnable onYesAnswer = () -> {
-            popup.setMessage(context.getString(R.string.loading));
-            popup.setTopLeftImage(BitmapLoader.INSTANCE.getImage(context, R.drawable.sand_watch_100));
-            puzzleSelectionViewListener.loadVideoAd();
-        };
-
-        this.popup = new Popup(
-                context,
-                popupBounds,
-                message,
-                onYesAnswer,
-                onNoAnswer,
-                yesButtonView,
-                null,
-                BitmapLoader.INSTANCE.getImage(context, R.drawable.gift_100)
-        );
-
-
-        float closeButtonEdgeLength = popupBounds.width() / 6;
-
-        int closeButton1 = ContextCompat.getColor(context, R.color.menuBackground);
-        int closeButton2 = ContextCompat.getColor(context, R.color.gameSettingsWindowGradientTo);
-        int closeButton3 = ContextCompat.getColor(context, R.color.gameSettingsWindowBackground);
-
-        RectF closeButtonBounds = new RectF(
-                popupBounds.right - closeButtonEdgeLength,
-                popupBounds.top - popupBounds.width() / 15 - closeButtonEdgeLength,
-                popupBounds.right,
-                popupBounds.top - popupBounds.width() / 15
-        );
-
-        closeWindowButtonView = new CloseWindowButtonView(
-                (ViewListener) context,
-                closeButtonBounds,
-                closeButton1, closeButton2, closeButton3, new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.close_window_100)}, context, paint);
-
-        RectF promoteVipButtonBounds = new RectF(
-                closeButtonBounds.left - popupBounds.width() / 15 - closeButtonEdgeLength * 94 / 70,
-                closeButtonBounds.top,
-                closeButtonBounds.left - popupBounds.width() / 15,
-                closeButtonBounds.bottom
-        );
-
-        promoteVipButtonView = new PromoteVipButtonView(
-                (ViewListener) context,
-                promoteVipButtonBounds,
-                closeButton1, closeButton2, closeButton3, new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.vip_100)}, context, paint);
+        return popup.getPopup();
     }
 
     /* used for calculating scrolled items */
@@ -343,18 +248,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                 PuzzleSelectionView.INSTANCE.draw(canvas, paint);
             }
 
-            if (showPopup) {
-                paint.setColor(darkBackgroundColor);
-                canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
-                popup.draw(canvas, paint);
-
-                closeWindowButtonView.draw(canvas, paint);
-                promoteVipButtonView.draw(canvas, paint);
-
-                if (showVipPopup) {
-                    vipPopup.draw(canvas, paint);
-                }
-            }
+            popup.draw(canvas, paint);
         }
     }
 
@@ -545,7 +439,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
             puzzleSelectionViewListener.onViewTouched(event);
             if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED)) {
                 if (PuzzleSelectionView.INSTANCE.getAppearance().equals(Appearance.MINIMIZED)) {
-                    if (!showPopup /* watch video ad */) {
+                    if (!popup.isShowingPopup()) {
                         if (returnButtonView.wasPressed()) {
                             TouchMonitor.INSTANCE.setTouchUp(false);
                             returnButtonView.onButtonPressed();
@@ -566,7 +460,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
 
                                     PuzzleSelectionView.INSTANCE.init((Context) puzzleSelectionViewListener, ((PuzzleSelectionButtonView) puzzleSelectionButtonView).getPuzzleReference(), puzzleSelectionViewListener, PaintManager.INSTANCE.createPaint());
                                     if (puzzleClass != null && puzzleClass.equals(Puzzle.PuzzleClass.VIP) && !AdManager.isRemoveAds()) {
-                                        showPopup = true;
+                                        popup.setShowPopup(true);
                                     } else {
                                         PuzzleSelectionView.INSTANCE.setAppearance(Appearance.MAXIMIZED);
                                     }
@@ -576,26 +470,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                             }
                         }
                     } else {
-                        if (showVipPopup) {
-                            if (TouchMonitor.INSTANCE.touchUp()) {
-                                vipPopup.onTouchEvent();
-                            }
-                        } else if (showPopup) {
-                            if (!popupBounds.contains(TouchMonitor.INSTANCE.getUpCoordinates().x, TouchMonitor.INSTANCE.getUpCoordinates().y) &&
-                                    !popupBounds.contains(TouchMonitor.INSTANCE.getDownCoordinates().x, TouchMonitor.INSTANCE.getDownCoordinates().y)) {
-                                if (TouchMonitor.INSTANCE.touchUp()) {
-                                    if (promoteVipButtonView.wasPressed()) {
-                                        promoteVipButtonView.onButtonPressed();
-                                    } else {
-                                        popup.doOnNoAnswer();
-                                        popup.setAnswered(false);
-                                    }
-                                }
-                            } else {
-                                popup.onTouchEvent();
-                            }
-                        }
-
+                        popup.onTouchEvent();
                         TouchMonitor.INSTANCE.setTouchUp(false);
                     }
                 } else {
@@ -607,7 +482,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
 
             if (PuzzleSelectionView.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED) ||
                     GameSettings.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED) ||
-                    showPopup /* show video ad */) {
+                    popup.isShowingPopup()) {
                 render();
                 return true;
             }
@@ -618,11 +493,25 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         return true;
     }
 
+    private void onRewarded(Context context) {
+        refreshPuzzleSelectionButtonView(PuzzleSelectionView.INSTANCE.getPuzzleReference());
+        PuzzleSelectionView.INSTANCE.getPuzzleReference().getPuzzle(context.getApplicationContext()).setPuzzleClass(Puzzle.PuzzleClass.FREE);
+        PuzzleSelectionView.INSTANCE.getPuzzleReference().writeToSharedPreferences(context.getApplicationContext());
+    }
+
+    private void onAdFailedToLoad(LoadAdError loadAdError, Context context) {
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString(GameMonitoring.LOAD_VIDEO_AD_ERROR_CODE, loadAdError.toString());
+            FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+            mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
+        } catch (Exception ignored) { }
+    }
+
     public void init(Context context, Paint paint) {
         this.initDone = false;
         PuzzleSelectionView.INSTANCE.setAppearance(Appearance.MINIMIZED);
         backgroundColor = ContextCompat.getColor(context, R.color.puzzleSelectionBackground);
-        darkBackgroundColor = ContextCompat.getColor(context, R.color.gameSettingsBackground);
 
         socialNetworks = new LinkedList<>();
         socialNetworks.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.facebook_100));
@@ -718,16 +607,15 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         initializedPuzzleSelectionButtons.put(Puzzles.COMPLEX, new HashSet<>(Puzzles.getNumOfPuzzlesPerCategory()));
         initializedPuzzleSelectionButtons.put(Puzzles.COLORFUL, new HashSet<>(Puzzles.getNumOfPuzzlesPerCategory()));
 
-        setUpPopup(context, paint);
-
-        this.vipPopup = new VipPopup(
-                (Context) puzzleSelectionViewListener,
+        this.popup = new WatchAdPopup(
+                context,
                 paint,
-                puzzleSelectionViewListener::onPurchaseVipPressed,
-                () -> {
-                    setShowVipPopup(false);
-                    render();
-                }
+                context.getString(R.string.freePuzzle),
+                this::render,
+                () -> onRewarded(context),
+                (error) -> onAdFailedToLoad(error, context),
+                this::render
+
         );
 
         this.initDone = true;
