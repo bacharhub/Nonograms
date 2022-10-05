@@ -314,9 +314,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().finish();
                         ((GameMonitoringListener)gameViewListener).onFinishPuzzle();
                         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
-                            if (puzzleSolvedView.isShowingPopup()) {
+                            /*if (puzzleSolvedView.isShowingPopup()) {
                                 gameViewListener.removeAds();
-                            }
+                            }*/
                         } else {
                             gameViewListener.onNextPuzzleButtonPressed();
                         }

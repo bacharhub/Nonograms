@@ -42,7 +42,7 @@ import java.util.UUID;
 
 public class GameActivity extends Activity implements GameViewListener, GameOptionsViewListener, GameMonitoringListener, VipPromoter {
 
-    private AdView adView;
+    // private AdView adView;
     private FirebaseAnalytics mFirebaseAnalytics;
     private GameView gameView;
     private RelativeLayout ll;
@@ -59,7 +59,7 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
         }
 
         gameView = new GameView(this);
-        adView = new AdView(GameActivity.this.getApplicationContext());
+        // adView = new AdView(GameActivity.this.getApplicationContext());
 
         ll = new RelativeLayout(this);
         ll.setGravity(Gravity.CENTER_VERTICAL);
@@ -100,9 +100,9 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
 
     @Override
     public void onPause() {
-        if (adView != null) {
+        /*if (adView != null) {
             adView.pause();
-        }
+        }*/
 
         super.onPause();
     }
@@ -116,7 +116,7 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
     @Override
     public void onViewTouched(MotionEvent event) {
         if (MemoryManager.isNoMemory()) {
-            removeAds();
+            // removeAds();
             Puzzles.releasePuzzlesOfOtherCategories();
         }
 
@@ -182,12 +182,7 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                 bundle.putString(GameMonitoring.START_OVER, PuzzleSelectionView.INSTANCE.getOverallPuzzle().getName());
                 mFirebaseAnalytics.logEvent(GameMonitoring.GAME_EVENT, bundle);
             }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
-            }
-        });
+        }, () -> YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED));
     }
 
     @Override
@@ -297,7 +292,7 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
         MyMediaPlayer.play("victory");
     }
 
-    @Override
+   /* @Override
     public void removeAds() {
         if (adView != null) {
             ViewGroup viewGroup = ((ViewGroup)adView.getParent());
@@ -310,7 +305,7 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
             adView.destroy();
             adView = null;
         }
-    }
+    }*/
 
     @Override
     public void onLaunchMarketButtonPressed() {
@@ -338,9 +333,9 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
     @Override
     public void onResume() {
         super.onResume();
-        if (adView != null) {
+        /*if (adView != null) {
             adView.resume();
-        }
+        }*/
 
         GameState.setGameState(GameState.GAME);
         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().setLastTimeSolvingTimeIncreased(System.currentTimeMillis());
@@ -348,7 +343,7 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
 
     @Override
     public void onDestroy() {
-        removeAds();
+        // removeAds();
         super.onDestroy();
     }
 

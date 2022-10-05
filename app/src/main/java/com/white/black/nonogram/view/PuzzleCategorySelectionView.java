@@ -136,7 +136,12 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                 (ViewListener) context,
                 context.getString(R.string.watchAd),
                 yesButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.play_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1),
+                ContextCompat.getColor(context, R.color.settingsBrown2),
+                ContextCompat.getColor(context, R.color.settingsBrown3),
+                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.play_512)},
+                context,
+                paint);
 
         Runnable onNoAnswer = () -> {
             setShowPopupFalse();
