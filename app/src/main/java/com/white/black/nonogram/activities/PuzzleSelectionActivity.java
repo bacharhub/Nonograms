@@ -72,12 +72,7 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
         rewardedInstanceHandler.setRewardedVideoAd(null);
     }
 
-    private final OnUserEarnedRewardListener userEarnedRewardListener = new OnUserEarnedRewardListener() {
-        @Override
-        public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
-            onRewarded();
-        }
-    };
+    private final OnUserEarnedRewardListener userEarnedRewardListener = rewardItem -> onRewarded();
 
     private final FullScreenContentCallback fullScreenContentCallback =
             new FullScreenContentCallback() {
@@ -145,17 +140,14 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
         setContentView(puzzleCategorySelectionView);
         this.overridePendingTransition(R.anim.enter, 0);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                puzzleCategorySelectionView.init(PuzzleSelectionActivity.this, PaintManager.INSTANCE.createPaint());
-                try {
-                    // Obtain the FirebaseAnalytics instance.
-                    mFirebaseAnalytics = FirebaseAnalytics.getInstance(PuzzleSelectionActivity.this);
-                    rewardedInstanceHandler = new RewardedInstanceHandler();
-                } catch (Exception ignored) {
+        new Thread(() -> {
+            puzzleCategorySelectionView.init(PuzzleSelectionActivity.this, PaintManager.INSTANCE.createPaint());
+            try {
+                // Obtain the FirebaseAnalytics instance.
+                mFirebaseAnalytics = FirebaseAnalytics.getInstance(PuzzleSelectionActivity.this);
+                rewardedInstanceHandler = new RewardedInstanceHandler();
+            } catch (Exception ignored) {
 
-                }
             }
         }).start();
 
@@ -282,12 +274,9 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
 
                 puzzleCategorySelectionView.render();
             }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
-                puzzleCategorySelectionView.render();
-            }
+        }, () -> {
+            YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
+            puzzleCategorySelectionView.render();
         });
     }
 

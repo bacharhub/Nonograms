@@ -1,12 +1,14 @@
 package com.white.black.nonogram.view;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -54,6 +56,7 @@ import com.white.black.nonogram.view.listeners.ViewListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -90,7 +93,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public GameView(Context context) {
         super(context);
-        gameViewListener = (GameViewListener)context;
+        gameViewListener = (GameViewListener) context;
         getHolder().addCallback(this);
         setFocusable(true);
     }
@@ -107,7 +110,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 if (canvas != null) {
                     try {
                         getHolder().unlockCanvasAndPost(canvas);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }
@@ -124,7 +128,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             tempCanvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
             paint.setAlpha(30);
             int foodItemDrawnCounter = 0;
-            for(int x = 0; x < ApplicationSettings.INSTANCE.getScreenWidth(); x += 150) {
+            for (int x = 0; x < ApplicationSettings.INSTANCE.getScreenWidth(); x += 150) {
                 for (int y = 0; y < ApplicationSettings.INSTANCE.getScreenHeight(); y += 150) {
                     tempCanvas.drawBitmap(animals.get((foodItemDrawnCounter++) % animals.size()), x, y, paint);
                 }
@@ -174,9 +178,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         returnButtonView.draw(canvas, paint);
         puzzleSelectionSettingsButtonView.draw(canvas, paint);
-        ButtonState undoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isUndoable())? ButtonState.ENABLED : ButtonState.DISABLED;
+        ButtonState undoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isUndoable()) ? ButtonState.ENABLED : ButtonState.DISABLED;
         undoButtonView.draw(canvas, paint, undoButtonState);
-        ButtonState redoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isRedoable())? ButtonState.ENABLED : ButtonState.DISABLED;
+        ButtonState redoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isRedoable()) ? ButtonState.ENABLED : ButtonState.DISABLED;
         redoButtonView.draw(canvas, paint, redoButtonState);
         clueButtonView.draw(canvas, paint);
         canvas.drawBitmap(paintPalette, null, paintPaletteBounds, paint);
@@ -238,9 +242,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         render();
-        if (PuzzleSelectionView.INSTANCE.getSelectedPuzzle() != null && !PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isClueAvailable()) {
+        /*if (PuzzleSelectionView.INSTANCE.getSelectedPuzzle() != null && !PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isClueAvailable()) {
             new Thread(redrawWhileClueIsNotAvailable).start();
-        }
+        }*/
     }
 
     @Override
@@ -253,7 +257,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    private final Runnable redrawWhileClueIsNotAvailable = new Runnable() {
+    /*private final Runnable redrawWhileClueIsNotAvailable = new Runnable() {
         @Override
         public void run() {
             Puzzle puzzle = PuzzleSelectionView.INSTANCE.getSelectedPuzzle();
@@ -270,7 +274,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             render();
         }
-    };
+    };*/
 
     private void checkIfFaultyPuzzle() {
         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().getSubPuzzles().size() > 0) { // do not report complex puzzles
@@ -312,7 +316,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         checkIfFaultyPuzzle();
                         boardView.clear();
                         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().finish();
-                        ((GameMonitoringListener)gameViewListener).onFinishPuzzle();
+                        ((GameMonitoringListener) gameViewListener).onFinishPuzzle();
                         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
                             /*if (puzzleSolvedView.isShowingPopup()) {
                                 gameViewListener.removeAds();
@@ -345,26 +349,26 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         int pointerId = event.getPointerId(pointerIndex);
         int maskedAction = event.getActionMasked();
 
-        switch(maskedAction) {
+        switch (maskedAction) {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN: {
-               if (slideLeftButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
-                   slideLeftButtonView.setTouchEventId(pointerId);
-               } else if (slideRightButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
-                   slideRightButtonView.setTouchEventId(pointerId);
-               } else if (slideUpButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
+                if (slideLeftButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
+                    slideLeftButtonView.setTouchEventId(pointerId);
+                } else if (slideRightButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
+                    slideRightButtonView.setTouchEventId(pointerId);
+                } else if (slideUpButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
                     slideUpButtonView.setTouchEventId(pointerId);
-               } else if (slideDownButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
-                   slideDownButtonView.setTouchEventId(pointerId);
-               } else if (multiTouchBrushButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
-                   multiTouchBrushButtonView.setTouchEventId(pointerId);
-               } else if (multiTouchDisqualifyButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
-                   multiTouchDisqualifyButtonView.setTouchEventId(pointerId);
-               } else if (multiTouchEraserButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
-                   multiTouchEraserButtonView.setTouchEventId(pointerId);
-               } else if (multiTouchQuestionButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
-                   multiTouchQuestionButtonView.setTouchEventId(pointerId);
-               }
+                } else if (slideDownButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
+                    slideDownButtonView.setTouchEventId(pointerId);
+                } else if (multiTouchBrushButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
+                    multiTouchBrushButtonView.setTouchEventId(pointerId);
+                } else if (multiTouchDisqualifyButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
+                    multiTouchDisqualifyButtonView.setTouchEventId(pointerId);
+                } else if (multiTouchEraserButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
+                    multiTouchEraserButtonView.setTouchEventId(pointerId);
+                } else if (multiTouchQuestionButtonView.getBounds().contains(TouchMonitor.INSTANCE.getDownCoordinates(pointerId).x, TouchMonitor.INSTANCE.getDownCoordinates(pointerId).y)) {
+                    multiTouchQuestionButtonView.setTouchEventId(pointerId);
+                }
 
                 break;
             }
@@ -394,19 +398,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         } else if (undoButtonView.wasPressed()) {
             TouchMonitor.INSTANCE.setTouchUp(false);
             undoButtonView.onButtonPressed();
-            ((GameMonitoringListener)gameViewListener).onToolbarButtonPressed(GameMonitoring.UNDO);
+            ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.UNDO);
         } else if (redoButtonView.wasPressed()) {
             TouchMonitor.INSTANCE.setTouchUp(false);
             redoButtonView.onButtonPressed();
-            ((GameMonitoringListener)gameViewListener).onToolbarButtonPressed(GameMonitoring.REDO);
+            ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.REDO);
         } else if (clueButtonView.wasPressed()) {
             TouchMonitor.INSTANCE.setTouchUp(false);
             MyMediaPlayer.play("blop");
-            if (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isClueAvailable()) {
-                ((GameMonitoringListener)gameViewListener).onToolbarButtonPressed(GameMonitoring.CLUE);
+            if (gameViewListener.numOfAvailableClues() > 0) {
+                ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.CLUE);
                 boardView.useClue();
-                clueButtonView.onButtonPressed();
-                new Thread(redrawWhileClueIsNotAvailable).start();
+                gameViewListener.useClue();
+                // clueButtonView.onButtonPressed();
+                // new Thread(redrawWhileClueIsNotAvailable).start();
             }
         } else {
             if (colorInputValueButtonGroup.press() && GameSettings.INSTANCE.getInput().equals(GameSettings.Input.TOUCH)) {
@@ -478,10 +483,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         returnButtonView = new ReturnButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 context.getString(R.string.return_button),
                 returnButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.return_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.return_100)}, context, paint);
 
         RectF settingsButtonBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenWidth() - horizontalDistanceFromEdge - buttonWidth,
@@ -491,10 +496,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         puzzleSelectionSettingsButtonView = new PuzzleSelectionSettingsButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 context.getString(R.string.settings_description),
                 settingsButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.settings_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.settings_512)}, context, paint);
 
         gameOptionsView = new GameOptionsView();
         gameOptionsView.init(context, paint);
@@ -523,9 +528,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         BrushButtonView brushButtonView = new BrushButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 brushButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.paint_brush_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.paint_brush_100)}, context, paint);
 
 
         RectF eraserButtonBounds = new RectF(
@@ -536,9 +541,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         EraserButtonView eraserButtonView = new EraserButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 eraserButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.eraser_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.eraser_100)}, context, paint);
 
         RectF disqualifyButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 2,
@@ -548,9 +553,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         DisqualifyButtonView disqualifyButtonView = new DisqualifyButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 disqualifyButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.close_window_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.close_window_100)}, context, paint);
 
         RectF questionButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 3,
@@ -560,9 +565,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         QuestionButtonView questionButtonView = new QuestionButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 questionButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.question_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.question_100)}, context, paint);
 
         List<GroupedButtonView<BoardInputValue>> groupedBoardInputValueButtons = new LinkedList<>();
         groupedBoardInputValueButtons.add(brushButtonView);
@@ -579,9 +584,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         undoButtonView = new UndoButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 undoButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.undo_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.undo_black_white_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.undo_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.undo_black_white_100)}, context, paint);
 
         RectF redoButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 5,
@@ -591,9 +596,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         redoButtonView = new RedoButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 redoButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.redo_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.redo_black_white_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.redo_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.redo_black_white_100)}, context, paint);
 
         RectF clueButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 6,
@@ -603,10 +608,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         clueButtonView = new ClueButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 PuzzleSelectionView.INSTANCE.getSelectedPuzzle(),
                 clueButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512), BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_black_white_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1),
+                ContextCompat.getColor(context, R.color.settingsBrown2),
+                ContextCompat.getColor(context, R.color.settingsBrown3),
+                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512), BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_black_white_512)},
+                context,
+                paint,
+                gameViewListener::numOfAvailableClues,
+                gameViewListener::useClue
+        );
 
         paintPaletteBounds = new RectF(
                 toolbarButtonPadding,
@@ -621,7 +634,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         int yOffset = 0;
         Puzzle puzzle = PuzzleSelectionView.INSTANCE.getSelectedPuzzle();
         List<GroupedButtonView<Integer>> colorButtonViews = new ArrayList<>(puzzle.getColorSet().size());
-        for(int c : puzzle.getColorSet()) {
+        for (int c : puzzle.getColorSet()) {
             if (xOffset == 7) {
                 xOffset = 1;
                 yOffset = 1;
@@ -635,7 +648,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             );
 
             colorButtonViews.add(new ColorButtonView(
-                    (ViewListener)context,
+                    (ViewListener) context,
                     colorButtonBounds,
                     ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), c, context, paint));
             xOffset++;
@@ -645,7 +658,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         int adSizeHeight = 0; // (AdManager.isRemoveAds())? 0 : AdSize.SMART_BANNER.getHeightInPixels(context);
         int boardTop = adSizeHeight + ApplicationSettings.INSTANCE.getScreenHeight() * 11 / 100;
-        int boardMaxHeight = ApplicationSettings.INSTANCE.getScreenHeight() - boardTop - 3 * toolbarButtonPadding - 2 * toolbarButtonLength ;
+        int boardMaxHeight = ApplicationSettings.INSTANCE.getScreenHeight() - boardTop - 3 * toolbarButtonPadding - 2 * toolbarButtonLength;
         boardMaxHeight -= (yOffset * (toolbarButtonPadding + toolbarButtonLength));
 
         if (boardView == null) {
@@ -678,9 +691,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         multiTouchBrushButtonView = new MultiTouchBrushButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 brushButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.paint_brush_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.paint_brush_100)}, context, paint);
 
         RectF eraserButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 9 / 2,
@@ -690,9 +703,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         multiTouchEraserButtonView = new MultiTouchEraserButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 eraserButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.eraser_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.eraser_100)}, context, paint);
 
         RectF disqualifyButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 11 / 2,
@@ -702,9 +715,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         multiTouchDisqualifyButtonView = new MultiTouchDisqualifyButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 disqualifyButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.close_window_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.close_window_100)}, context, paint);
 
         RectF questionButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 9 / 2,
@@ -714,9 +727,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         multiTouchQuestionButtonView = new MultiTouchQuestionButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 questionButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.question_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.question_100)}, context, paint);
 
         RectF undoButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 4,
@@ -726,9 +739,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         undoButtonView = new UndoButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 undoButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.undo_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.undo_black_white_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.undo_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.undo_black_white_100)}, context, paint);
 
         RectF redoButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 6,
@@ -738,9 +751,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         redoButtonView = new RedoButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 redoButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.redo_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.redo_black_white_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.redo_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.redo_black_white_100)}, context, paint);
 
         RectF clueButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) * 5,
@@ -750,10 +763,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         clueButtonView = new ClueButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 PuzzleSelectionView.INSTANCE.getSelectedPuzzle(),
                 clueButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512), BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_black_white_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1),
+                ContextCompat.getColor(context, R.color.settingsBrown2),
+                ContextCompat.getColor(context, R.color.settingsBrown3),
+                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512), BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_black_white_512)},
+                context,
+                paint,
+                gameViewListener::numOfAvailableClues,
+                gameViewListener::useClue
+        );
 
         RectF slideUpButtonBounds = new RectF(
                 toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength) / 2,
@@ -763,9 +784,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         slideUpButtonView = new SlideUpButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 slideUpButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_up_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_up_100)}, context, paint);
 
         slideUpButtonView.setDoOnTouchEvent(new Runnable() {
             @Override
@@ -788,9 +809,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         slideDownButtonView = new SlideDownButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 slideDownButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_down_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_down_100)}, context, paint);
 
         slideDownButtonView.setDoOnTouchEvent(new Runnable() {
             @Override
@@ -813,9 +834,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         slideLeftButtonView = new SlideLeftButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 slideLeftButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_left_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_left_100)}, context, paint);
 
         slideLeftButtonView.setDoOnTouchEvent(new Runnable() {
             @Override
@@ -831,16 +852,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         });
 
         RectF slideRightButtonBounds = new RectF(
-                toolbarButtonPadding  + (toolbarButtonPadding + toolbarButtonLength),
+                toolbarButtonPadding + (toolbarButtonPadding + toolbarButtonLength),
                 ApplicationSettings.INSTANCE.getScreenHeight() - (toolbarButtonPadding + toolbarButtonLength) * 2,
                 toolbarButtonPadding + toolbarButtonLength + (toolbarButtonPadding + toolbarButtonLength),
                 ApplicationSettings.INSTANCE.getScreenHeight() - toolbarButtonPadding - (toolbarButtonPadding + toolbarButtonLength)
         );
 
         slideRightButtonView = new SlideRightButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 slideRightButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_right_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_right_100)}, context, paint);
 
         slideRightButtonView.setDoOnTouchEvent(new Runnable() {
             @Override
@@ -879,7 +900,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         paintPalette = BitmapLoader.INSTANCE.getImage(context, R.drawable.paint_palette_100);
 
-        for(int c : puzzle.getColorSet()) {
+        for (int c : puzzle.getColorSet()) {
             if (xOffset == maxColorsInARow) {
                 xOffset = 0;
                 yOffset++;
@@ -893,7 +914,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             );
 
             colorButtonViews.add(new ColorButtonView(
-                    (ViewListener)context,
+                    (ViewListener) context,
                     colorButtonBounds,
                     ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), c, context, paint));
             xOffset++;
@@ -903,7 +924,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         int adSizeHeight = 0; // (AdManager.isRemoveAds())? 0 : AdSize.SMART_BANNER.getHeightInPixels(context);
         int boardTop = adSizeHeight + ApplicationSettings.INSTANCE.getScreenHeight() * 11 / 100;
-        int boardMaxHeight = ApplicationSettings.INSTANCE.getScreenHeight() - boardTop - 4 * toolbarButtonPadding - 3 * toolbarButtonLength ;
+        int boardMaxHeight = ApplicationSettings.INSTANCE.getScreenHeight() - boardTop - 4 * toolbarButtonPadding - 3 * toolbarButtonLength;
 
         if (boardView == null) {
             boardView = new BoardView(

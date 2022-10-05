@@ -75,9 +75,11 @@ public class PuzzleCategorySelectionView extends ScrollableView {
     public VipPopup getVipPopup() {
         return vipPopup;
     }
+
     public boolean isShowVipPopup() {
         return showVipPopup;
     }
+
     public void setShowVipPopup(boolean showVipPopup) {
         this.showVipPopup = showVipPopup;
     }
@@ -156,10 +158,16 @@ public class PuzzleCategorySelectionView extends ScrollableView {
             puzzleSelectionViewListener.loadVideoAd();
         };
 
-        this.popup =new
-            Popup(
-                    context, popupBounds, message, onYesAnswer, onNoAnswer, yesButtonView, null, BitmapLoader.INSTANCE.getImage(context, R.drawable.gift_100)
-            );
+        this.popup = new Popup(
+                context,
+                popupBounds,
+                message,
+                onYesAnswer,
+                onNoAnswer,
+                yesButtonView,
+                null,
+                BitmapLoader.INSTANCE.getImage(context, R.drawable.gift_100)
+        );
 
 
         float closeButtonEdgeLength = popupBounds.width() / 6;
@@ -176,9 +184,9 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         );
 
         closeWindowButtonView = new CloseWindowButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 closeButtonBounds,
-                closeButton1, closeButton2, closeButton3, new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.close_window_100)}, context, paint);
+                closeButton1, closeButton2, closeButton3, new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.close_window_100)}, context, paint);
 
         RectF promoteVipButtonBounds = new RectF(
                 closeButtonBounds.left - popupBounds.width() / 15 - closeButtonEdgeLength * 94 / 70,
@@ -188,9 +196,9 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         );
 
         promoteVipButtonView = new PromoteVipButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 promoteVipButtonBounds,
-                closeButton1, closeButton2, closeButton3, new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.vip_100)}, context, paint);
+                closeButton1, closeButton2, closeButton3, new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.vip_100)}, context, paint);
     }
 
     /* used for calculating scrolled items */
@@ -201,7 +209,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
 
     public PuzzleCategorySelectionView(Context context) {
         super(context);
-        puzzleSelectionViewListener = (PuzzleSelectionViewListener)context;
+        puzzleSelectionViewListener = (PuzzleSelectionViewListener) context;
         backToTop();
     }
 
@@ -238,7 +246,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
             if (listPuzzleSelectionButtonView != null) {
                 for (int i = 0; i < listPuzzleSelectionButtonView.length; i++) {
                     if (listPuzzleSelectionButtonView[i] != null && listPuzzleSelectionButtonView[i] instanceof PuzzleSelectionButtonView) {
-                        ((PuzzleSelectionButtonView)listPuzzleSelectionButtonView[i]).recycleBitmap();
+                        ((PuzzleSelectionButtonView) listPuzzleSelectionButtonView[i]).recycleBitmap();
                     }
                 }
             }
@@ -280,7 +288,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
             tempCanvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
             paint.setAlpha(30);
             int foodItemDrawnCounter = 0;
-            for(int x = 0; x < ApplicationSettings.INSTANCE.getScreenWidth(); x += 150) {
+            for (int x = 0; x < ApplicationSettings.INSTANCE.getScreenWidth(); x += 150) {
                 for (int y = 0; y < ApplicationSettings.INSTANCE.getScreenHeight(); y += 150) {
                     tempCanvas.drawBitmap(socialNetworks.get((foodItemDrawnCounter++) % socialNetworks.size()), x, y, paint);
                 }
@@ -299,7 +307,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
             canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), PUZZLES_TOP - verticalGapBetweenPuzzles, paint);
             paint.setAlpha(30);
             int socialNetworksDrawnCounter = 0;
-            for(int x = 0; x < ApplicationSettings.INSTANCE.getScreenWidth(); x += 150) {
+            for (int x = 0; x < ApplicationSettings.INSTANCE.getScreenWidth(); x += 150) {
                 for (int y = 0; y < PUZZLES_TOP - verticalGapBetweenPuzzles - 100; y += 150) {
                     canvas.drawBitmap(socialNetworks.get((socialNetworksDrawnCounter++) % socialNetworks.size()), x, y, paint);
                 }
@@ -362,8 +370,8 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                 if (currentInitializedPuzzleSelectionButtons.contains(puzzleReference.getUniqueId())) {
                     PicButtonView[] puzzleSelectionButtonView = puzzleSelectionButtonViewMap.get(Puzzles.getCurrent());
                     for (int i = 0; i < puzzleSelectionButtonView.length; i++) {
-                        if (puzzleSelectionButtonView[i] != null && puzzleSelectionButtonView[i] instanceof PuzzleSelectionButtonView && ((PuzzleSelectionButtonView)puzzleSelectionButtonView[i]).getPuzzleReference() == puzzleReference) {
-                            ((PuzzleSelectionButtonView)puzzleSelectionButtonView[i]).recycleBitmap();
+                        if (puzzleSelectionButtonView[i] != null && puzzleSelectionButtonView[i] instanceof PuzzleSelectionButtonView && ((PuzzleSelectionButtonView) puzzleSelectionButtonView[i]).getPuzzleReference() == puzzleReference) {
+                            ((PuzzleSelectionButtonView) puzzleSelectionButtonView[i]).recycleBitmap();
                             break;
                         }
                     }
@@ -554,9 +562,9 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                                     MyMediaPlayer.play("blop");
                                     TouchMonitor.INSTANCE.setTouchUp(false);
 
-                                    Puzzle.PuzzleClass puzzleClass = ((PuzzleSelectionButtonView)puzzleSelectionButtonView).getPuzzleReference().getPuzzle((Context)puzzleSelectionViewListener).getPuzzleClass();
+                                    Puzzle.PuzzleClass puzzleClass = ((PuzzleSelectionButtonView) puzzleSelectionButtonView).getPuzzleReference().getPuzzle((Context) puzzleSelectionViewListener).getPuzzleClass();
 
-                                    PuzzleSelectionView.INSTANCE.init((Context)puzzleSelectionViewListener, ((PuzzleSelectionButtonView)puzzleSelectionButtonView).getPuzzleReference(), puzzleSelectionViewListener, PaintManager.INSTANCE.createPaint());
+                                    PuzzleSelectionView.INSTANCE.init((Context) puzzleSelectionViewListener, ((PuzzleSelectionButtonView) puzzleSelectionButtonView).getPuzzleReference(), puzzleSelectionViewListener, PaintManager.INSTANCE.createPaint());
                                     if (puzzleClass != null && puzzleClass.equals(Puzzle.PuzzleClass.VIP) && !AdManager.isRemoveAds()) {
                                         showPopup = true;
                                     } else {
@@ -590,7 +598,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
 
                         TouchMonitor.INSTANCE.setTouchUp(false);
                     }
-            } else {
+                } else {
                     PuzzleSelectionView.INSTANCE.onTouchEvent();
                 }
             } else {
@@ -638,10 +646,10 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         );
 
         returnButtonView = new ReturnButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 context.getString(R.string.return_button),
                 returnButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.return_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.return_100)}, context, paint);
 
         RectF settingsButtonBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenWidth() - horizontalDistanceFromEdge - buttonWidth,
@@ -651,10 +659,10 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         );
 
         puzzleSelectionSettingsButtonView = new PuzzleSelectionSettingsButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 context.getString(R.string.settings_description),
                 settingsButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.settings_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.settings_512)}, context, paint);
 
         menuOptionsView = new MenuOptionsView();
         menuOptionsView.init(context, paint);
@@ -666,34 +674,34 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                 top + buttonHeight
         );
 
-        smallCategoryButtonView = new SwitchCategoryButtonView((ViewListener)context,
+        smallCategoryButtonView = new SwitchCategoryButtonView((ViewListener) context,
                 context.getString(R.string.small_puzzle_description),
                 switchCategoryButtonViewBounds,
-                ContextCompat.getColor(context, R.color.smallPuzzleGreen1), ContextCompat.getColor(context, R.color.smallPuzzleGreen2), ContextCompat.getColor(context, R.color.smallPuzzleGreen3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_green_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.smallPuzzleGreen1), ContextCompat.getColor(context, R.color.smallPuzzleGreen2), ContextCompat.getColor(context, R.color.smallPuzzleGreen3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_green_512)}, context, paint);
 
-        normalCategoryButtonView = new SwitchCategoryButtonView((ViewListener)context,
+        normalCategoryButtonView = new SwitchCategoryButtonView((ViewListener) context,
                 context.getString(R.string.normal_puzzle_description),
                 switchCategoryButtonViewBounds,
-                ContextCompat.getColor(context, R.color.normalPuzzleOrange1), ContextCompat.getColor(context, R.color.normalPuzzleOrange2), ContextCompat.getColor(context, R.color.normalPuzzleOrange3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_yellow_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.normalPuzzleOrange1), ContextCompat.getColor(context, R.color.normalPuzzleOrange2), ContextCompat.getColor(context, R.color.normalPuzzleOrange3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_yellow_512)}, context, paint);
 
-        largeCategoryButtonView = new SwitchCategoryButtonView((ViewListener)context,
+        largeCategoryButtonView = new SwitchCategoryButtonView((ViewListener) context,
                 context.getString(R.string.large_puzzle_description),
                 switchCategoryButtonViewBounds,
-                ContextCompat.getColor(context, R.color.largePuzzleRed1), ContextCompat.getColor(context, R.color.largePuzzleRed2), ContextCompat.getColor(context, R.color.largePuzzleRed3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_red_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.largePuzzleRed1), ContextCompat.getColor(context, R.color.largePuzzleRed2), ContextCompat.getColor(context, R.color.largePuzzleRed3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_red_512)}, context, paint);
 
-        complexCategoryButtonView = new SwitchCategoryButtonView((ViewListener)context,
+        complexCategoryButtonView = new SwitchCategoryButtonView((ViewListener) context,
                 context.getString(R.string.complex_puzzle_description),
                 switchCategoryButtonViewBounds,
-                ContextCompat.getColor(context, R.color.complexPuzzleLightBlue1), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue2), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_dark_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.complexPuzzleLightBlue1), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue2), ContextCompat.getColor(context, R.color.complexPuzzleLightBlue3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_dark_512)}, context, paint);
 
-        colorfulCategoryButtonView = new SwitchCategoryButtonView((ViewListener)context,
+        colorfulCategoryButtonView = new SwitchCategoryButtonView((ViewListener) context,
                 context.getString(R.string.colorful_puzzle_description),
                 switchCategoryButtonViewBounds,
-                ContextCompat.getColor(context, R.color.colorfulPuzzlePink1), ContextCompat.getColor(context, R.color.colorfulPuzzlePink2), ContextCompat.getColor(context, R.color.colorfulPuzzlePink3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_blue_512)}, context, paint);
+                ContextCompat.getColor(context, R.color.colorfulPuzzlePink1), ContextCompat.getColor(context, R.color.colorfulPuzzlePink2), ContextCompat.getColor(context, R.color.colorfulPuzzlePink3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_blue_512)}, context, paint);
 
-        puzzleWidth = (int)((puzzleSelectionSettingsButtonView.getBounds().right - returnButtonView.getBounds().left) / (NUM_OF_PUZZLES_A_ROW + 1));
+        puzzleWidth = (int) ((puzzleSelectionSettingsButtonView.getBounds().right - returnButtonView.getBounds().left) / (NUM_OF_PUZZLES_A_ROW + 1));
         puzzleHeight = puzzleWidth * 5 / 3;
-        horizontalGapBetweenPuzzles = ((int)(puzzleSelectionSettingsButtonView.getBounds().right - returnButtonView.getBounds().left) - NUM_OF_PUZZLES_A_ROW * puzzleWidth) / (NUM_OF_PUZZLES_A_ROW - 1);
+        horizontalGapBetweenPuzzles = ((int) (puzzleSelectionSettingsButtonView.getBounds().right - returnButtonView.getBounds().left) - NUM_OF_PUZZLES_A_ROW * puzzleWidth) / (NUM_OF_PUZZLES_A_ROW - 1);
         verticalGapBetweenPuzzles = puzzleHeight / 5;
 
         puzzleSelectionButtonViewMap = new HashMap<>();
@@ -712,18 +720,15 @@ public class PuzzleCategorySelectionView extends ScrollableView {
 
         setUpPopup(context, paint);
 
-        this.vipPopup = new VipPopup((Context)puzzleSelectionViewListener, paint, new Runnable() {
-            @Override
-            public void run() {
-                puzzleSelectionViewListener.onPurchaseVipPressed();
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                setShowVipPopup(false);
-                render();
-            }
-        });
+        this.vipPopup = new VipPopup(
+                (Context) puzzleSelectionViewListener,
+                paint,
+                puzzleSelectionViewListener::onPurchaseVipPressed,
+                () -> {
+                    setShowVipPopup(false);
+                    render();
+                }
+        );
 
         this.initDone = true;
         updateScrolledButtons();
@@ -735,6 +740,6 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         int color2 = category.getColorPack().getColor2();
         int color3 = category.getColorPack().getColor3();
 
-        return new PuzzleSelectionButtonView(puzzleSelectionViewListener, puzzleReference, bounds, color1, color2, color3, (Context)puzzleSelectionViewListener, paint);
+        return new PuzzleSelectionButtonView(puzzleSelectionViewListener, puzzleReference, bounds, color1, color2, color3, (Context) puzzleSelectionViewListener, paint);
     }
 }

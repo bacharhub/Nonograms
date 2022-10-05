@@ -114,6 +114,21 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
     }
 
     @Override
+    public int numOfAvailableClues() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(GameActivity.this);
+        return sharedPreferences.getInt("clue_count", 3);
+    }
+
+    @Override
+    public void useClue() {
+        int numOfAvailableClues = numOfAvailableClues();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(GameActivity.this);
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        prefsEditor.putInt("clue_count", numOfAvailableClues - 1);
+        prefsEditor.apply();
+    }
+
+    @Override
     public void onViewTouched(MotionEvent event) {
         if (MemoryManager.isNoMemory()) {
             // removeAds();

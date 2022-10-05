@@ -8,7 +8,7 @@ import android.view.SurfaceView;
 
 import com.white.black.nonogram.TouchMonitor;
 
-public abstract class ScrollableView extends SurfaceView implements SurfaceHolder.Callback{
+public abstract class ScrollableView extends SurfaceView implements SurfaceHolder.Callback {
 
     volatile boolean initDone;
     int top = 0;
@@ -50,7 +50,7 @@ public abstract class ScrollableView extends SurfaceView implements SurfaceHolde
                 this.verticalGap = topMax;
             }
 
-            this.top = Math.min(Math.max((int)this.verticalGap + (TouchMonitor.INSTANCE.getMove().y - TouchMonitor.INSTANCE.getDownCoordinates().y), topMin), topMax);
+            this.top = Math.min(Math.max((int) this.verticalGap + (TouchMonitor.INSTANCE.getMove().y - TouchMonitor.INSTANCE.getDownCoordinates().y), topMin), topMax);
         } else {
             doOnCoordinatesGapChanged(topMin, topMax);
         }
@@ -64,7 +64,7 @@ public abstract class ScrollableView extends SurfaceView implements SurfaceHolde
             this.verticalBoost += (int) (TouchMonitor.INSTANCE.getCoordinatesGap().y * (600.0 / (TouchMonitor.INSTANCE.getUpTime() - TouchMonitor.INSTANCE.getDownTime())));
         }
 
-        this.top = Math.min(Math.max((int)this.verticalGap, topMin), topMax);
+        this.top = Math.min(Math.max((int) this.verticalGap, topMin), topMax);
         TouchMonitor.INSTANCE.setMove(TouchMonitor.INSTANCE.getDownCoordinates());
         TouchMonitor.INSTANCE.initializeCoordinatesGap();
     }
@@ -84,12 +84,7 @@ public abstract class ScrollableView extends SurfaceView implements SurfaceHolde
             return;
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronizedUpdate(viewHeight, viewTop, viewBottom);
-            }
-        }).start();
+        new Thread(() -> synchronizedUpdate(viewHeight, viewTop, viewBottom)).start();
     }
 
     private synchronized void synchronizedUpdate(int viewHeight, int viewTop, int viewBottom) {
@@ -123,7 +118,8 @@ public abstract class ScrollableView extends SurfaceView implements SurfaceHolde
                 if (canvas != null) {
                     try {
                         getHolder().unlockCanvasAndPost(canvas);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }

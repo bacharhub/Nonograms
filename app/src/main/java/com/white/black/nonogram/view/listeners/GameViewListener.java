@@ -6,4 +6,6 @@ public interface GameViewListener extends SecondaryViewListener {
     void onLaunchMarketButtonPressed();
     // void removeAds();
     void reportFaultyPuzzle(String cause, String uniqueId);
+    int numOfAvailableClues();
+    void useClue();
 }
