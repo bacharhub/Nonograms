@@ -1,6 +1,7 @@
 package com.white.black.nonogram.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +9,7 @@ import android.graphics.Point;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -28,6 +30,8 @@ import com.white.black.nonogram.MyMediaPlayer;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
+import com.white.black.nonogram.utils.VipPromotionUtils;
+import com.white.black.nonogram.view.VipPopup;
 import com.white.black.nonogram.view.YesNoQuestion;
 import com.white.black.nonogram.view.Appearance;
 import com.white.black.nonogram.view.GameView;
@@ -174,6 +178,15 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
             }
 
             gameView.render();
+        } else if (gameView.isShowPopup()) {
+            if (gameView.isShowVipPopup()) {
+                MyMediaPlayer.play("blop");
+                gameView.setShowVipPopup(false);
+                gameView.render();
+            } else {
+                gameView.getPopup().doOnNoAnswer();
+                gameView.getPopup().setAnswered(false);
+            }
         } else {
             GameState.setGameState(GameState.PUZZLE_SELECTION);
             GameActivity.this.finish();
@@ -364,6 +377,61 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
 
     @Override
     public void promote() {
+        Bundle bundle = new Bundle();
+        bundle.putString(GameMonitoring.VIP, GameMonitoring.VIP_PROMOTION_APPEARED);
+        mFirebaseAnalytics.logEvent(GameMonitoring.GAME_EVENT, bundle);
+        MyMediaPlayer.play("blop");
+        gameView.getVipPopup().update();
+        if (AdManager.isRemoveAds()) {
+            gameView.setShowVipPopup(true);
+            gameView.render();
+        } else {
+            gameView.getVipPopup().setPrice("Loading..");
+            gameView.setShowVipPopup(true);
+            gameView.render();
+            onPromoteVipPressed(GameActivity.this);
+        }
+    }
 
+    @Override
+    public void onPromoteVipPressed(Context context) {
+        VipPromotionUtils.INSTANCE.onPromoteVipPressed(
+                context,
+                () -> onBillingSetupFailed(GameActivity.this),
+                this::onRemoveAdsPurchaseFound,
+                () -> {
+                    gameView.setShowVipPopup(false);
+                    gameView.setShowPopupFalse();
+                    gameView.render();
+                },
+                this::itemAlreadyOwned,
+                () -> gameView.getVipPopup().getPopup().setAnswered(AdManager.isRemoveAds()),
+                mFirebaseAnalytics
+        );
+    }
+
+    private void onBillingSetupFailed(Context context) {
+        gameView.setShowVipPopup(false);
+        gameView.render();
+        Handler mainHandler = new Handler(context.getMainLooper());
+        mainHandler.post(
+                () -> new AlertDialog.Builder(context).setMessage(R.string.no_internet_connection)
+                        .setNeutralButton(android.R.string.ok, null).show()
+        );
+    }
+
+    private void onRemoveAdsPurchaseFound(String price) {
+        gameView.getVipPopup().setPrice(price);
+        gameView.setShowVipPopup(true);
+        gameView.render();
+    }
+
+    private void itemAlreadyOwned() {
+        AdManager.setRemoveAdsTrue(GameActivity.this.getApplicationContext());
+        gameView.setShowPopupFalse();
+        gameView.render();
+        Bundle bundle = new Bundle();
+        bundle.putString(GameMonitoring.VIP, GameMonitoring.REMOVE_ADS_ALREADY_OWNED);
+        mFirebaseAnalytics.logEvent(GameMonitoring.GAME_EVENT, bundle);
     }
 }

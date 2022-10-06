@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -16,6 +17,8 @@ import android.view.SurfaceView;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.white.black.nonogram.AdManager;
 import com.white.black.nonogram.ApplicationSettings;
 import com.white.black.nonogram.BitmapLoader;
@@ -90,6 +93,32 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private Bitmap background;
     private BoardView boardView;
     private PuzzleSolvedView puzzleSolvedView;
+
+    private WatchAdPopup popup;
+
+    public VipPopup getVipPopup() {
+        return popup.getVipPopup();
+    }
+
+    public void setShowVipPopup(boolean showVipPopup) {
+        popup.setShowVipPopup(showVipPopup);
+    }
+
+    public void setShowPopupFalse() {
+        this.popup.setShowPopup(false);
+    }
+
+    public boolean isShowPopup() {
+        return popup.isShowingPopup();
+    }
+
+    public boolean isShowVipPopup() {
+        return popup.isShowingVipPopup();
+    }
+
+    public Popup getPopup() {
+        return popup.getPopup();
+    }
 
     public GameView(Context context) {
         super(context);
@@ -196,6 +225,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
             puzzleSolvedView.draw(canvas, paint);
         }
+
+        popup.draw(canvas, paint);
     }
 
     private void drawOnJoystick(Canvas canvas, Paint paint) {
@@ -308,6 +339,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
                 puzzleSolvedView.onTouchEvent(gameViewListener);
+            } else if (popup.isShowingPopup()) {
+                popup.onTouchEvent();
+                TouchMonitor.INSTANCE.setTouchUp(false);
             } else if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED)) {
                 if (!PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isDone()) {
                     PuzzleSelectionView.INSTANCE.getSelectedPuzzle().increaseSolvingTime();
@@ -334,7 +368,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 }
             }
 
-            // maybe?
             if (PaintManager.INSTANCE.isReadyToRender(System.currentTimeMillis())) {
                 render();
                 PaintManager.INSTANCE.setLastRenderingTime(System.currentTimeMillis());
@@ -406,12 +439,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         } else if (clueButtonView.wasPressed()) {
             TouchMonitor.INSTANCE.setTouchUp(false);
             MyMediaPlayer.play("blop");
-            if (gameViewListener.numOfAvailableClues() > 0) {
+            if (gameViewListener.numOfAvailableClues() > 0 || AdManager.isRemoveAds()) {
                 ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.CLUE);
                 boardView.useClue();
                 gameViewListener.useClue();
                 // clueButtonView.onButtonPressed();
                 // new Thread(redrawWhileClueIsNotAvailable).start();
+            } else {
+                popup.setShowPopup(true);
             }
         } else {
             if (colorInputValueButtonGroup.press() && GameSettings.INSTANCE.getInput().equals(GameSettings.Input.TOUCH)) {
@@ -512,7 +547,51 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().fillPermanentDisqualify();
 
+        this.popup = new WatchAdPopup(
+                context,
+                paint,
+                context.getString(R.string.get_hints),
+                BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512),
+                () -> {
+                    render();
+                    onRewardedAdOffered(context, false);
+                },
+                () -> {
+                    onRewarded(context);
+                    onRewardedAdOffered(context, true);
+                },
+                (error) -> onAdFailedToLoad(error, context),
+                this::render
+        );
+
         render();
+    }
+
+    private void onRewarded(Context context) {
+        int numberOfAvailableClues = gameViewListener.numOfAvailableClues();
+        SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefsEditor.putInt("clue_count", numberOfAvailableClues + 5);
+        prefsEditor.apply();
+    }
+
+    private void onRewardedAdOffered(Context context, boolean accepted) {
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString(GameMonitoring.REWARDED_AD_OFFER, accepted ? GameMonitoring.REWARDED_AD_OFFER_ACCEPTED : GameMonitoring.REWARDED_AD_OFFER_REFUSED);
+            FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+            mFirebaseAnalytics.logEvent(GameMonitoring.GAME_EVENT, bundle);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void onAdFailedToLoad(LoadAdError loadAdError, Context context) {
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString(GameMonitoring.LOAD_VIDEO_AD_ERROR_CODE, loadAdError.toString());
+            FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+            mFirebaseAnalytics.logEvent(GameMonitoring.GAME_EVENT, bundle);
+        } catch (Exception ignored) {
+        }
     }
 
     public void initTouchToolbar(Context context, Paint paint) {
@@ -838,17 +917,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 slideLeftButtonBounds,
                 ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_left_100)}, context, paint);
 
-        slideLeftButtonView.setDoOnTouchEvent(new Runnable() {
-            @Override
-            public void run() {
-                if (!multiTouchBrushButtonView.isPressed() && !multiTouchDisqualifyButtonView.isPressed() && !multiTouchEraserButtonView.isPressed() && !multiTouchQuestionButtonView.isPressed()) {
-                    boardView.moveTouchDownSlotUsingJoystick(-1, 0);
-                } else {
-                    boardView.moveTouchUpSlotUsingJoystick(-1, 0);
-                }
-
-                render();
+        slideLeftButtonView.setDoOnTouchEvent(() -> {
+            if (!multiTouchBrushButtonView.isPressed() && !multiTouchDisqualifyButtonView.isPressed() && !multiTouchEraserButtonView.isPressed() && !multiTouchQuestionButtonView.isPressed()) {
+                boardView.moveTouchDownSlotUsingJoystick(-1, 0);
+            } else {
+                boardView.moveTouchUpSlotUsingJoystick(-1, 0);
             }
+
+            render();
         });
 
         RectF slideRightButtonBounds = new RectF(

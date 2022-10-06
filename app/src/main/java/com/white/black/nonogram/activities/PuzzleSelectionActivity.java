@@ -14,20 +14,10 @@ import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsParams;
-import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.OnUserEarnedRewardListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -45,18 +35,15 @@ import com.white.black.nonogram.RewardedInstanceHandler;
 import com.white.black.nonogram.SubPuzzle;
 import com.white.black.nonogram.TouchMonitor;
 import com.white.black.nonogram.utils.VipPromotionUtils;
-import com.white.black.nonogram.view.YesNoQuestion;
 import com.white.black.nonogram.view.Appearance;
 import com.white.black.nonogram.view.PaintManager;
 import com.white.black.nonogram.view.PuzzleCategorySelectionView;
 import com.white.black.nonogram.view.PuzzleSelectionView;
+import com.white.black.nonogram.view.YesNoQuestion;
 import com.white.black.nonogram.view.listeners.MenuOptionsViewListener;
 import com.white.black.nonogram.view.listeners.PuzzleSelectionViewListener;
 import com.white.black.nonogram.view.listeners.Renderable;
 import com.white.black.nonogram.view.listeners.VipPromoter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PuzzleSelectionActivity extends Activity implements PuzzleSelectionViewListener, MenuOptionsViewListener, Renderable, VipPromoter {
 
@@ -270,11 +257,6 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
             YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
             puzzleCategorySelectionView.render();
         });
-    }
-
-    @Override
-    public void loadVideoAd() {
-        AdManager.loadRewardedVideo(rewardedInstanceHandler, PuzzleSelectionActivity.this, userEarnedRewardListener, rewardedAdLoadCallback);
     }
 
     @Override
@@ -524,10 +506,6 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
         puzzleCategorySelectionView.getVipPopup().setPrice(price);
         puzzleCategorySelectionView.setShowVipPopup(true);
         puzzleCategorySelectionView.render();
-    }
-
-    public void onPurchaseVipPressed() {
-        VipPromotionUtils.INSTANCE.onPurchaseVipPressed(PuzzleSelectionActivity.this);
     }
 
     private void itemAlreadyOwned() {

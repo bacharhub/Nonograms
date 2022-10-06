@@ -55,4 +55,7 @@ public class GameMonitoring {
     public static final String REMOVE_ADS_NO_INTERNET_CONNECTION = "remove_ads_canceled";
     public static final String VIP_PROMOTION_APPEARED = "vip_promotion_appeared";
     public static final String VIP = "vip";
+    public static final String REWARDED_AD_OFFER = "rewarded_ad_offer";
+    public static final String REWARDED_AD_OFFER_ACCEPTED = "rewarded_ad_offer_accepted";
+    public static final String REWARDED_AD_OFFER_REFUSED = "rewarded_ad_offer_refused";
 }

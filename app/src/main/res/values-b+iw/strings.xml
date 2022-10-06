@@ -43,7 +43,7 @@
     <string name="facebook">פייסבוק</string>
     <string name="earphones_lottery">earphones_lottery</string>
     <string name="new_puzzles">פאזלים חדשים!</string>
-    <string name="click_to_play">לחץ כדי לשחק</string>
+    <string name="click_to_play">כיף במרחק לחיצה</string>
     <string name="app_id">842719909943</string>
     <string name="most_puzzles_solved">CgkIt7CVsMMYEAIQAQ</string>
     <string name="signin_other_error">לא ניתן להתחבר לטבלת השיאים כעת. אנא נסה במועד מאוחר יותר.</string>
@@ -266,6 +266,7 @@
     <string name="fox">שועל</string>
     <string name="super_mario">סופר מריו</string>
     <string name="freePuzzle">פאזל מתנה!</string>
+    <string name="get_hints">5+ רמזים</string>
     <string name="watchAd">צפה בסרטון</string>
     <string name="loading">טוען..</string>
     <string name="no_ads">ללא פרסומות!</string>

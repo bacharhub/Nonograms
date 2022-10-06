@@ -21,6 +21,7 @@ import com.white.black.nonogram.view.buttons.YesNoButtonView;
 public class Popup {
 
     private String message;
+    private Bitmap messageIcon;
     private Runnable onYesAnswer;
     private Runnable onNoAnswer;
     private RectF windowBounds;
@@ -68,8 +69,9 @@ public class Popup {
 
     public Popup(Context context, RectF windowBounds,
                  String message, Runnable onYesAnswer, Runnable onNoAnswer,
-                 YesNoButtonView yesButtonView, YesNoButtonView noButtonView, Bitmap topLeftImage) {
+                 YesNoButtonView yesButtonView, YesNoButtonView noButtonView, Bitmap topLeftImage, Bitmap messageIcon) {
         this.message = message;
+        this.messageIcon = messageIcon;
         this.onNoAnswer = onNoAnswer;
         this.onYesAnswer = onYesAnswer;
         this.windowBounds = windowBounds;
@@ -111,7 +113,7 @@ public class Popup {
     public Popup(Context context, RectF windowBounds,
                  String message, Runnable onYesAnswer, Runnable onNoAnswer,
                  YesNoButtonView yesButtonView, YesNoButtonView noButtonView) {
-        this(context, windowBounds, message, onYesAnswer, onNoAnswer, yesButtonView, noButtonView, BitmapLoader.INSTANCE.getImage(context, R.drawable.rose_96));
+        this(context, windowBounds, message, onYesAnswer, onNoAnswer, yesButtonView, noButtonView, BitmapLoader.INSTANCE.getImage(context, R.drawable.rose_96), null);
     }
 
     public void draw(Canvas canvas, Paint paint) {
@@ -127,18 +129,36 @@ public class Popup {
         paint.setTextSize(yesNoQuestionFontSizeFactor * ApplicationSettings.INSTANCE.getScreenWidth() / 15);
         paint.setColor(messageColor);
 
-        if (isAnswered()) {
-            Rect textBounds = new Rect();
-            paint.getTextBounds(message, 0, message.length(), textBounds);
-            canvas.drawText(message, windowBounds.centerX(), windowBounds.centerY() + textBounds.height() / 2, paint);
-        } else {
-            canvas.drawText(message, windowBounds.centerX(), windowBounds.top + windowBounds.height() * 3 / 10, paint);
+        Rect textBounds = new Rect();
+        paint.getTextBounds(message, 0, message.length(), textBounds);
+        int messageIconSize = 100;
+        int messageIconTotalWidth = (!isAnswered() && messageIcon != null) ? messageIconSize + 20 : 0;
+
+        float messageX = windowBounds.centerX() + messageIconTotalWidth / 2;
+        float messageY = isAnswered() ? windowBounds.centerY() + textBounds.height() / 2 : windowBounds.top + windowBounds.height() * 3 / 10;
+        canvas.drawText(message, messageX, messageY, paint);
+
+        if (!isAnswered()) {
             if (yesButtonView != null) {
                 yesButtonView.draw(canvas, paint);
             }
 
             if (noButtonView != null) {
                 noButtonView.draw(canvas, paint);
+            }
+
+            if (messageIcon != null) {
+                canvas.drawBitmap(
+                        messageIcon,
+                        null,
+                        new RectF(
+                                windowBounds.centerX() - textBounds.width() / 2 - 20 - messageIconSize + messageIconTotalWidth / 2,
+                                messageY - textBounds.height() / 2 - messageIconSize / 2,
+                                windowBounds.centerX() - textBounds.width() / 2 - 20 + messageIconTotalWidth / 2,
+                                messageY - textBounds.height() / 2 - messageIconSize / 2 + messageIconSize
+                        ),
+                        paint
+                );
             }
         }
 

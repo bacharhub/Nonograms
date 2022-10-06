@@ -499,6 +499,16 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         PuzzleSelectionView.INSTANCE.getPuzzleReference().writeToSharedPreferences(context.getApplicationContext());
     }
 
+    private void onRewardedAdOffered(Context context, boolean accepted) {
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString(GameMonitoring.REWARDED_AD_OFFER, accepted ? GameMonitoring.REWARDED_AD_OFFER_ACCEPTED : GameMonitoring.REWARDED_AD_OFFER_REFUSED);
+            FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+            mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
+        } catch (Exception ignored) {
+        }
+    }
+
     private void onAdFailedToLoad(LoadAdError loadAdError, Context context) {
         try {
             Bundle bundle = new Bundle();
@@ -611,11 +621,11 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                 context,
                 paint,
                 context.getString(R.string.freePuzzle),
-                this::render,
-                () -> onRewarded(context),
+                null,
+                () -> { render(); onRewardedAdOffered(context, false); },
+                () -> { onRewarded(context); onRewardedAdOffered(context, true); },
                 (error) -> onAdFailedToLoad(error, context),
                 this::render
-
         );
 
         this.initDone = true;

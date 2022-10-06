@@ -32,11 +32,11 @@ import java.util.function.Consumer;
 
 public class WatchAdPopup {
 
-    private String rewardDescription;
-    private Runnable onNoAnswer;
+    private final String rewardDescription;
+    private final Runnable onNoAnswer;
     private Runnable onRewarded;
-    private Consumer<LoadAdError> onAdFailedToLoad;
-    private Runnable onRewardedVideoAdClosed;
+    private final Consumer<LoadAdError> onAdFailedToLoad;
+    private final Runnable onRewardedVideoAdClosed;
 
     private Popup popup;
     private VipPopup vipPopup;
@@ -56,6 +56,7 @@ public class WatchAdPopup {
             Context context,
             Paint paint,
             String rewardDescription,
+            Bitmap rewardIcon,
             Runnable onNoAnswer,
             Runnable onRewarded,
             Consumer<LoadAdError> onAdFailedToLoad,
@@ -66,7 +67,7 @@ public class WatchAdPopup {
         this.onRewarded = onRewarded;
         this.onAdFailedToLoad = onAdFailedToLoad;
         this.onRewardedVideoAdClosed = onRewardedVideoAdClosed;
-        setup(context, paint, rewardDescription);
+        setup(context, paint, rewardDescription, rewardIcon);
     }
 
     public VipPopup getVipPopup() {
@@ -77,7 +78,9 @@ public class WatchAdPopup {
         return this.popup;
     }
 
-    public void setShowPopup(boolean b) { this.showPopup = b; }
+    public void setShowPopup(boolean b) {
+        this.showPopup = b;
+    }
 
     public boolean isShowingPopup() {
         return this.showPopup;
@@ -98,7 +101,7 @@ public class WatchAdPopup {
         this.showVipPopup = false;
     }
 
-    private void setup(Context context, Paint paint, String rewardDescription) {
+    private void setup(Context context, Paint paint, String rewardDescription, Bitmap rewardIcon) {
         popupBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenWidth() * 16 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 41 / 100,
@@ -134,7 +137,7 @@ public class WatchAdPopup {
         Runnable onYesAnswer = () -> {
             popup.setMessage(context.getString(R.string.loading));
             popup.setTopLeftImage(BitmapLoader.INSTANCE.getImage(context, R.drawable.sand_watch_100));
-            AdManager.loadRewardedVideo(rewardedInstanceHandler, (Activity)context, userEarnedRewardListener, rewardedAdLoadCallback);
+            AdManager.loadRewardedVideo(rewardedInstanceHandler, (Activity) context, userEarnedRewardListener, rewardedAdLoadCallback);
         };
 
         this.popup = new Popup(
@@ -145,7 +148,8 @@ public class WatchAdPopup {
                 onNoAnswer,
                 yesButtonView,
                 null,
-                BitmapLoader.INSTANCE.getImage(context, R.drawable.gift_100)
+                BitmapLoader.INSTANCE.getImage(context, R.drawable.gift_100),
+                rewardIcon
         );
 
         float closeButtonEdgeLength = popupBounds.width() / 6;
@@ -215,7 +219,7 @@ public class WatchAdPopup {
         this.vipPopup = new VipPopup(
                 context,
                 paint,
-                () -> VipPromotionUtils.INSTANCE.onPurchaseVipPressed((Activity)context),
+                () -> VipPromotionUtils.INSTANCE.onPurchaseVipPressed((Activity) context),
                 () -> {
                     setShowVipPopup(false);
                     this.onNoAnswer.run();

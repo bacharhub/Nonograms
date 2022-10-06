@@ -120,7 +120,7 @@ public class VipPopup {
                 ContextCompat.getColor(context, R.color.largePuzzleRed1), ContextCompat.getColor(context, R.color.largePuzzleRed2), ContextCompat.getColor(context, R.color.largePuzzleRed3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.shopping_cart_100)}, context, paint);
 
         this.popup = new Popup(
-                context, windowBounds, "", onYesAnswer, onNoAnswer, yesButtonView, null, BitmapLoader.INSTANCE.getImage(context, R.drawable.best_seller_100)
+                context, windowBounds, "", onYesAnswer, onNoAnswer, yesButtonView, null, BitmapLoader.INSTANCE.getImage(context, R.drawable.best_seller_100), null
         );
 
         windowBackgroundBounds = new RectF(windowBounds.left, windowBounds.top, windowBounds.right + windowBounds.width() * 2 / 100, windowBounds.bottom + windowBounds.height() * 2 / 100);

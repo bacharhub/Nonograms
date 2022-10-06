@@ -39,6 +39,7 @@
     <string name="board_numbers_size_percentage">0.80f</string>
     <string name="zoomed_board_numbers_size_percentage">0.85f</string>
     <string name="next_puzzle">Prochain puzzle</string>
+    <string name="get_hints">+5 des indices!</string>
     <string name="lottery">Lotterie</string>
     <string name="bluetooth_earphones_question">Mort d\'envie de gagner des ecouteurs Bluetooth?</string>
     <string name="more_details_on_facebook">Rejoignez notre page Facebook page pour plus de details!</string>
