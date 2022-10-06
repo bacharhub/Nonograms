@@ -86,6 +86,7 @@ public enum Puzzles {
     private static void loadSmallPuzzles(Context context) {
         current = SMALL;
 
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.smile), 5, R.drawable.smile_5); // 00:05
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.hashtag), 12, R.drawable.hashtag_12); // 00:05
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.ticket), 11, R.drawable.ticket_11); // 00:06
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.screen), 13, R.drawable.screen_13); // 00:08
@@ -97,8 +98,8 @@ public enum Puzzles {
         addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.mail), 12, R.drawable.mail_12); // 00:26
         addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.hourglass), 14, R.drawable.hourglass_14); // 00:29
         addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.keyboard), 13, R.drawable.keyboard_13); // 00:32
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.camera), 12, R.drawable.camera_12); // 00:32
 
+        addPuzzleReference(context.getString(R.string.camera), 12, R.drawable.camera_12); // 00:32
         addPuzzleReference(context.getString(R.string.lock), 12, R.drawable.lock_12); // 00:34
         addPuzzleReference(context.getString(R.string.human), 18, R.drawable.human_18); // 00:39
         addPuzzleReference(context.getString(R.string.trash_can), 13, R.drawable.trash_can_13); // 00:45

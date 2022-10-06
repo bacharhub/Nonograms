@@ -432,6 +432,8 @@ class BoardView {
                     } else {
                         puzzle.colorAtPoint(x, y, 0);
                     }
+
+                    fillWithDisqualify(puzzle, x, y);
                 }
             }
         }
@@ -441,6 +443,16 @@ class BoardView {
         }
 
         TouchMonitor.INSTANCE.setTouchUp(false);
+    }
+
+    private void fillWithDisqualify(Puzzle puzzle, int x, int y) {
+        if (puzzle.isRowComplete(y)) {
+            puzzle.fillRowBoardInputValueIfEmpty(y, BoardInputValue.DISQUALIFY);
+        }
+
+        if (puzzle.isColumnComplete(x)) {
+            puzzle.fillColumnBoardInputValueIfEmpty(x, BoardInputValue.DISQUALIFY);
+        }
     }
 
     private void editSlotUsingTouch(BoardInputValue boardInputValue, int color) {

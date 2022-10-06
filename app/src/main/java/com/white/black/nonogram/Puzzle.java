@@ -122,6 +122,32 @@ public class Puzzle {
         coloringProgress.getBoardInputValues()[x][y] = boardInputValue;
     }
 
+    public void fillRowBoardInputValueIfEmpty(int y, BoardInputValue boardInputValue) {
+        if (!hasColoringProgress()) {
+            initializeColoringProgress();
+        }
+
+        for (int x = 0; x < coloringProgress.getBoardInputValues().length; x++) {
+            if (coloringProgress.getBoardInputValues()[x][y] == null) {
+                coloringProgress.getBoardInputValues()[x][y] = boardInputValue;
+            }
+        }
+    }
+
+    public void fillColumnBoardInputValueIfEmpty(int x, BoardInputValue boardInputValue) {
+        if (!hasColoringProgress()) {
+            initializeColoringProgress();
+        }
+
+        int numOfRows = coloringProgress.getBoardInputValues()[0].length;
+
+        for (int y = 0; y < numOfRows; y++) {
+            if (coloringProgress.getBoardInputValues()[x][y] == null) {
+                coloringProgress.getBoardInputValues()[x][y] = boardInputValue;
+            }
+        }
+    }
+
     public BoardInputValue getBoardInputValue(int x, int y) {
         if (!hasColoringProgress()) {
             initializeColoringProgress();
@@ -361,6 +387,16 @@ public class Puzzle {
         }
 
         return true;
+    }
+
+    public boolean isRowComplete(int y) {
+        List<ColoredNumber> row = getNumbers().getRows().get(y);
+        return row.equals(PuzzleFactory.INSTANCE.getRowColors(y, getColoringProgressColors()));
+    }
+
+    public boolean isColumnComplete(int x) {
+        List<ColoredNumber> column = getNumbers().getColumns().get(x);
+        return column.equals(PuzzleFactory.INSTANCE.getColumnColors(x, getColoringProgressColors()));
     }
 
     public boolean isPartiallyDone() {
