@@ -290,6 +290,7 @@ class PuzzleSolvedView {
     }
 
     public void draw(Canvas canvas, Paint paint) {
+        paint.setTextAlign(Paint.Align.LEFT);
         Puzzle puzzle = PuzzleSelectionView.INSTANCE.getOverallPuzzle();
         paint.setColor(backgroundColor);
         canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);

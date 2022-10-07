@@ -169,31 +169,39 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
 
     @Override
     public void onBackPressed() {
-        if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
-            if (YesNoQuestion.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
-                YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
-                MyMediaPlayer.play("blop");
-            } else {
-                onOptionsButtonPressed();
-            }
+        if (Puzzles.hasPlayerSolvedAtLeastOnePuzzle(GameActivity.this)) {
+            if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
+                if (YesNoQuestion.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
+                    YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
+                    MyMediaPlayer.play("blop");
+                } else {
+                    onOptionsButtonPressed();
+                }
 
-            gameView.render();
-        } else if (gameView.isShowPopup()) {
-            if (gameView.isShowVipPopup()) {
-                MyMediaPlayer.play("blop");
-                gameView.setShowVipPopup(false);
                 gameView.render();
+            } else if (gameView.isShowPopup()) {
+                if (gameView.isShowVipPopup()) {
+                    MyMediaPlayer.play("blop");
+                    gameView.setShowVipPopup(false);
+                    gameView.render();
+                } else {
+                    gameView.getPopup().doOnNoAnswer();
+                    gameView.getPopup().setAnswered(false);
+                }
             } else {
-                gameView.getPopup().doOnNoAnswer();
-                gameView.getPopup().setAnswered(false);
+                GameState.setGameState(GameState.PUZZLE_SELECTION);
+                GameActivity.this.finish();
+                this.overridePendingTransition(0, R.anim.leave);
+                MyMediaPlayer.play("page_selection");
+
+                gameView.clearBackground();
             }
         } else {
-            GameState.setGameState(GameState.PUZZLE_SELECTION);
-            GameActivity.this.finish();
-            this.overridePendingTransition(0, R.anim.leave);
-            MyMediaPlayer.play("page_selection");
-
-            gameView.clearBackground();
+            Intent start = new Intent(Intent.ACTION_MAIN);
+            start.addCategory(Intent.CATEGORY_HOME);
+            start.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            start.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(start);
         }
     }
 

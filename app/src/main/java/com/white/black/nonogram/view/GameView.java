@@ -29,6 +29,7 @@ import com.white.black.nonogram.GameState;
 import com.white.black.nonogram.MemoryManager;
 import com.white.black.nonogram.MyMediaPlayer;
 import com.white.black.nonogram.Puzzle;
+import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
 import com.white.black.nonogram.view.buttons.ButtonState;
@@ -109,7 +110,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public boolean isShowPopup() {
-        return popup.isShowingPopup();
+        return popup != null && popup.isShowingPopup();
     }
 
     public boolean isShowVipPopup() {
@@ -199,34 +200,37 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         super.draw(canvas);
 
         handleBackground(canvas, paint, new Rect(0, boardView.getBoardTop(), ApplicationSettings.INSTANCE.getScreenWidth(), boardView.getBoardBottom()));
+
         if (GameSettings.INSTANCE.getInput().equals(GameSettings.Input.JOYSTICK)) {
             drawOnJoystick(canvas, paint);
         } else {
             drawOnTouch(canvas, paint);
         }
 
-        returnButtonView.draw(canvas, paint);
-        puzzleSelectionSettingsButtonView.draw(canvas, paint);
-        ButtonState undoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isUndoable()) ? ButtonState.ENABLED : ButtonState.DISABLED;
-        undoButtonView.draw(canvas, paint, undoButtonState);
-        ButtonState redoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isRedoable()) ? ButtonState.ENABLED : ButtonState.DISABLED;
-        redoButtonView.draw(canvas, paint, redoButtonState);
-        clueButtonView.draw(canvas, paint);
-        canvas.drawBitmap(paintPalette, null, paintPaletteBounds, paint);
+        if (gameOptionsView != null) { // player has solved at least one puzzle
+            returnButtonView.draw(canvas, paint);
+            puzzleSelectionSettingsButtonView.draw(canvas, paint);
+            ButtonState undoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isUndoable()) ? ButtonState.ENABLED : ButtonState.DISABLED;
+            undoButtonView.draw(canvas, paint, undoButtonState);
+            ButtonState redoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isRedoable()) ? ButtonState.ENABLED : ButtonState.DISABLED;
+            redoButtonView.draw(canvas, paint, redoButtonState);
+            clueButtonView.draw(canvas, paint);
+            canvas.drawBitmap(paintPalette, null, paintPaletteBounds, paint);
 
-        if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
-            gameOptionsView.draw(canvas, paint);
-        }
+            if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
+                gameOptionsView.draw(canvas, paint);
+            }
 
-        if (YesNoQuestion.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
-            YesNoQuestion.INSTANCE.draw(canvas, paint);
+            if (YesNoQuestion.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
+                YesNoQuestion.INSTANCE.draw(canvas, paint);
+            }
+
+            popup.draw(canvas, paint);
         }
 
         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
             puzzleSolvedView.draw(canvas, paint);
         }
-
-        popup.draw(canvas, paint);
     }
 
     private void drawOnJoystick(Canvas canvas, Paint paint) {
@@ -258,15 +262,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private void drawOnTouch(Canvas canvas, Paint paint) {
         boardView.draw(canvas, paint, boardInputValueButtonGroup.getCurrentPressedVal(), colorInputValueButtonGroup.getCurrentPressedVal());
         coverBoardWithBackground(canvas, paint);
-        boardInputValueButtonGroup.draw(canvas, paint);
-        if (boardInputValueButtonGroup.getCurrentPressedVal().equals(BoardInputValue.BRUSH)) {
-            colorInputValueButtonGroup.draw(canvas, paint);
-        } else {
-            Integer color = colorInputValueButtonGroup.getCurrentPressedVal();
-            Integer fakeColor = -1;
-            colorInputValueButtonGroup.setCurrentPressedVal(fakeColor);
-            colorInputValueButtonGroup.draw(canvas, paint);
-            colorInputValueButtonGroup.setCurrentPressedVal(color);
+
+        if (gameOptionsView != null) { // player has solved at least one puzzle
+            boardInputValueButtonGroup.draw(canvas, paint);
+            if (boardInputValueButtonGroup.getCurrentPressedVal().equals(BoardInputValue.BRUSH)) {
+                colorInputValueButtonGroup.draw(canvas, paint);
+            } else {
+                Integer color = colorInputValueButtonGroup.getCurrentPressedVal();
+                Integer fakeColor = -1;
+                colorInputValueButtonGroup.setCurrentPressedVal(fakeColor);
+                colorInputValueButtonGroup.draw(canvas, paint);
+                colorInputValueButtonGroup.setCurrentPressedVal(color);
+            }
         }
     }
 
@@ -336,10 +343,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public synchronized boolean onTouchEvent(MotionEvent event) {
         if (initDone) {
             gameViewListener.onViewTouched(event);
-
             if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
                 puzzleSolvedView.onTouchEvent(gameViewListener);
-            } else if (popup.isShowingPopup()) {
+            } else if (popup != null && popup.isShowingPopup()) {
                 popup.onTouchEvent();
                 TouchMonitor.INSTANCE.setTouchUp(false);
             } else if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED)) {
@@ -422,47 +428,51 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void doOnGameSettingsMinimized(MotionEvent event) {
-        if (returnButtonView.wasPressed()) {
-            TouchMonitor.INSTANCE.setTouchUp(false);
-            returnButtonView.onButtonPressed();
-        } else if (puzzleSelectionSettingsButtonView.wasPressed()) {
-            TouchMonitor.INSTANCE.setTouchUp(false);
-            puzzleSelectionSettingsButtonView.onButtonPressed();
-        } else if (undoButtonView.wasPressed()) {
-            TouchMonitor.INSTANCE.setTouchUp(false);
-            undoButtonView.onButtonPressed();
-            ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.UNDO);
-        } else if (redoButtonView.wasPressed()) {
-            TouchMonitor.INSTANCE.setTouchUp(false);
-            redoButtonView.onButtonPressed();
-            ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.REDO);
-        } else if (clueButtonView.wasPressed()) {
-            TouchMonitor.INSTANCE.setTouchUp(false);
-            MyMediaPlayer.play("blop");
-            if (gameViewListener.numOfAvailableClues() > 0 || AdManager.isRemoveAds()) {
-                ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.CLUE);
-                boardView.useClue();
-                gameViewListener.useClue();
-                // clueButtonView.onButtonPressed();
-                // new Thread(redrawWhileClueIsNotAvailable).start();
+        if (gameOptionsView != null) { // player has solved at least one puzzle
+            if (returnButtonView.wasPressed()) {
+                TouchMonitor.INSTANCE.setTouchUp(false);
+                returnButtonView.onButtonPressed();
+            } else if (puzzleSelectionSettingsButtonView.wasPressed()) {
+                TouchMonitor.INSTANCE.setTouchUp(false);
+                puzzleSelectionSettingsButtonView.onButtonPressed();
+            } else if (undoButtonView.wasPressed()) {
+                TouchMonitor.INSTANCE.setTouchUp(false);
+                undoButtonView.onButtonPressed();
+                ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.UNDO);
+            } else if (redoButtonView.wasPressed()) {
+                TouchMonitor.INSTANCE.setTouchUp(false);
+                redoButtonView.onButtonPressed();
+                ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.REDO);
+            } else if (clueButtonView.wasPressed()) {
+                TouchMonitor.INSTANCE.setTouchUp(false);
+                MyMediaPlayer.play("blop");
+                if (gameViewListener.numOfAvailableClues() > 0 || AdManager.isRemoveAds()) {
+                    ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.CLUE);
+                    boardView.useClue();
+                    gameViewListener.useClue();
+                    // clueButtonView.onButtonPressed();
+                    // new Thread(redrawWhileClueIsNotAvailable).start();
+                } else {
+                    popup.setShowPopup(true);
+                }
             } else {
-                popup.setShowPopup(true);
+                if (colorInputValueButtonGroup.press() && GameSettings.INSTANCE.getInput().equals(GameSettings.Input.TOUCH)) {
+                    boardInputValueButtonGroup.setCurrentPressedVal(BoardInputValue.BRUSH);
+                }
+
+                boardView.handleCamera();
+
+                if (GameSettings.INSTANCE.getInput().equals(GameSettings.Input.JOYSTICK)) {
+                    applyTouchEventIdsOnJoystickInputMode(event);
+                    doOnJoystickInputMode();
+                    removeTouchEventIdsOnJoystickInputMode(event);
+                } else {
+                    boardInputValueButtonGroup.press();
+                    boardView.editSlotRouter(boardInputValueButtonGroup.getCurrentPressedVal(), colorInputValueButtonGroup.getCurrentPressedVal());
+                }
             }
         } else {
-            if (colorInputValueButtonGroup.press() && GameSettings.INSTANCE.getInput().equals(GameSettings.Input.TOUCH)) {
-                boardInputValueButtonGroup.setCurrentPressedVal(BoardInputValue.BRUSH);
-            }
-
-            boardView.handleCamera();
-
-            if (GameSettings.INSTANCE.getInput().equals(GameSettings.Input.JOYSTICK)) {
-                applyTouchEventIdsOnJoystickInputMode(event);
-                doOnJoystickInputMode();
-                removeTouchEventIdsOnJoystickInputMode(event);
-            } else {
-                boardInputValueButtonGroup.press();
-                boardView.editSlotRouter(boardInputValueButtonGroup.getCurrentPressedVal(), colorInputValueButtonGroup.getCurrentPressedVal());
-            }
+            boardView.editSlotRouter(boardInputValueButtonGroup.getCurrentPressedVal(), colorInputValueButtonGroup.getCurrentPressedVal());
         }
     }
 
@@ -510,59 +520,64 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         int buttonHeight = ApplicationSettings.INSTANCE.getScreenHeight() / 12;
         int buttonWidth = ApplicationSettings.INSTANCE.getScreenWidth() * 22 / 100;
 
-        RectF returnButtonBounds = new RectF(
-                horizontalDistanceFromEdge,
-                top,
-                horizontalDistanceFromEdge + buttonWidth,
-                top + buttonHeight
-        );
-
-        returnButtonView = new ReturnButtonView(
-                (ViewListener) context,
-                context.getString(R.string.return_button),
-                returnButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.return_100)}, context, paint);
-
-        RectF settingsButtonBounds = new RectF(
-                ApplicationSettings.INSTANCE.getScreenWidth() - horizontalDistanceFromEdge - buttonWidth,
-                top,
-                ApplicationSettings.INSTANCE.getScreenWidth() - horizontalDistanceFromEdge,
-                top + buttonHeight
-        );
-
-        puzzleSelectionSettingsButtonView = new PuzzleSelectionSettingsButtonView(
-                (ViewListener) context,
-                context.getString(R.string.settings_description),
-                settingsButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.settings_512)}, context, paint);
-
-        gameOptionsView = new GameOptionsView();
-        gameOptionsView.init(context, paint);
-
         if (GameSettings.INSTANCE.getInput().equals(GameSettings.Input.TOUCH)) {
             initTouchToolbar(context, paint);
         } else {
             initJoystickToolbar(context, paint);
         }
 
-        PuzzleSelectionView.INSTANCE.getSelectedPuzzle().fillPermanentDisqualify();
+        if (Puzzles.hasPlayerSolvedAtLeastOnePuzzle(context)) { // player has solved at least one puzzle
+            RectF returnButtonBounds = new RectF(
+                    horizontalDistanceFromEdge,
+                    top,
+                    horizontalDistanceFromEdge + buttonWidth,
+                    top + buttonHeight
+            );
 
-        this.popup = new WatchAdPopup(
-                context,
-                paint,
-                context.getString(R.string.get_hints),
-                BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512),
-                () -> {
-                    render();
-                    onRewardedAdOffered(context, false);
-                },
-                () -> {
-                    onRewarded(context);
-                    onRewardedAdOffered(context, true);
-                },
-                (error) -> onAdFailedToLoad(error, context),
-                this::render
-        );
+            returnButtonView = new ReturnButtonView(
+                    (ViewListener) context,
+                    context.getString(R.string.return_button),
+                    returnButtonBounds,
+                    ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.return_100)}, context, paint);
+
+            RectF settingsButtonBounds = new RectF(
+                    ApplicationSettings.INSTANCE.getScreenWidth() - horizontalDistanceFromEdge - buttonWidth,
+                    top,
+                    ApplicationSettings.INSTANCE.getScreenWidth() - horizontalDistanceFromEdge,
+                    top + buttonHeight
+            );
+
+            puzzleSelectionSettingsButtonView = new PuzzleSelectionSettingsButtonView(
+                    (ViewListener) context,
+                    context.getString(R.string.settings_description),
+                    settingsButtonBounds,
+                    ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.settings_512)}, context, paint);
+
+            gameOptionsView = new GameOptionsView();
+            gameOptionsView.init(context, paint);
+
+            this.popup = new WatchAdPopup(
+                    context,
+                    paint,
+                    context.getString(R.string.get_hints),
+                    BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512),
+                    () -> {
+                        render();
+                        onRewardedAdOffered(context, false);
+                    },
+                    () -> {
+                        onRewarded(context);
+                        onRewardedAdOffered(context, true);
+                    },
+                    (error) -> onAdFailedToLoad(error, context),
+                    this::render
+            );
+        } else {
+            // colorInputValueButtonGroup = new ButtonGroup<>(colorButtonViews(context, paint, Puzzles.getTutorialPuzzleReference().getPuzzle(context)));
+            // boardInputValueButtonGroup = new ButtonGroup<>(groupedBoardInputValueButtons(context, paint));
+        }
+
+        PuzzleSelectionView.INSTANCE.getSelectedPuzzle().fillPermanentDisqualify();
 
         render();
     }
@@ -752,7 +767,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             boardView.setBoardMaxHeight(boardMaxHeight);
         }
 
-
         boardView.init(context);
         this.initDone = true;
     }
@@ -867,17 +881,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 slideUpButtonBounds,
                 ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_up_100)}, context, paint);
 
-        slideUpButtonView.setDoOnTouchEvent(new Runnable() {
-            @Override
-            public void run() {
-                if (!multiTouchBrushButtonView.isPressed() && !multiTouchDisqualifyButtonView.isPressed() && !multiTouchEraserButtonView.isPressed() && !multiTouchQuestionButtonView.isPressed()) {
-                    boardView.moveTouchDownSlotUsingJoystick(0, -1);
-                } else {
-                    boardView.moveTouchUpSlotUsingJoystick(0, -1);
-                }
-
-                render();
+        slideUpButtonView.setDoOnTouchEvent(() -> {
+            if (!multiTouchBrushButtonView.isPressed() && !multiTouchDisqualifyButtonView.isPressed() && !multiTouchEraserButtonView.isPressed() && !multiTouchQuestionButtonView.isPressed()) {
+                boardView.moveTouchDownSlotUsingJoystick(0, -1);
+            } else {
+                boardView.moveTouchUpSlotUsingJoystick(0, -1);
             }
+
+            render();
         });
 
         RectF slideDownButtonBounds = new RectF(
@@ -892,17 +903,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 slideDownButtonBounds,
                 ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.slide_down_100)}, context, paint);
 
-        slideDownButtonView.setDoOnTouchEvent(new Runnable() {
-            @Override
-            public void run() {
-                if (!multiTouchBrushButtonView.isPressed() && !multiTouchDisqualifyButtonView.isPressed() && !multiTouchEraserButtonView.isPressed() && !multiTouchQuestionButtonView.isPressed()) {
-                    boardView.moveTouchDownSlotUsingJoystick(0, +1);
-                } else {
-                    boardView.moveTouchUpSlotUsingJoystick(0, +1);
-                }
-
-                render();
+        slideDownButtonView.setDoOnTouchEvent(() -> {
+            if (!multiTouchBrushButtonView.isPressed() && !multiTouchDisqualifyButtonView.isPressed() && !multiTouchEraserButtonView.isPressed() && !multiTouchQuestionButtonView.isPressed()) {
+                boardView.moveTouchDownSlotUsingJoystick(0, +1);
+            } else {
+                boardView.moveTouchUpSlotUsingJoystick(0, +1);
             }
+
+            render();
         });
 
         RectF slideLeftButtonBounds = new RectF(
@@ -1021,5 +1029,45 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void clear() {
         boardView.clear();
         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().clear();
+    }
+
+    private List<GroupedButtonView<Integer>> colorButtonViews(Context context, Paint paint, Puzzle puzzle) {
+        List<GroupedButtonView<Integer>> colorButtonViews = new ArrayList<>();
+        for (int c : puzzle.getColorSet()) {
+            RectF colorButtonBounds = new RectF();
+
+            colorButtonViews.add(
+                    new ColorButtonView(
+                            (ViewListener) context,
+                            colorButtonBounds,
+                            ContextCompat.getColor(context, R.color.settingsBrown1),
+                            ContextCompat.getColor(context, R.color.settingsBrown2),
+                            ContextCompat.getColor(context, R.color.settingsBrown3),
+                            c,
+                            context,
+                            paint
+                    )
+            );
+        }
+
+        return colorButtonViews;
+    }
+
+    private List<GroupedButtonView<BoardInputValue>> groupedBoardInputValueButtons(Context context, Paint paint) {
+        BrushButtonView brushButtonView = new BrushButtonView(
+                (ViewListener) context,
+                new RectF(),
+                ContextCompat.getColor(context, R.color.settingsBrown1),
+                ContextCompat.getColor(context, R.color.settingsBrown2),
+                ContextCompat.getColor(context, R.color.settingsBrown3),
+                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.paint_brush_100)},
+                context,
+                paint
+        );
+
+        List<GroupedButtonView<BoardInputValue>> groupedBoardInputValueButtons = new LinkedList<>();
+        groupedBoardInputValueButtons.add(brushButtonView);
+
+        return groupedBoardInputValueButtons;
     }
 }

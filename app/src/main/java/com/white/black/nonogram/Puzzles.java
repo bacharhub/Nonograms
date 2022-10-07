@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 import androidx.core.content.ContextCompat;
 
+import com.white.black.nonogram.activities.GameActivity;
 import com.white.black.nonogram.view.ColorPack;
 
 import java.util.ArrayList;
@@ -73,6 +74,16 @@ public enum Puzzles {
                 }
             }
         }
+    }
+
+    public static boolean hasPlayerSolvedAtLeastOnePuzzle(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int numOfPuzzlesSolved = sharedPreferences.getInt(context.getString(R.string.most_puzzles_solved), 0);
+        return numOfPuzzlesSolved > 0;
+    }
+
+    public static PuzzleReference getTutorialPuzzleReference() {
+        return Puzzles.SMALL.puzzleReferences.get(0);
     }
 
     private static void addPuzzleReference(String puzzleName, int puzzleId, int imageId) {
@@ -383,6 +394,10 @@ public enum Puzzles {
                 }
             }
         }
+    }
+
+    public static void setTutorialPuzzleAsLastPuzzle() {
+        lastPuzzle = getTutorialPuzzleReference();
     }
 
     public static void writeToSharedPreferencesLastPuzzle(Context context, String uniqueId) {

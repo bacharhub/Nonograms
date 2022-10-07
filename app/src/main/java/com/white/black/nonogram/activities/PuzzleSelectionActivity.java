@@ -236,23 +236,20 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
 
     @Override
     public void onStartOverButtonPressed() {
-        YesNoQuestion.INSTANCE.init(PuzzleSelectionActivity.this, PaintManager.INSTANCE.createPaint(), PuzzleSelectionActivity.this.getString(R.string.restart_message), new Runnable() {
-            @Override
-            public void run() {
-                PuzzleSelectionView.INSTANCE.getOverallPuzzle().clear();
-                puzzleCategorySelectionView.refreshPuzzleSelectionButtonView(PuzzleSelectionView.INSTANCE.getPuzzleReference());
-                PuzzleSelectionView.INSTANCE.init(PuzzleSelectionActivity.this, PuzzleSelectionView.INSTANCE.getPuzzleReference(), PuzzleSelectionActivity.this, PaintManager.INSTANCE.createPaint());
-                PuzzleSelectionView.INSTANCE.getPuzzleReference().writeToSharedPreferences(PuzzleSelectionActivity.this.getApplicationContext());
-                YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
-                Bundle bundle = new Bundle();
-                bundle.putString(GameMonitoring.PUZZLE_CATEGORY, Puzzles.getCurrent().name());
-                bundle.putString(GameMonitoring.START_OVER, PuzzleSelectionView.INSTANCE.getOverallPuzzle().getName());
-                if (mFirebaseAnalytics != null) {
-                    mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
-                }
-
-                puzzleCategorySelectionView.render();
+        YesNoQuestion.INSTANCE.init(PuzzleSelectionActivity.this, PaintManager.INSTANCE.createPaint(), PuzzleSelectionActivity.this.getString(R.string.restart_message), () -> {
+            PuzzleSelectionView.INSTANCE.getOverallPuzzle().clear();
+            puzzleCategorySelectionView.refreshPuzzleSelectionButtonView(PuzzleSelectionView.INSTANCE.getPuzzleReference());
+            PuzzleSelectionView.INSTANCE.init(PuzzleSelectionActivity.this, PuzzleSelectionView.INSTANCE.getPuzzleReference(), PuzzleSelectionActivity.this, PaintManager.INSTANCE.createPaint());
+            PuzzleSelectionView.INSTANCE.getPuzzleReference().writeToSharedPreferences(PuzzleSelectionActivity.this.getApplicationContext());
+            YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
+            Bundle bundle = new Bundle();
+            bundle.putString(GameMonitoring.PUZZLE_CATEGORY, Puzzles.getCurrent().name());
+            bundle.putString(GameMonitoring.START_OVER, PuzzleSelectionView.INSTANCE.getOverallPuzzle().getName());
+            if (mFirebaseAnalytics != null) {
+                mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
             }
+
+            puzzleCategorySelectionView.render();
         }, () -> {
             YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
             puzzleCategorySelectionView.render();

@@ -50,6 +50,7 @@ import com.white.black.nonogram.GameSettings;
 import com.white.black.nonogram.GameState;
 import com.white.black.nonogram.MemoryManager;
 import com.white.black.nonogram.MyMediaPlayer;
+import com.white.black.nonogram.PuzzleReference;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
@@ -82,16 +83,13 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         menuView = new MenuView(this);
         setContentView(menuView);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                init();
-                try {
-                    // Obtain the FirebaseAnalytics instance.
-                    mFirebaseAnalytics = FirebaseAnalytics.getInstance(MenuActivity.this);
-                } catch (Exception ignored) {
+        new Thread(() -> {
+            init();
+            try {
+                // Obtain the FirebaseAnalytics instance.
+                mFirebaseAnalytics = FirebaseAnalytics.getInstance(MenuActivity.this);
+            } catch (Exception ignored) {
 
-                }
             }
         }).start();
 
@@ -192,55 +190,63 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         initGameDimensions();
         PaintManager.INSTANCE.init(MenuActivity.this.getApplicationContext());
         menuView.init(MenuActivity.this, PaintManager.INSTANCE.createPaint());
+        GameSettings.INSTANCE.initSound(MenuActivity.this.getApplicationContext());
 
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    //AdManager.init(MenuActivity.this.getApplicationContext());
+        new Thread(() -> {
+            /*try {
+                //AdManager.init(MenuActivity.this.getApplicationContext());
 
-                    if (!MemoryManager.isLowMemory() && !AdManager.isRemoveAds()) {
-                        MobileAds.initialize(MenuActivity.this.getApplicationContext());
-                    }
-
-                    GameSettings.INSTANCE.initSound(MenuActivity.this.getApplicationContext());
-                } catch (Exception ignored) {
-
+                if (!MemoryManager.isLowMemory() && !AdManager.isRemoveAds()) {
+                    MobileAds.initialize(MenuActivity.this.getApplicationContext());
                 }
 
-                Puzzles.init(MenuActivity.this.getApplicationContext());
+
+            } catch (Exception ignored) {
+
+            }*/
+
+            Puzzles.init(MenuActivity.this.getApplicationContext());
+
+            if (Puzzles.hasPlayerSolvedAtLeastOnePuzzle(MenuActivity.this)) {
                 continuePuzzleQuestion();
+            } else {
+                goToTutorial();
             }
         }).start();
 
-        new Thread(new Runnable() {
-            public void run() {
-                MyMediaPlayer.initialize(MenuActivity.this.getApplicationContext());
-            }
-        }).start();
+        new Thread(() -> MyMediaPlayer.initialize(MenuActivity.this.getApplicationContext())).start();
+    }
+
+    private void goToTutorial() {
+        PuzzleReference tutorialPuzzle = Puzzles.getTutorialPuzzleReference();
+        tutorialPuzzle.getPuzzle(MenuActivity.this).clear();
+        Puzzles.setTutorialPuzzleAsLastPuzzle();
+        GameState.setGameState(GameState.CONTINUE_PUZZLE);
+        Puzzles.moveToCategoryByPuzzle(tutorialPuzzle);
+        GameSettings.INSTANCE.onTouchButtonPressed();
+        Intent intent = new Intent(MenuActivity.this, PuzzleSelectionActivity.class);
+        MenuActivity.this.startActivityForResult(intent, 0);
+        Bundle bundle = new Bundle();
+        bundle.putString(GameMonitoring.CHOOSE_CATEGORY, GameMonitoring.TUTORIAL_PUZZLE);
+        mFirebaseAnalytics.logEvent(GameMonitoring.MENU_EVENT, bundle);
     }
 
     private void continuePuzzleQuestion() {
         if (Puzzles.getLastPuzzle() != null && !Puzzles.getLastPuzzle().getPuzzle(MenuActivity.this.getApplicationContext()).isDone()) {
-            YesNoQuestion.INSTANCE.init(MenuActivity.this, PaintManager.INSTANCE.createPaint(), MenuActivity.this.getString(R.string.continue_message), new Runnable() {
-                @Override
-                public void run() {
-                    YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
-                    GameState.setGameState(GameState.CONTINUE_PUZZLE);
-                    Puzzles.moveToCategoryByPuzzle(Puzzles.getLastPuzzle());
-                    Intent intent = new Intent(MenuActivity.this, PuzzleSelectionActivity.class);
-                    MenuActivity.this.startActivityForResult(intent, 0);
-                    Bundle bundle = new Bundle();
-                    bundle.putString(GameMonitoring.CHOOSE_CATEGORY, GameMonitoring.CONTINUE_PUZZLE);
-                    mFirebaseAnalytics.logEvent(GameMonitoring.MENU_EVENT, bundle);
-                    menuView.render();
-                    menuView.clearBackground();
-                }
-            }, new Runnable() {
-                @Override
-                public void run() {
-                    YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
-                    menuView.render();
-                }
+            YesNoQuestion.INSTANCE.init(MenuActivity.this, PaintManager.INSTANCE.createPaint(), MenuActivity.this.getString(R.string.continue_message), () -> {
+                YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
+                GameState.setGameState(GameState.CONTINUE_PUZZLE);
+                Puzzles.moveToCategoryByPuzzle(Puzzles.getLastPuzzle());
+                Intent intent = new Intent(MenuActivity.this, PuzzleSelectionActivity.class);
+                MenuActivity.this.startActivityForResult(intent, 0);
+                Bundle bundle = new Bundle();
+                bundle.putString(GameMonitoring.CHOOSE_CATEGORY, GameMonitoring.CONTINUE_PUZZLE);
+                mFirebaseAnalytics.logEvent(GameMonitoring.MENU_EVENT, bundle);
+                menuView.render();
+                menuView.clearBackground();
+            }, () -> {
+                YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
+                menuView.render();
             });
 
             menuView.render();

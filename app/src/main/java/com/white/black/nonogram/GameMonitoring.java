@@ -28,6 +28,7 @@ public class GameMonitoring {
     public static final String FACEBOOK = "facebook";
     public static final String LOTTERY = "lottery";
     public static final String CONTINUE_PUZZLE = "continue_puzzle";
+    public static final String TUTORIAL_PUZZLE = "tutorial_puzzle";
     public static final String SMALL_PUZZLES = "small_puzzles";
     public static final String NORMAL_PUZZLES = "normal_puzzles";
     public static final String LARGE_PUZZLES = "large_puzzles";
