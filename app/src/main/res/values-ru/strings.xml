@@ -36,6 +36,7 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="board_numbers_size_percentage">0.80f</string>
+    <string name="fill_cells">заполнить ячейки</string>
     <string name="zoomed_board_numbers_size_percentage">0.85f</string>
     <string name="next_puzzle">Продолжить</string>
     <string name="lottery">Лотерея</string>

@@ -46,6 +46,7 @@
     <string name="click_to_play">Click to play</string>
     <string name="app_id">842719909943</string>
     <string name="most_puzzles_solved">CgkIt7CVsMMYEAIQAQ</string>
+    <string name="fill_cells">Fill the empty cells</string>
     <string name="leaderboards_score" translatable="false">leaderboards_score</string>
     <string name="signin_other_error">Please check your network connection and try again later.</string>
     <string name="no_internet_connection">Please check your network connection and try again later.</string>

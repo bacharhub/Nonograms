@@ -9,6 +9,52 @@ import java.util.Stack;
 
 public class Puzzle {
 
+    public static class SolutionStep {
+        private int xLeft;
+        private int xRight;
+        private int yTop;
+        private int yBottom;
+        private SolutionStep nextStep;
+
+        public int getXLeft() {
+            return xLeft;
+        }
+
+        public int getXRight() {
+            return xRight;
+        }
+
+        public int getYTop() {
+            return yTop;
+        }
+
+        public int getYBottom() {
+            return yBottom;
+        }
+
+        public SolutionStep(int xLeft, int xRight, int yTop, int yBottom, SolutionStep nextStep) {
+            this.xLeft = xLeft;
+            this.xRight = xRight;
+            this.yTop = yTop;
+            this.yBottom = yBottom;
+            this.nextStep = nextStep;
+        }
+    }
+
+    private volatile SolutionStep solutionStep;
+
+    public SolutionStep getSolutionStep() {
+        return solutionStep;
+    }
+
+    public synchronized void nextSolutionStep() {
+        solutionStep = solutionStep.nextStep;
+    }
+
+    public void addSolutionStep(SolutionStep solutionStep) {
+        this.solutionStep = solutionStep;
+    }
+
     public PuzzleClass getPuzzleClass() {
         return puzzleClass;
     }
@@ -26,7 +72,6 @@ public class Puzzle {
 
     private final static long NEW_PERIOD = 3600 * 24 * 14 * 1000; //14 days
     private final long puzzleFirstLoadTime;
-    private static final long INTERVAL_BETWEEN_CLUES_MILLISECONDS = 30 * 1000;
     private final int id;
     private final String name;
 
@@ -40,7 +85,6 @@ public class Puzzle {
     private ColoringProgress coloringProgress;
     private FixedStack<ColoringProgress> fixedUndo = new FixedStack<>(10);
     private final Stack<ColoringProgress> redo = new Stack<>();
-    private long lastClueUsedTime;
     private boolean usingHintOnFirstStep;
 
     public void setUsingHintOnFirstStep(boolean usingHintOnFirstStep) {
@@ -63,7 +107,7 @@ public class Puzzle {
         return fixedUndo;
     }
 
-    public Puzzle (long puzzleFirstLoadTime, int id, String name/*, Bitmap filteredBitmap*/, int[][] filteredColors, List<Integer> colorSet, Numbers numbers) {
+    public Puzzle(long puzzleFirstLoadTime, int id, String name, int[][] filteredColors, List<Integer> colorSet, Numbers numbers, SolutionStep solutionStep) {
         this.puzzleFirstLoadTime = puzzleFirstLoadTime;
         this.id = id;
         this.name = name;
@@ -71,6 +115,7 @@ public class Puzzle {
         this.colorSet = colorSet;
         this.subPuzzles = new LinkedList<>();
         this.numbers = numbers;
+        this.solutionStep = solutionStep;
     }
 
     private void initializeColoringProgress() {
@@ -92,26 +137,6 @@ public class Puzzle {
 
     public void setLastTimeSolvingTimeIncreased(long lastTimeSolvingTimeIncreased) {
         this.lastTimeSolvingTimeIncreased = lastTimeSolvingTimeIncreased;
-    }
-
-    public long getLastClueUsedTime() {
-        return lastClueUsedTime;
-    }
-
-    public static long getIntervalBetweenCluesMilliseconds() {
-        return INTERVAL_BETWEEN_CLUES_MILLISECONDS;
-    }
-
-    public boolean isClueAvailable() {
-        return System.currentTimeMillis() > lastClueUsedTime + INTERVAL_BETWEEN_CLUES_MILLISECONDS;
-    }
-
-    public void setClueNotAvailable() {
-        lastClueUsedTime = System.currentTimeMillis();
-    }
-
-    private void setClueAvailable() {
-        lastClueUsedTime = 0;
     }
 
     public void putBoardInputValue(int x, int y, BoardInputValue boardInputValue) {
@@ -255,9 +280,9 @@ public class Puzzle {
             }
         }
 
-        int seconds = (int) (totalSolvingTime / 1000) % 60 ;
-        int minutes = (int) ((totalSolvingTime / (1000*60)) % 60);
-        int hours   = (int) ((totalSolvingTime / (1000*60*60)) % 24);
+        int seconds = (int) (totalSolvingTime / 1000) % 60;
+        int minutes = (int) ((totalSolvingTime / (1000 * 60)) % 60);
+        int hours = (int) ((totalSolvingTime / (1000 * 60 * 60)) % 24);
 
         StringBuilder duration = new StringBuilder();
         if (hours > 0) {
@@ -323,7 +348,7 @@ public class Puzzle {
             initializeColoringProgress();
         }
 
-        for(int x = 0; x < this.filteredColors.length; x++) {
+        for (int x = 0; x < this.filteredColors.length; x++) {
             for (int y = 0; y < this.filteredColors[0].length; y++) {
                 if (BoardInputValue.BRUSH.equals(this.coloringProgress.getBoardInputValues()[x][y])) {
                     this.coloringProgress.getBoardInputValues()[x][y] = null;
@@ -331,7 +356,7 @@ public class Puzzle {
             }
         }
 
-        for(int x = 0; x < this.filteredColors.length; x++) {
+        for (int x = 0; x < this.filteredColors.length; x++) {
             for (int y = 0; y < this.filteredColors[0].length; y++) {
                 this.coloringProgress.getColoringProgress()[x][y] = this.filteredColors[x][y];
                 if (this.filteredColors[x][y] != 0) {
@@ -404,7 +429,7 @@ public class Puzzle {
             return false;
         }
 
-        for(int x = 0; x < this.filteredColors.length; x++) {
+        for (int x = 0; x < this.filteredColors.length; x++) {
             for (int y = 0; y < this.filteredColors[0].length; y++) {
                 if (Color.alpha(this.coloringProgress.getColoringProgress()[x][y]) != 0) {
                     return true;
@@ -432,7 +457,6 @@ public class Puzzle {
         this.coloringProgress = null;
         fillPermanentDisqualify();
         clearUndoRedo();
-        setClueAvailable();
         this.initializeSolvingTime();
 
         if (subPuzzles.size() > 0) {

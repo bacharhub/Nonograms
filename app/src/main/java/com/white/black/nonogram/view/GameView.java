@@ -16,7 +16,6 @@ import android.view.SurfaceView;
 
 import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.white.black.nonogram.AdManager;
@@ -33,25 +32,25 @@ import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
 import com.white.black.nonogram.view.buttons.ButtonState;
+import com.white.black.nonogram.view.buttons.PuzzleSelectionSettingsButtonView;
+import com.white.black.nonogram.view.buttons.ReturnButtonView;
+import com.white.black.nonogram.view.buttons.boardinput.ButtonGroup;
+import com.white.black.nonogram.view.buttons.boardinput.GroupedButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.multitouch.MultiTouchBrushButtonView;
-import com.white.black.nonogram.view.buttons.boardinput.multitouch.MultiTouchQuestionButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.multitouch.MultiTouchDisqualifyButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.multitouch.MultiTouchEraserButtonView;
+import com.white.black.nonogram.view.buttons.boardinput.multitouch.MultiTouchQuestionButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.multitouch.SlideDownButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.multitouch.SlideLeftButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.multitouch.SlideRightButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.multitouch.SlideUpButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.singletouch.BrushButtonView;
-import com.white.black.nonogram.view.buttons.boardinput.ButtonGroup;
 import com.white.black.nonogram.view.buttons.boardinput.singletouch.ClueButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.singletouch.ColorButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.singletouch.DisqualifyButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.singletouch.EraserButtonView;
-import com.white.black.nonogram.view.buttons.PuzzleSelectionSettingsButtonView;
-import com.white.black.nonogram.view.buttons.boardinput.GroupedButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.singletouch.QuestionButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.singletouch.RedoButtonView;
-import com.white.black.nonogram.view.buttons.ReturnButtonView;
 import com.white.black.nonogram.view.buttons.boardinput.singletouch.UndoButtonView;
 import com.white.black.nonogram.view.listeners.GameMonitoringListener;
 import com.white.black.nonogram.view.listeners.GameViewListener;
@@ -60,7 +59,6 @@ import com.white.black.nonogram.view.listeners.ViewListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -92,10 +90,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private MultiTouchEraserButtonView multiTouchEraserButtonView;
 
     private Bitmap background;
+    private Bitmap taskIcon;
     private BoardView boardView;
     private PuzzleSolvedView puzzleSolvedView;
 
     private WatchAdPopup popup;
+
+    private boolean isTutorial;
+    private String taskInstruction;
 
     public VipPopup getVipPopup() {
         return popup.getVipPopup();
@@ -207,7 +209,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             drawOnTouch(canvas, paint);
         }
 
-        if (gameOptionsView != null) { // player has solved at least one puzzle
+        if (isTutorial) {
+            drawInstruction(canvas, paint);
+        } else {
             returnButtonView.draw(canvas, paint);
             puzzleSelectionSettingsButtonView.draw(canvas, paint);
             ButtonState undoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isUndoable()) ? ButtonState.ENABLED : ButtonState.DISABLED;
@@ -231,6 +235,39 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
             puzzleSolvedView.draw(canvas, paint);
         }
+    }
+
+    private void drawInstruction(Canvas canvas, Paint paint) {
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTextSize(ApplicationSettings.INSTANCE.getScreenWidth() / 15);
+        Rect textBounds = new Rect();
+        paint.getTextBounds(taskInstruction, 0, taskInstruction.length(), textBounds);
+
+        int gapBetweenInstructionAndIcon = 30;
+        int taskIconSize = 192;
+        int distanceFromLeftEdge = (ApplicationSettings.INSTANCE.getScreenWidth() - (taskIconSize + gapBetweenInstructionAndIcon + textBounds.width())) / 2;
+
+        paint.setColor(Color.WHITE);
+        paint.setAlpha(165);
+        canvas.drawRect(
+                0,
+                boardView.getBoardBottom() - taskIconSize / 2 - 20,
+                ApplicationSettings.INSTANCE.getScreenWidth(),
+                boardView.getBoardBottom() + taskIconSize / 2 + 20,
+                paint
+        );
+
+        paint.setAlpha(255);
+        canvas.drawBitmap(taskIcon, null, new RectF(
+                distanceFromLeftEdge,
+                boardView.getBoardBottom() - taskIconSize / 2,
+                taskIconSize + distanceFromLeftEdge,
+                boardView.getBoardBottom() + taskIconSize / 2
+        ), paint);
+
+        paint.setColor(Color.BLACK);
+        canvas.drawText(taskInstruction, distanceFromLeftEdge + taskIconSize + gapBetweenInstructionAndIcon, boardView.getBoardBottom() + 20, paint);
+        paint.setTextAlign(Paint.Align.CENTER);
     }
 
     private void drawOnJoystick(Canvas canvas, Paint paint) {
@@ -263,7 +300,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         boardView.draw(canvas, paint, boardInputValueButtonGroup.getCurrentPressedVal(), colorInputValueButtonGroup.getCurrentPressedVal());
         coverBoardWithBackground(canvas, paint);
 
-        if (gameOptionsView != null) { // player has solved at least one puzzle
+        if (!isTutorial) { // player has solved at least one puzzle
             boardInputValueButtonGroup.draw(canvas, paint);
             if (boardInputValueButtonGroup.getCurrentPressedVal().equals(BoardInputValue.BRUSH)) {
                 colorInputValueButtonGroup.draw(canvas, paint);
@@ -428,7 +465,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void doOnGameSettingsMinimized(MotionEvent event) {
-        if (gameOptionsView != null) { // player has solved at least one puzzle
+        if (!isTutorial) { // player has solved at least one puzzle
             if (returnButtonView.wasPressed()) {
                 TouchMonitor.INSTANCE.setTouchUp(false);
                 returnButtonView.onButtonPressed();
@@ -514,11 +551,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         animals.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.reindeer_100));
         animals.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.turtle_100));
 
+        taskIcon = BitmapLoader.INSTANCE.getImage(context, R.drawable.task_64);
+
         int adSizeHeight = 0; // (AdManager.isRemoveAds())? 0 : AdSize.SMART_BANNER.getHeightInPixels(context);
         int top = adSizeHeight + ApplicationSettings.INSTANCE.getScreenHeight() / 100;
         int horizontalDistanceFromEdge = ApplicationSettings.INSTANCE.getScreenHeight() / 22;
         int buttonHeight = ApplicationSettings.INSTANCE.getScreenHeight() / 12;
         int buttonWidth = ApplicationSettings.INSTANCE.getScreenWidth() * 22 / 100;
+        taskInstruction = context.getString(R.string.fill_cells);
+
+        this.isTutorial = !Puzzles.hasPlayerSolvedAtLeastOnePuzzle(context);
+
+        if (isTutorial) {
+            new Thread(() -> {
+                while (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().getSolutionStep() != null) {
+                    try {
+                        render();
+                        Thread.sleep(25);
+                    } catch (Exception ignored) {
+                    }
+                }
+            }).start();
+        }
 
         if (GameSettings.INSTANCE.getInput().equals(GameSettings.Input.TOUCH)) {
             initTouchToolbar(context, paint);
@@ -526,7 +580,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             initJoystickToolbar(context, paint);
         }
 
-        if (Puzzles.hasPlayerSolvedAtLeastOnePuzzle(context)) { // player has solved at least one puzzle
+        if (!isTutorial) { // player has solved at least one puzzle
             RectF returnButtonBounds = new RectF(
                     horizontalDistanceFromEdge,
                     top,

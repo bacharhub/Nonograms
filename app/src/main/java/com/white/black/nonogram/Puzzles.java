@@ -67,7 +67,7 @@ public enum Puzzles {
     }
 
     public static void releasePuzzlesOfOtherCategories() {
-        for(Puzzles puzzleCategory : Puzzles.values()) {
+        for (Puzzles puzzleCategory : Puzzles.values()) {
             if (puzzleCategory != Puzzles.getCurrent()) {
                 for (PuzzleReference puzzleReference : puzzleCategory.getPuzzleReferences()) {
                     puzzleReference.release();
@@ -91,24 +91,33 @@ public enum Puzzles {
     }
 
     private static void addPuzzleReference(Puzzle.PuzzleClass puzzleClass, String puzzleName, int puzzleId, int imageId) {
-        current.puzzleReferences.add(new PuzzleReference(puzzleClass, puzzleName, puzzleId, imageId));
+        addPuzzleReference(puzzleClass, puzzleName, puzzleId, imageId, null);
+    }
+
+    private static void addPuzzleReference(Puzzle.PuzzleClass puzzleClass, String puzzleName, int puzzleId, int imageId, Puzzle.SolutionStep solutionStep) {
+        current.puzzleReferences.add(new PuzzleReference(puzzleClass, puzzleName, puzzleId, imageId, solutionStep));
     }
 
     private static void loadSmallPuzzles(Context context) {
         current = SMALL;
 
-        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.smile), 5, R.drawable.smile_5); // 00:05
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.smile), 5, R.drawable.smile_5, new Puzzle.SolutionStep(
+                0, 4, 3, 3, new Puzzle.SolutionStep(
+                4, 4, 2, 3, new Puzzle.SolutionStep(
+                3, 3, 0, 1, new Puzzle.SolutionStep(
+                1, 1, 0, 1, null))))); // 00:05
+
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.hashtag), 12, R.drawable.hashtag_12); // 00:05
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.ticket), 11, R.drawable.ticket_11); // 00:06
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.screen), 13, R.drawable.screen_13); // 00:08
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.charged_battery), 14, R.drawable.charged_battery_14); // 00:08
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.box), 14, R.drawable.box_14); // 00:13
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.binoculars), 12, R.drawable.binoculars_12); // 00:14
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.flag), 13, R.drawable.flag_13); // 00:19
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.bus), 13, R.drawable.bus_13); // 00:24
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.mail), 12, R.drawable.mail_12); // 00:26
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.hourglass), 14, R.drawable.hourglass_14); // 00:29
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.keyboard), 13, R.drawable.keyboard_13); // 00:32
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.flag), 13, R.drawable.flag_13); // 00:19
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.bus), 13, R.drawable.bus_13); // 00:24
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.mail), 12, R.drawable.mail_12); // 00:26
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.hourglass), 14, R.drawable.hourglass_14); // 00:29
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.keyboard), 13, R.drawable.keyboard_13); // 00:32
 
         addPuzzleReference(context.getString(R.string.camera), 12, R.drawable.camera_12); // 00:32
         addPuzzleReference(context.getString(R.string.lock), 12, R.drawable.lock_12); // 00:34
@@ -142,12 +151,12 @@ public enum Puzzles {
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.crown), 16, R.drawable.crown_16); // 02:02
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.cake), 16, R.drawable.cake_16); // 02:10
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.camera), 16, R.drawable.camera_16); // 02:22
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.shop), 16, R.drawable.shop_16); // 02:32
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.octopus), 16, R.drawable.octopus_16); // 02:35
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.lock), 18, R.drawable.lock_18); // 02:46
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.fox), 16, R.drawable.fox_15); // 02:50
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.golf_ball), 16, R.drawable.golf_ball_16); // 02:57
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.mosque), 16, R.drawable.mosque_16); // 03:05
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.shop), 16, R.drawable.shop_16); // 02:32
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.octopus), 16, R.drawable.octopus_16); // 02:35
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.lock), 18, R.drawable.lock_18); // 02:46
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.fox), 16, R.drawable.fox_15); // 02:50
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.golf_ball), 16, R.drawable.golf_ball_16); // 02:57
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.mosque), 16, R.drawable.mosque_16); // 03:05
 
         addPuzzleReference(context.getString(R.string.skull), 16, R.drawable.skull_16); // 03:17
         addPuzzleReference(context.getString(R.string.heart), 16, R.drawable.heart_16); // 03:17
@@ -177,12 +186,12 @@ public enum Puzzles {
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.pig), 24, R.drawable.pig_24); // 04:36
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.corgi), 24, R.drawable.corgi_24); // 05:26
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.bug), 24, R.drawable.bug_24); // 05:49
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.rucksack), 24, R.drawable.rucksack_24); // 06:32
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.coffee_maker), 24, R.drawable.coffee_maker_24); // 06:48
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.butterfly), 24, R.drawable.butterfly_24); // 06:54
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.gorilla), 24, R.drawable.gorilla_24); // 07:46
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.elephant), 24, R.drawable.elephant_24); // 07:54
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.bear), 24, R.drawable.bear_24); // 08:03
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.rucksack), 24, R.drawable.rucksack_24); // 06:32
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.coffee_maker), 24, R.drawable.coffee_maker_24); // 06:48
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.butterfly), 24, R.drawable.butterfly_24); // 06:54
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.gorilla), 24, R.drawable.gorilla_24); // 07:46
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.elephant), 24, R.drawable.elephant_24); // 07:54
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.bear), 24, R.drawable.bear_24); // 08:03
 
         addPuzzleReference(context.getString(R.string.charcoal), 24, R.drawable.charcoal_24); // 08:34
         addPuzzleReference(context.getString(R.string.snail), 24, R.drawable.snail_24); // 09:43
@@ -195,7 +204,7 @@ public enum Puzzles {
         addPuzzleReference(context.getString(R.string.coffee_pot), 24, R.drawable.coffee_pot_24); // 13:10
         addPuzzleReference(context.getString(R.string.phone), 24, R.drawable.phone_23); // 13:11
         addPuzzleReference(context.getString(R.string.anonymous), 24, R.drawable.anonymous_24); // 13:15
-        addPuzzleReference(context.getString(R.string.octopus),24, R.drawable.octopus_24); // 13:20
+        addPuzzleReference(context.getString(R.string.octopus), 24, R.drawable.octopus_24); // 13:20
         addPuzzleReference(context.getString(R.string.tire), 24, R.drawable.tire_24); // 13:26
         addPuzzleReference(context.getString(R.string.alligator), 24, R.drawable.alligator_24); // 13:31
         addPuzzleReference(context.getString(R.string.firefighter), 24, R.drawable.firefighter_24); // 14:27
@@ -219,12 +228,12 @@ public enum Puzzles {
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.nail), 50, R.drawable.nail_50); // 04:02
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.mailbox), 50, R.drawable.mailbox_50); // 04:04
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.jacket), 50, R.drawable.jacket_50); // 04:08
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.piano), 50, R.drawable.piano_50); // 04:10
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.stapler), 50, R.drawable.stapler_50); // 05:27
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.kimono), 50, R.drawable.kimono_50); // 06:02
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.crow), 50, R.drawable.crow_50); // 06:13
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.birthday_present), 50, R.drawable.birthday_present_50); // 07:24
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.starfish), 50, R.drawable.starfish_50); // 07:36
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.piano), 50, R.drawable.piano_50); // 04:10
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.stapler), 50, R.drawable.stapler_50); // 05:27
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.kimono), 50, R.drawable.kimono_50); // 06:02
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.crow), 50, R.drawable.crow_50); // 06:13
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.birthday_present), 50, R.drawable.birthday_present_50); // 07:24
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.starfish), 50, R.drawable.starfish_50); // 07:36
 
         addPuzzleReference(context.getString(R.string.wizard), 50, R.drawable.wizard_50); // 08:01
         addPuzzleReference(context.getString(R.string.treasure_chest), 50, R.drawable.treasure_chest_50); // 09:31
@@ -282,12 +291,12 @@ public enum Puzzles {
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.pokeball), 96, R.drawable.pokeball_16); // 10:26
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.emoji), 17, R.drawable.emoji_17); // 11:29
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.whale), 20, R.drawable.whale_20); // 21:32
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.sock), 24, R.drawable.sock_96); // 03:00
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.flame), 24, R.drawable.flame_96); // 16:17
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.big_ben), 96, R.drawable.big_ben_96); // 18:06
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.volcano), 48, R.drawable.volcano_96); // 18:23
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.seal), 96, R.drawable.seal_96); // 19:20
-        addPuzzleReference(Puzzle.PuzzleClass.FREE,context.getString(R.string.accordion), 96, R.drawable.accordion_96); // 23:27
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.sock), 24, R.drawable.sock_96); // 03:00
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.flame), 24, R.drawable.flame_96); // 16:17
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.big_ben), 96, R.drawable.big_ben_96); // 18:06
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.volcano), 48, R.drawable.volcano_96); // 18:23
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.seal), 96, R.drawable.seal_96); // 19:20
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.accordion), 96, R.drawable.accordion_96); // 23:27
 
         addPuzzleReference(context.getString(R.string.engagement_ring), 96, R.drawable.engagement_ring_96); // 25:01
         addPuzzleReference(context.getString(R.string.milkshake), 48, R.drawable.milkshake_96); // 25:19
@@ -368,7 +377,7 @@ public enum Puzzles {
         loadComplexPuzzles(context);
         loadColorfulPuzzles(context);
 
-        for(Puzzles puzzleCategory : Puzzles.values()) {
+        for (Puzzles puzzleCategory : Puzzles.values()) {
             for (int i = 0; i < 12; i++) {
                 puzzleCategory.getPuzzleReferences().get(i).load(context);
             }
@@ -386,7 +395,7 @@ public enum Puzzles {
             return;
         }
 
-        for(Puzzles puzzleCategory : Puzzles.values()) {
+        for (Puzzles puzzleCategory : Puzzles.values()) {
             for (PuzzleReference puzzleReference : puzzleCategory.getPuzzleReferences()) {
                 if (puzzleReference.getUniqueId().equals(lastPuzzleUniqueId)) {
                     lastPuzzle = puzzleReference;

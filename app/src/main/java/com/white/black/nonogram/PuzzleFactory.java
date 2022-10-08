@@ -28,7 +28,7 @@ public enum PuzzleFactory {
         int[][] croppedFilteredColors = crop(filteredColors);
         List<Integer> colorSet = sortColorList(new LinkedList<>(new HashSet<>(colorMatrixToList(croppedFilteredColors))));
         Numbers numbers = createNumbersOfColors(croppedFilteredColors);
-        Puzzle puzzle = new Puzzle(System.currentTimeMillis(), id, name/*, filteredBitmap*/, croppedFilteredColors, colorSet, numbers);
+        Puzzle puzzle = new Puzzle(System.currentTimeMillis(), id, name, croppedFilteredColors, colorSet, numbers, null);
         addSubPuzzles(puzzle);
 
         return puzzle;
@@ -175,7 +175,7 @@ public enum PuzzleFactory {
                 List<Integer> subPuzzleColorSet = sortColorList(new LinkedList<Integer>(new HashSet(colorMatrixToList(subPuzzleFilteredColors))));
                 //Bitmap subPuzzleFilteredBitmap = createBitmapOfFilteredColors(subPuzzleFilteredColors);
                 Numbers numbers = createNumbersOfColors(subPuzzleFilteredColors);
-                Puzzle subPuzzle = new Puzzle(System.currentTimeMillis(), puzzle.getId(), puzzle.getName()/*, subPuzzleFilteredBitmap*/, subPuzzleFilteredColors, subPuzzleColorSet, numbers);
+                Puzzle subPuzzle = new Puzzle(System.currentTimeMillis(), puzzle.getId(), puzzle.getName(), subPuzzleFilteredColors, subPuzzleColorSet, numbers, null);
 
                 puzzle.addSubPuzzle(new SubPuzzle(subPuzzle, x1, y1));
             }

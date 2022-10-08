@@ -219,7 +219,6 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
 
     private void goToTutorial() {
         PuzzleReference tutorialPuzzle = Puzzles.getTutorialPuzzleReference();
-        tutorialPuzzle.getPuzzle(MenuActivity.this).clear();
         Puzzles.setTutorialPuzzleAsLastPuzzle();
         GameState.setGameState(GameState.CONTINUE_PUZZLE);
         Puzzles.moveToCategoryByPuzzle(tutorialPuzzle);

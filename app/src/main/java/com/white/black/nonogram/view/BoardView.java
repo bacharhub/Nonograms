@@ -8,18 +8,22 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Bundle;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.white.black.nonogram.ApplicationSettings;
 import com.white.black.nonogram.BitmapLoader;
 import com.white.black.nonogram.BoardInputValue;
 import com.white.black.nonogram.ColoredNumber;
 import com.white.black.nonogram.ColoringProgress;
+import com.white.black.nonogram.GameMonitoring;
 import com.white.black.nonogram.GameSettings;
 import com.white.black.nonogram.MyMediaPlayer;
 import com.white.black.nonogram.Puzzle;
 import com.white.black.nonogram.PuzzleFactory;
+import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
 import com.white.black.nonogram.view.listeners.GameViewListener;
@@ -71,9 +75,7 @@ class BoardView {
     private Bitmap disqualify;
     private Bitmap permanentDisqualify;
     private Bitmap bulb;
-
-    private int backgroundWidthToUse;
-    private int backgroundHeightToUse;
+    private Bitmap handCursor;
 
     private ClickIntention clickIntention = ClickIntention.NONE;
     private boolean vibrating;
@@ -96,6 +98,8 @@ class BoardView {
     private float scaleDownPointer1Y = -1;
     private float scaleDownPointer2X = -1;
     private float scaleDownPointer2Y = -1;
+
+    private boolean isTutorial;
 
     private boolean isVibrating() {
         return vibrating;
@@ -165,9 +169,9 @@ class BoardView {
                     double startAccumulatedDistance = calculateAccumulatedDistanceFromCenter(scaleDownPointer1X, scaleDownPointer1Y, scaleDownPointer2X, scaleDownPointer2Y, (scaleDownPointer1X + scaleDownPointer2X) / 2, (scaleDownPointer1Y + scaleDownPointer2Y) / 2);
                     double endAccumulatedDistance = calculateAccumulatedDistanceFromCenter((TouchMonitor.INSTANCE.getMove(0).x), (TouchMonitor.INSTANCE.getMove(0).y), (TouchMonitor.INSTANCE.getMove(1).x), (TouchMonitor.INSTANCE.getMove(1).y), (scaleDownPointer1X + scaleDownPointer2X) / 2, (scaleDownPointer1Y + scaleDownPointer2Y) / 2);
 
-                    float newScale = (float)(endAccumulatedDistance - startAccumulatedDistance) / 200;
-                    addToCameraX = -(((scaleDownPointer2X + scaleDownPointer1X) / 2) - ApplicationSettings.INSTANCE.getScreenWidth() / 2) * ( (scale + newScale) - 1f);
-                    addToCameraY = -(((scaleDownPointer2Y + scaleDownPointer1Y) / 2) - boardTop) * ( (scale + newScale) - 1f);
+                    float newScale = (float) (endAccumulatedDistance - startAccumulatedDistance) / 200;
+                    addToCameraX = -(((scaleDownPointer2X + scaleDownPointer1X) / 2) - ApplicationSettings.INSTANCE.getScreenWidth() / 2) * ((scale + newScale) - 1f);
+                    addToCameraY = -(((scaleDownPointer2Y + scaleDownPointer1Y) / 2) - boardTop) * ((scale + newScale) - 1f);
 
                     if (newScale < 0) {
                         newScale = newScale * 2;
@@ -228,7 +232,7 @@ class BoardView {
             int boardMaxHeight,
             float slotSizeToFontSizeMultiplicationFactor,
             float zoomedSlotSizeToFontSizeMultiplicationFactor
-        ) {
+    ) {
         this.viewListener = viewListener;
         this.puzzle = puzzle;
         this.boardTop = boardTop;
@@ -242,7 +246,30 @@ class BoardView {
     }
 
     private boolean legalSlot(int x, int y) {
-        return  (x >= 0 && x < puzzle.getWidth() && y >= 0 && y < puzzle.getHeight());
+        Puzzle.SolutionStep solutionStep = puzzle.getSolutionStep();
+        if (isTutorial && solutionStep != null) {
+            return x >= solutionStep.getXLeft() && x <= solutionStep.getXRight() && y >= solutionStep.getYTop() && y <= solutionStep.getYBottom();
+        }
+
+        return (x >= 0 && x < puzzle.getWidth() && y >= 0 && y < puzzle.getHeight());
+    }
+
+    private boolean legalSlotX(int x) {
+        Puzzle.SolutionStep solutionStep = puzzle.getSolutionStep();
+        if (isTutorial && solutionStep != null) {
+            return legalSlot(x, solutionStep.getYTop());
+        }
+
+        return legalSlot(x, 0);
+    }
+
+    private boolean legalSlotY(int y) {
+        Puzzle.SolutionStep solutionStep = puzzle.getSolutionStep();
+        if (isTutorial && solutionStep != null) {
+            return legalSlot(solutionStep.getXLeft(), y);
+        }
+
+        return legalSlot(0, y);
     }
 
     private void fillGridSlotsOnMovementRouter(Canvas canvas, Paint paint, BoardInputValue boardInputValue, int color) {
@@ -341,6 +368,57 @@ class BoardView {
         drawSlotCounter(canvas, paint, maxDownUpX, minDownUpX, maxDownUpY, minDownUpY);
     }
 
+    private void fillGridSlotsOnMovementForTutorial(Canvas canvas, Paint paint) {
+        Puzzle.SolutionStep solutionStep = puzzle.getSolutionStep();
+        if (solutionStep == null) {
+            return;
+        }
+
+        int color = puzzle.getColorSet().get(0);
+        RectF slotBounds = new RectF();
+
+        int interval = 500;
+        int xMaxInterval = (solutionStep.getXRight() - solutionStep.getXLeft() + 1) * interval;
+        int yMaxInterval = (solutionStep.getYBottom() - solutionStep.getYTop() + 1) * interval;
+        long actualXInterval = System.currentTimeMillis() % ((long) xMaxInterval);
+        long actualYInterval = System.currentTimeMillis() % ((long) yMaxInterval);
+        long progressFromXLeftToXRight = actualXInterval / interval;
+        long progressFromYTopToYBottom = actualYInterval / interval;
+
+        for (int x = solutionStep.getXLeft(); x <= solutionStep.getXLeft() + progressFromXLeftToXRight; x++) {
+            for (int y = solutionStep.getYTop(); y <= solutionStep.getYTop() + progressFromYTopToYBottom; y++) {
+                float slotCenterX = rowBounds.right + x * slotSize + slotSize / 2;
+                float slotCenterY = columnBounds.bottom + y * slotSize + slotSize / 2;
+                slotBounds.set(slotCenterX - slotSize * 4 / 10,
+                        slotCenterY - slotSize * 4 / 10,
+                        slotCenterX + slotSize * 4 / 10,
+                        slotCenterY + slotSize * 4 / 10);
+
+                paint.setColor(Color.WHITE);
+                canvas.drawRect(slotBounds, paint);
+
+                slotBounds.set(slotCenterX - slotSize * 5 / 10,
+                        slotCenterY - slotSize * 5 / 10,
+                        slotCenterX + slotSize * 5 / 10,
+                        slotCenterY + slotSize * 5 / 10);
+                paint.setAlpha(100);
+                canvas.drawBitmap(colorBitmapMap.get(color), null, slotBounds, paint);
+                paint.setAlpha(255);
+            }
+        }
+
+        float handCursorXLeft = rowBounds.right + slotSize / 2 + solutionStep.getXLeft() * slotSize + (solutionStep.getXRight() - solutionStep.getXLeft()) * slotSize * (actualXInterval / (float) xMaxInterval);
+        float handCursorYTop = columnBounds.bottom + slotSize / 2 + solutionStep.getYTop() * slotSize + (solutionStep.getYBottom() - solutionStep.getYTop()) * slotSize * (actualYInterval / (float) yMaxInterval);
+        RectF handCursorBounds = new RectF(
+                handCursorXLeft - slotSize * 4 / 10,
+                handCursorYTop,
+                handCursorXLeft + slotSize * 4 / 10,
+                handCursorYTop + slotSize * 8 / 10
+        );
+
+        canvas.drawBitmap(handCursor, null, handCursorBounds, paint);
+    }
+
     private void fillGridSlotsOnMovementTouch(Canvas canvas, Paint paint, BoardInputValue boardInputValue, int color) {
         if (TouchMonitor.INSTANCE.touchDown() && !TouchMonitor.INSTANCE.touchUp() && legalSlot(slotTouchDownX, slotTouchDownY)) {
             float boardTouchX = TouchMonitor.INSTANCE.getMove().x - gridBounds.left;
@@ -348,7 +426,7 @@ class BoardView {
             int slotX = Math.min(numberOfSlotsInARow - maxNumbersRowSize - 1, Math.max(0, (int) (boardTouchX / slotSize)));
             int slotY = Math.min(numberOfSlotsInAColumn - maxNumbersColumnSize - 1, Math.max(0, (int) (boardTouchY / slotSize)));
 
-            if (legalSlot(slotX, 0)) {
+            if (legalSlotX(slotX)) {
                 if (slotTouchUpX != slotX && GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED)) {
                     MyMediaPlayer.play("select");
                 }
@@ -356,7 +434,7 @@ class BoardView {
                 slotTouchUpX = slotX;
             }
 
-            if (legalSlot(0, slotY)) {
+            if (legalSlotY(slotY)) {
                 if (slotTouchUpY != slotY && GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED)) {
                     MyMediaPlayer.play("select");
                 }
@@ -442,6 +520,24 @@ class BoardView {
             puzzle.addColoringProgressToUndo(coloringProgress);
         }
 
+        if (isTutorial) {
+            Puzzle.SolutionStep solutionStep = puzzle.getSolutionStep();
+            if (solutionStep != null) {
+                boolean stepComplete = true;
+                for (int x = solutionStep.getXLeft(); x <= solutionStep.getXRight(); x++) {
+                    for (int y = solutionStep.getYTop(); y <= solutionStep.getYBottom(); y++) {
+                        if (puzzle.copyColoringProgress().getColoringProgress()[x][y] != color) {
+                            stepComplete = false;
+                        }
+                    }
+                }
+
+                if (stepComplete) {
+                    puzzle.nextSolutionStep();
+                }
+            }
+        }
+
         TouchMonitor.INSTANCE.setTouchUp(false);
     }
 
@@ -457,52 +553,51 @@ class BoardView {
 
     private void editSlotUsingTouch(BoardInputValue boardInputValue, int color) {
         if (TouchMonitor.INSTANCE.touchUp()) {
-                if (legalSlot(slotTouchDownX, slotTouchDownY) || (clickedFast() && shortDistanceHasBeenMade())) {
-                    float boardTouchX = TouchMonitor.INSTANCE.getUpCoordinates().x - gridBounds.left;
-                    float boardTouchY = TouchMonitor.INSTANCE.getUpCoordinates().y - gridBounds.top;
-                    int slotX = (int) (boardTouchX / slotSize);
-                    int slotY = (int) (boardTouchY / slotSize);
+            if (legalSlot(slotTouchDownX, slotTouchDownY) || (clickedFast() && shortDistanceHasBeenMade())) {
+                float boardTouchX = TouchMonitor.INSTANCE.getUpCoordinates().x - gridBounds.left;
+                float boardTouchY = TouchMonitor.INSTANCE.getUpCoordinates().y - gridBounds.top;
+                int slotX = (int) (boardTouchX / slotSize);
+                int slotY = (int) (boardTouchY / slotSize);
 
-                    //if (legalSlot(slotTouchUpX, slotTouchUpY)) {
-                        if (clickedFast() && shortDistanceHasBeenMade()) {
-                            boardTouchX = TouchMonitor.INSTANCE.getDownCoordinates().x - gridBounds.left;
-                            boardTouchY = TouchMonitor.INSTANCE.getDownCoordinates().y - gridBounds.top;
-                            if (legalSlot((int) (boardTouchX / slotSize), (int) (boardTouchY / slotSize))) {
-                                if (legalSlot(slotX, 0)) {
-                                    slotTouchUpX = slotX;
-                                }
 
-                                if (legalSlot(0, slotY)) {
-                                    slotTouchUpY = slotY;
-                                }
-
-                                if (legalSlot(slotTouchUpX, slotTouchUpY)) {
-                                    MyMediaPlayer.play("select");
-                                    slotTouchDownX = slotTouchUpX;
-                                    slotTouchDownY = slotTouchUpY;
-                                    editSlot(boardInputValue, color);
-                                }
-                            }
-                        } else {
-                            if (legalSlot(slotX, 0)) {
-                                slotTouchUpX = slotX;
-                            }
-
-                            if (legalSlot(0, slotY)) {
-                                slotTouchUpY = slotY;
-                            }
-
-                            if (legalSlot(slotTouchUpX, slotTouchUpY)) {
-                                editSlot(boardInputValue, color);
-                            }
+                if (clickedFast() && shortDistanceHasBeenMade()) {
+                    boardTouchX = TouchMonitor.INSTANCE.getDownCoordinates().x - gridBounds.left;
+                    boardTouchY = TouchMonitor.INSTANCE.getDownCoordinates().y - gridBounds.top;
+                    if (legalSlot((int) (boardTouchX / slotSize), (int) (boardTouchY / slotSize))) {
+                        if (legalSlotX(slotX)) {
+                            slotTouchUpX = slotX;
                         }
-                    //}
-                }
 
-                clickIntention = ClickIntention.NONE;
-                slotTouchDownX = -1;
-                slotTouchDownY = -1;
-                vibrating = false;
+                        if (legalSlotY(slotY)) {
+                            slotTouchUpY = slotY;
+                        }
+
+                        if (legalSlot(slotTouchUpX, slotTouchUpY)) {
+                            MyMediaPlayer.play("select");
+                            slotTouchDownX = slotTouchUpX;
+                            slotTouchDownY = slotTouchUpY;
+                            editSlot(boardInputValue, color);
+                        }
+                    }
+                } else {
+                    if (legalSlotX(slotX)) {
+                        slotTouchUpX = slotX;
+                    }
+
+                    if (legalSlotY(slotY)) {
+                        slotTouchUpY = slotY;
+                    }
+
+                    if (legalSlot(slotTouchUpX, slotTouchUpY)) {
+                        editSlot(boardInputValue, color);
+                    }
+                }
+            }
+
+            clickIntention = ClickIntention.NONE;
+            slotTouchDownX = -1;
+            slotTouchDownY = -1;
+            vibrating = false;
         } else if (TouchMonitor.INSTANCE.touchDown()) {
             if (TouchMonitor.INSTANCE.getDownCoordinates().y < boardTop + boardMaxHeight && TouchMonitor.INSTANCE.getDownCoordinates().y > boardTop) {
                 if (isAttemptingToFillSlots()) {
@@ -538,7 +633,7 @@ class BoardView {
         @Override
         public void run() {
             if (scale > 1f && isAttemptingToFillSlots() && !isVibrating() && !cameraState.equals(CameraState.ZOOM) && TouchMonitor.INSTANCE.touchDown()) {
-                ((GameViewListener)viewListener).onZoomedSlotSelected();
+                ((GameViewListener) viewListener).onZoomedSlotSelected();
                 vibrating = true;
             }
         }
@@ -560,7 +655,7 @@ class BoardView {
     }
 
     private boolean shortDistanceHasBeenMade() {
-        double distBetweenMoveAndDown =  Math.sqrt((TouchMonitor.INSTANCE.getMove().x - TouchMonitor.INSTANCE.getDownCoordinates().x) * (TouchMonitor.INSTANCE.getMove().x - TouchMonitor.INSTANCE.getDownCoordinates().x) + (TouchMonitor.INSTANCE.getMove().y - TouchMonitor.INSTANCE.getDownCoordinates().y) * (TouchMonitor.INSTANCE.getMove().y - TouchMonitor.INSTANCE.getDownCoordinates().y));
+        double distBetweenMoveAndDown = Math.sqrt((TouchMonitor.INSTANCE.getMove().x - TouchMonitor.INSTANCE.getDownCoordinates().x) * (TouchMonitor.INSTANCE.getMove().x - TouchMonitor.INSTANCE.getDownCoordinates().x) + (TouchMonitor.INSTANCE.getMove().y - TouchMonitor.INSTANCE.getDownCoordinates().y) * (TouchMonitor.INSTANCE.getMove().y - TouchMonitor.INSTANCE.getDownCoordinates().y));
         return distBetweenMoveAndDown < ApplicationSettings.INSTANCE.getScreenWidth() / 15;
     }
 
@@ -569,7 +664,7 @@ class BoardView {
     }
 
     private boolean zoomed() {
-       return scale + addToScale != 1f;
+        return scale + addToScale != 1f;
     }
 
     private boolean isAttemptingToFillSlots() {
@@ -640,8 +735,9 @@ class BoardView {
     }
 
     private void initDimensions() {
-        backgroundWidthToUse = ApplicationSettings.INSTANCE.getScreenWidth() * 98 / 100;
+        int backgroundWidthToUse = ApplicationSettings.INSTANCE.getScreenWidth() * 98 / 100;
 
+        int backgroundHeightToUse;
         if (boardMaxHeight * numberOfSlotsInARow / numberOfSlotsInAColumn > backgroundWidthToUse) {
             backgroundHeightToUse = backgroundWidthToUse * numberOfSlotsInAColumn / numberOfSlotsInARow;
         } else {
@@ -653,7 +749,7 @@ class BoardView {
         backgroundHeightToUse *= (scale + addToScale);
         completionSlotLength = (scale + addToScale) * ApplicationSettings.INSTANCE.getScreenHeight() / 100;
 
-        slotSize = (int)Math.min((double)(backgroundWidthToUse - completionSlotLength) / numberOfSlotsInARow, (double)(backgroundHeightToUse - completionSlotLength) / numberOfSlotsInAColumn);
+        slotSize = (int) Math.min((double) (backgroundWidthToUse - completionSlotLength) / numberOfSlotsInARow, (double) (backgroundHeightToUse - completionSlotLength) / numberOfSlotsInAColumn);
 
         float pushCameraLeftBy = cameraX + addToCameraX;
         float pushCameraUpBy = cameraY + addToCameraY;
@@ -683,9 +779,9 @@ class BoardView {
                 boardBackgroundBounds.top + maxNumbersColumnSize * slotSize + completionSlotLength
         );
 
-        fontSize = (int)(slotSize * slotSizeToFontSizeMultiplicationFactor);
+        fontSize = (int) (slotSize * slotSizeToFontSizeMultiplicationFactor);
         zoomedSlotSize = slotSize * 100 / 96;
-        zoomedFontSize = (int)(zoomedSlotSize * zoomedSlotSizeToFontSizeMultiplicationFactor);
+        zoomedFontSize = (int) (zoomedSlotSize * zoomedSlotSizeToFontSizeMultiplicationFactor);
 
         miniPicBounds = new RectF(
                 rowBounds.left,
@@ -694,7 +790,7 @@ class BoardView {
                 columnBounds.bottom
         );
 
-        miniPicSlotSize = (int)Math.min(miniPicBounds.width() / puzzle.getWidth(), miniPicBounds.height() / puzzle.getHeight());
+        miniPicSlotSize = (int) Math.min(miniPicBounds.width() / puzzle.getWidth(), miniPicBounds.height() / puzzle.getHeight());
 
         gridBounds = new RectF(
                 rowBounds.right,
@@ -705,8 +801,10 @@ class BoardView {
     }
 
     public void init(Context context) {
+        isTutorial = !Puzzles.hasPlayerSolvedAtLeastOnePuzzle(context);
         slotMarkClueColor = Color.CYAN;
         bulb = BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512);
+        handCursor = BitmapLoader.INSTANCE.getImage(context, R.drawable.hand_cursor_512);
         question = BitmapLoader.INSTANCE.getImage(context, R.drawable.question_mark_100);
         disqualify = BitmapLoader.INSTANCE.getImage(context, R.drawable.disqualify_100);
         permanentDisqualify = BitmapLoader.INSTANCE.getImage(context, R.drawable.permanent_disqualify_100);
@@ -722,7 +820,7 @@ class BoardView {
         Paint paint = PaintManager.INSTANCE.createPaint();
         for (Integer color : puzzle.getColorSet()) {
             this.colorBitmapMap.put(color, createColorBitMap(paint, color));
-            this.colorToTextColorMap.put(color, (PuzzleFactory.INSTANCE.getDistanceBetweenColors(color, Color.WHITE) > PuzzleFactory.INSTANCE.getDistanceBetweenColors(color, Color.BLACK))? Color.WHITE : Color.BLACK);
+            this.colorToTextColorMap.put(color, (PuzzleFactory.INSTANCE.getDistanceBetweenColors(color, Color.WHITE) > PuzzleFactory.INSTANCE.getDistanceBetweenColors(color, Color.BLACK)) ? Color.WHITE : Color.BLACK);
         }
 
         numbersBitmapMap = new HashMap<>();
@@ -735,7 +833,7 @@ class BoardView {
         Bitmap imageBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
         imageBitmap.setDensity(Bitmap.DENSITY_NONE);
         Canvas canvas = new Canvas(imageBitmap);
-        drawGridColor(canvas, paint, color, 0, 0);
+        drawGridColor(canvas, paint, color);
         return imageBitmap;
     }
 
@@ -823,8 +921,15 @@ class BoardView {
         drawSlotMark(canvas, paint); // V
         drawRowAndColumn(canvas, paint, colorToZoomFor); // X
         drawGrid(canvas, paint); // V
+        drawSolutionStep(canvas, paint);
         fillGridSlots(canvas, paint, colorToZoomFor); // V
-        fillGridSlotsOnMovementRouter(canvas, paint, boardInputValue, colorToZoomFor); // V
+
+        if (isTutorial && !TouchMonitor.INSTANCE.touchDown()) {
+            fillGridSlotsOnMovementForTutorial(canvas, paint);
+        } else {
+            fillGridSlotsOnMovementRouter(canvas, paint, boardInputValue, colorToZoomFor); // V
+        }
+
         drawSlotNumbers(canvas, paint); // V
         drawMiniPic(canvas, paint); // V
     }
@@ -895,10 +1000,10 @@ class BoardView {
 
             paint.setStrokeWidth(currentStrokeWidth);
         } else if (!legalSlot(clueX, clueY) && legalSlot(slotTouchUpX, slotTouchUpY)) {
-                paint.setColor(Color.MAGENTA);
-                paint.setAlpha(50);
-                canvas.drawRect(boardBackgroundBounds.left, rowBounds.top + slotTouchUpY * slotSize, boardBackgroundBounds.right, rowBounds.top + (slotTouchUpY + 1) * slotSize, paint);
-                canvas.drawRect(columnBounds.left + slotTouchUpX * slotSize, boardBackgroundBounds.top, columnBounds.left + (slotTouchUpX + 1) * slotSize, boardBackgroundBounds.bottom, paint);
+            paint.setColor(Color.MAGENTA);
+            paint.setAlpha(50);
+            canvas.drawRect(boardBackgroundBounds.left, rowBounds.top + slotTouchUpY * slotSize, boardBackgroundBounds.right, rowBounds.top + (slotTouchUpY + 1) * slotSize, paint);
+            canvas.drawRect(columnBounds.left + slotTouchUpX * slotSize, boardBackgroundBounds.top, columnBounds.left + (slotTouchUpX + 1) * slotSize, boardBackgroundBounds.bottom, paint);
         }
 
         paint.setAlpha(255);
@@ -924,12 +1029,7 @@ class BoardView {
         }
     }
 
-    private void drawGridColor(Canvas canvas, Paint paint, int color, float slotCenterX, float slotCenterY) {
-        /*Rect slotBounds = new Rect((int)(slotCenterX - slotSize * 40 / 100),
-                (int)(slotCenterY - slotSize * 40 / 100),
-                (int)(slotCenterX + slotSize * 40 / 100),
-                (int)(slotCenterY + slotSize * 40 / 100));*/
-
+    private void drawGridColor(Canvas canvas, Paint paint, int color) {
         Rect slotBounds = new Rect(1, 1, 9, 9);
 
         float[] hsv = new float[3];
@@ -943,19 +1043,6 @@ class BoardView {
 
         float moreLgt = Math.min(1f, lgt + 0.15f);
         float lessLgt = Math.max(0f, lgt - 0.15f);
-        /*Rect moreLgtBounds = new Rect(
-                slotBounds.left + slotBounds.width() * 5 / 100,
-                slotBounds.top + slotBounds.width() * 5 / 100,
-                slotBounds.right - slotBounds.width() * 5 / 100,
-                slotBounds.top + slotBounds.width() * 15 / 100
-        );
-
-        Rect lessLgtBounds = new Rect(
-                slotBounds.left + slotBounds.width() * 5 / 100,
-                slotBounds.top + slotBounds.width() * 5 / 100,
-                slotBounds.left + slotBounds.width() * 15 / 100,
-                slotBounds.bottom - slotBounds.width() * 5 / 100
-        );*/
 
         Rect moreLgtBounds = new Rect(
                 2,
@@ -971,11 +1058,11 @@ class BoardView {
                 8
         );
 
-        paint.setColor(Color.HSVToColor(new float[] {hsv[0], hsv[1], lgt}));
+        paint.setColor(Color.HSVToColor(new float[]{hsv[0], hsv[1], lgt}));
         canvas.drawRect(slotBounds, paint);
-        paint.setColor(Color.HSVToColor(new float[] {hsv[0], hsv[1], moreLgt}));
+        paint.setColor(Color.HSVToColor(new float[]{hsv[0], hsv[1], moreLgt}));
         canvas.drawRect(moreLgtBounds, paint);
-        paint.setColor(Color.HSVToColor(new float[] {hsv[0], hsv[1], lessLgt}));
+        paint.setColor(Color.HSVToColor(new float[]{hsv[0], hsv[1], lessLgt}));
         canvas.drawRect(lessLgtBounds, paint);
     }
 
@@ -1038,12 +1125,34 @@ class BoardView {
 
         paint.setStrokeWidth(GRID_OUTLINE_WIDTH);
         for (int x = 1; x < numberOfSlotsInARow - maxNumbersRowSize; x++) {
-            canvas.drawLine(rowBounds.right + x * slotSize, columnBounds.bottom, rowBounds.right + x * slotSize, boardBackgroundBounds.bottom , paint);
+            canvas.drawLine(rowBounds.right + x * slotSize, columnBounds.bottom, rowBounds.right + x * slotSize, boardBackgroundBounds.bottom, paint);
         }
 
         paint.setStrokeWidth(GRID_BOLD_OUTLINE_WIDTH);
         for (int x = 5; x < numberOfSlotsInARow - maxNumbersRowSize; x += 5) {
-            canvas.drawLine(rowBounds.right + x * slotSize, columnBounds.bottom, rowBounds.right + x * slotSize, boardBackgroundBounds.bottom , paint);
+            canvas.drawLine(rowBounds.right + x * slotSize, columnBounds.bottom, rowBounds.right + x * slotSize, boardBackgroundBounds.bottom, paint);
+        }
+    }
+
+    private void drawSolutionStep(Canvas canvas, Paint paint) {
+        if (isTutorial) {
+            paint.setStyle(Paint.Style.STROKE);
+            Puzzle.SolutionStep solutionStep = puzzle.getSolutionStep();
+            if (solutionStep != null) {
+                int strokeWidth = 10;
+
+                paint.setStrokeWidth(strokeWidth);
+                paint.setColor(Color.CYAN);
+                canvas.drawRect(
+                        rowBounds.right + solutionStep.getXLeft() * slotSize + strokeWidth / 2,
+                        columnBounds.bottom + solutionStep.getYTop() * slotSize + strokeWidth / 2,
+                        rowBounds.right + (solutionStep.getXRight() + 1) * slotSize - strokeWidth / 2,
+                        columnBounds.bottom + (solutionStep.getYBottom() + 1) * slotSize - strokeWidth / 2,
+                        paint
+                );
+            }
+
+            paint.setStyle(Paint.Style.FILL);
         }
     }
 
@@ -1071,9 +1180,9 @@ class BoardView {
 
     private void drawRowNumbers(Canvas canvas, Paint paint, Puzzle puzzle, RectF rowBounds, float slotSize, int fontSize, float zoomedSlotSize, int zoomedFontSize, int curve, Integer colorToZoomFor) {
         RectF numberBounds = new RectF();
-        int y = (int)rowBounds.top;
+        int y = (int) rowBounds.top;
         for (List<ColoredNumber> row : puzzle.getNumbers().getRows()) {
-            int x = (int)(rowBounds.left + slotSize * (maxNumbersRowSize - row.size()));
+            int x = (int) (rowBounds.left + slotSize * (maxNumbersRowSize - row.size()));
             for (ColoredNumber coloredNumber : row) {
                 drawNumber(canvas, paint, puzzle, coloredNumber, x, y, slotSize, fontSize, zoomedSlotSize, zoomedFontSize, curve, colorToZoomFor, numberBounds);
                 x += slotSize;
@@ -1085,9 +1194,9 @@ class BoardView {
 
     private void drawColumnNumbers(Canvas canvas, Paint paint, Puzzle puzzle, RectF columnBounds, float slotSize, int fontSize, float zoomedSlotSize, int zoomedFontSize, int curve, Integer colorToZoomFor) {
         RectF numberBounds = new RectF();
-        int x = (int)columnBounds.left;
+        int x = (int) columnBounds.left;
         for (List<ColoredNumber> column : puzzle.getNumbers().getColumns()) {
-            int y = (int)(columnBounds.top + slotSize * (maxNumbersColumnSize - column.size()));
+            int y = (int) (columnBounds.top + slotSize * (maxNumbersColumnSize - column.size()));
             for (ColoredNumber coloredNumber : column) {
                 drawNumber(canvas, paint, puzzle, coloredNumber, x, y, slotSize, fontSize, zoomedSlotSize, zoomedFontSize, curve, colorToZoomFor, numberBounds);
                 y += slotSize;
@@ -1103,8 +1212,8 @@ class BoardView {
         boolean multiColor = puzzle.getColorSet().size() != 1;
         boolean shouldZoomIn = colorToZoomFor.equals(coloredNumber.getColor()) && multiColor;
 
-        float currentSlotSize = (shouldZoomIn)? zoomedSlotSize : slotSize;
-        float currentFontSize = (shouldZoomIn)? zoomedFontSize : fontSize;
+        float currentSlotSize = (shouldZoomIn) ? zoomedSlotSize : slotSize;
+        float currentFontSize = (shouldZoomIn) ? zoomedFontSize : fontSize;
 
         numberBounds.set(
                 x + slotSize / 2 - currentSlotSize * 48 / 100,
@@ -1139,19 +1248,19 @@ class BoardView {
         } else {
             boolean multiColor = puzzle.getColorSet().size() != 1;
             boolean shouldZoomIn = colorToZoomFor.equals(coloredNumber.getColor()) && multiColor;
-            Map<Point, Bitmap> relevantNumbersBitmapMap = (shouldZoomIn)? zoomedNumbersBitmapMap : numbersBitmapMap;
+            Map<Point, Bitmap> relevantNumbersBitmapMap = (shouldZoomIn) ? zoomedNumbersBitmapMap : numbersBitmapMap;
 
-            Point slot = new Point(x,y);
+            Point slot = new Point(x, y);
             Bitmap numberImage = relevantNumbersBitmapMap.get(slot);
             if (numberImage == null) {
-                numberImage = Bitmap.createBitmap((int)slotSize + 6 /* for bold stroke */, (int)slotSize + 6 /* for bold stroke */, Bitmap.Config.ARGB_8888);
+                numberImage = Bitmap.createBitmap((int) slotSize + 6 /* for bold stroke */, (int) slotSize + 6 /* for bold stroke */, Bitmap.Config.ARGB_8888);
                 numberImage.setDensity(Bitmap.DENSITY_NONE);
                 Canvas tmpCanvas = new Canvas(numberImage);
                 drawNumberOnImageNotAvailable(tmpCanvas, paint, puzzle, coloredNumber, 3, 3, slotSize, fontSize, zoomedSlotSize, zoomedFontSize, curve, colorToZoomFor, numberBounds);
                 relevantNumbersBitmapMap.put(slot, numberImage);
             }
 
-            canvas.drawBitmap(numberImage, x -3 /* for bold stroke */, y -3 /* for bold stroke */, paint);
+            canvas.drawBitmap(numberImage, x - 3 /* for bold stroke */, y - 3 /* for bold stroke */, paint);
         }
     }
 
