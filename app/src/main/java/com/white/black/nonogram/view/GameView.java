@@ -266,7 +266,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         ), paint);
 
         paint.setColor(Color.BLACK);
-        canvas.drawText(taskInstruction, distanceFromLeftEdge + taskIconSize + gapBetweenInstructionAndIcon, boardView.getBoardBottom() + 20, paint);
+        canvas.drawText(
+                taskInstruction,
+                distanceFromLeftEdge + taskIconSize + gapBetweenInstructionAndIcon,
+                boardView.getBoardBottom() + textBounds.height() / 2,
+                paint
+        );
+
         paint.setTextAlign(Paint.Align.CENTER);
     }
 
