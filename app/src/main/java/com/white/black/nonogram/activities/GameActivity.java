@@ -300,7 +300,6 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
     @Override
     public void onLaunchMarketButtonPressed() {
         if (((GameState.getGameState().equals(GameState.GAME)))) {
-            GameState.setGameState(GameState.PLAYSTORE);
             GameSettings.INSTANCE.onReviewButtonPressed(GameActivity.this);
         }
     }
@@ -350,7 +349,9 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
     @Override
     public void onPause() {
         super.onPause();
-        pool.shutdownNow();
+        if (pool != null) {
+            pool.shutdownNow();
+        }
     }
 
     @Override

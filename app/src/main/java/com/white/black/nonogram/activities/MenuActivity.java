@@ -450,7 +450,6 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
     @Override
     public void onLaunchMarketButtonPressed() {
         if (((GameState.getGameState().equals(GameState.MENU)))) {
-            GameState.setGameState(GameState.PLAYSTORE);
             GameSettings.INSTANCE.onReviewButtonPressed(MenuActivity.this);
             Bundle bundle = new Bundle();
             bundle.putString(GameMonitoring.CHOOSE_SETTINGS, GameMonitoring.VOTE);

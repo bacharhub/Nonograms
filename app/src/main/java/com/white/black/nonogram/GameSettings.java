@@ -1,13 +1,20 @@
 package com.white.black.nonogram;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.white.black.nonogram.view.Appearance;
 
 public enum GameSettings {
@@ -57,16 +64,23 @@ public enum GameSettings {
     }
 
     public void onReviewButtonPressed(Context context) {
-        Uri uri = Uri.parse("market://details?id=com.white.black.nonogram");
-        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
-        // To count with Play market backstack, After pressing back button,
-        // to taken back to our application, we need to add following flags to intent.
-        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-        try {
-            context.startActivity(goToMarket);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(context, context.getString(R.string.rate_us_next_time), Toast.LENGTH_LONG).show();
-        }
+        ReviewManager manager = ReviewManagerFactory.create(context);
+        Task<ReviewInfo> request = manager.requestReviewFlow();
+        request.addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // We can get the ReviewInfo object
+                ReviewInfo reviewInfo = task.getResult();
+                Task<Void> flow = manager.launchReviewFlow((Activity) context, reviewInfo);
+                flow.addOnCompleteListener(result -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(GameMonitoring.CHOOSE_TOOLBAR, GameMonitoring.VOTE_COMPLETE);
+                    FirebaseAnalytics.getInstance(context).logEvent(GameMonitoring.GAME_EVENT, bundle);
+                    // The flow has finished. The API does not indicate whether the user
+                    // reviewed or not, or even whether the review dialog was shown. Thus, no
+                    // matter the result, we continue our app flow.
+                });
+            }
+        });
     }
 
     public void onInstructionsButtonPressed(Context context) {

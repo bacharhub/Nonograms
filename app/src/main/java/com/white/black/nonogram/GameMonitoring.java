@@ -38,6 +38,7 @@ public class GameMonitoring {
     public static final String JOYSTICK = "joystick";
     public static final String SOUND = "sound";
     public static final String VOTE = "vote";
+    public static final String VOTE_COMPLETE = "in_app_vote_complete";
     public static final String INSTRUCTIONS = "instructions";
     public static final String ICONS8 = "icons8";
     public static final String PRIVACY_POLICY = "privacy_policy";

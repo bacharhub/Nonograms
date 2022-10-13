@@ -133,28 +133,22 @@ class PuzzleSolvedView {
                 String message = context.getString(R.string.would_you_rate);
 
                 popup = new Popup(
-                        context, popupWindowBounds, message, new Runnable() {
-                    @Override
-                    public void run() {
-                        popup.setMessage(context.getString(R.string.thank_feedback));
-                        ((GameViewListener) context).onLaunchMarketButtonPressed();
-                        try {
-                            SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-                            prefsEditor.putBoolean("hideRating", true);
-                            prefsEditor.apply();
+                        context, popupWindowBounds, message, () -> {
+                            popup.setMessage(context.getString(R.string.thank_feedback));
+                            ((GameViewListener) context).onLaunchMarketButtonPressed();
+                            try {
+                                SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+                                prefsEditor.putBoolean("hideRating", true);
+                                prefsEditor.apply();
 
-                            ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.VOTE_APP);
-                        } catch (Exception ignored) {
+                                ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.VOTE_APP);
+                            } catch (Exception ignored) {
 
-                        }
-                    }
-                }, new Runnable() {
-                    @Override
-                    public void run() {
-                        popup.setMessage(context.getString(R.string.thank_feedback));
-                        ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.REFUSE_APP);
-                    }
-                }, yesButtonView, noButtonView
+                            }
+                        }, () -> {
+                            popup.setMessage(context.getString(R.string.thank_feedback));
+                            ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.REFUSE_APP);
+                        }, yesButtonView, noButtonView
                 );
             }
         };

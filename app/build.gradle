@@ -68,6 +68,7 @@ dependencies {
 
     implementation 'com.android.billingclient:billing:5.0.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.play:review:2.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

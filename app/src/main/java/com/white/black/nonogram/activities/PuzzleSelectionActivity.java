@@ -297,7 +297,6 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
     @Override
     public void onLaunchMarketButtonPressed() {
         if ((GameState.getGameState().equals(GameState.PUZZLE_SELECTION))) {
-            GameState.setGameState(GameState.PLAYSTORE);
             GameSettings.INSTANCE.onReviewButtonPressed(PuzzleSelectionActivity.this);
             Bundle bundle = new Bundle();
             bundle.putString(GameMonitoring.CHOOSE_SETTINGS, GameMonitoring.VOTE);
