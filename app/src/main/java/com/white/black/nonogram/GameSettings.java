@@ -57,10 +57,13 @@ public enum GameSettings {
     }
 
     public void onReviewButtonPressed(Context context) {
-        Uri uri = Uri.parse(context.getString(R.string.google_play));
-        Intent myAppLinkToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        Uri uri = Uri.parse("market://details?id=com.white.black.nonogram");
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        // To count with Play market backstack, After pressing back button,
+        // to taken back to our application, we need to add following flags to intent.
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         try {
-            context.startActivity(myAppLinkToMarket);
+            context.startActivity(goToMarket);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(context, context.getString(R.string.rate_us_next_time), Toast.LENGTH_LONG).show();
         }
