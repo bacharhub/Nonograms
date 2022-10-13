@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 public class AdManager {
 
     private static final long INTERSTITIAL_POPUP_INTERVAL = 1000 * 180; // 3 minutes
-    private static final long VIDEO_POPUP_INTERVAL = 3000; //1000 * 360; // 6 minutes
     private static long lastInterstitialPopupTime = System.currentTimeMillis();
     private static boolean removeAds;
 
@@ -69,7 +68,7 @@ public class AdManager {
             RewardedAdLoadCallback rewardedAdLoadCallback
     ) {
         // Use an activity context to get the rewarded video instance.
-        if (rewardedInstanceHandler.isLoadingRewardedAd()) { // still loading?
+        if (rewardedInstanceHandler.isLoadingRewardedAd()) {
             return;
         }
 
@@ -82,26 +81,11 @@ public class AdManager {
         rewardedInstanceHandler.setLoadingRewardedAd(true);
         RewardedAd.load(
                 context,
-                "ca-app-pub-6810954825772230/1111987109",/*"ca-app-pub-3940256099942544/5224354917",*/ // for testing*/,
+                "ca-app-pub-6810954825772230/1111987109",
                 new AdRequest.Builder().build(),
                 rewardedAdLoadCallback
         );
     }
-
-    /*private static void loadAdmobBanner(AdView adView, Context context, RelativeLayout ll) {
-        if (!MemoryManager.isLowMemory()) {
-            Handler mainHandler = new Handler(context.getMainLooper());
-            mainHandler.post(new Runnable() {
-                public void run() {
-                    adView.setAdSize(AdSize.SMART_BANNER);
-                    adView.setAdUnitId("ca-app-pub-6810954825772230/7132472456"); // banner unit id
-                    AdRequest adRequest = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).addTestDevice("A0E4010295027A20A294B65F0E570045").addTestDevice("09C786AA0313E7BD913792B9330CAB47").build();
-                    adView.loadAd(adRequest);
-                    ll.addView(adView); // The ad banner
-                }
-            });
-        }
-    }*/
 
     private static void _unmuteSound(Context context){
         AudioManager aManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
@@ -149,65 +133,4 @@ public class AdManager {
             );
         }
     }
-
-    /*public static void loadBanner(Context context, AdView adView, RelativeLayout ll) {
-        if (MemoryManager.isLowMemory() || isRemoveAds()) {
-            return;
-        }
-
-        loadAdmobBanner(adView, context, ll);
-    }*/
-
-    /*
-
-    public static void loadInterstitialAndBanner(Context context, AdView adView, RelativeLayout ll) {
-        if (MemoryManager.isLowMemory() || isRemoveAds()) {
-            return;
-        }
-
-        InterstitialAd interstitialAd = new InterstitialAd(context);
-        interstitialAd.setAdUnitId("ca-app-pub-6810954825772230/4958165792");
-        interstitialAd.setAdListener(new AdListener(){
-            @Override
-            public void onAdLoaded() {
-                Handler mainHandler = new Handler(context.getMainLooper());
-                mainHandler.post(new Runnable() {
-                                     public void run() {
-                                         _muteSound(context);
-                                         interstitialAd.show();
-                                     }
-                                 }
-                );
-            }
-
-            @Override
-            public void onAdClosed() {
-                interstitialAd.setAdListener(null);
-                _unmuteSound(context);
-                loadAdmobBanner(adView, context, ll);
-            }
-
-            @Override
-            public void onAdFailedToLoad(int var) {
-                lastInterstitialPopupTime = 0;
-                interstitialAd.setAdListener(null);
-                loadAdmobBanner(adView, context, ll);
-            }
-        });
-
-        if (System.currentTimeMillis() > lastInterstitialPopupTime + INTERSTITIAL_POPUP_INTERVAL) {
-            lastInterstitialPopupTime = System.currentTimeMillis();
-            Handler mainHandler = new Handler(context.getMainLooper());
-            mainHandler.post(new Runnable() {
-                                 public void run() {
-                                         interstitialAd.loadAd(new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).addTestDevice("A0E4010295027A20A294B65F0E570045").build());
-                                 }
-                             }
-            );
-        } else {
-                loadAdmobBanner(adView, context, ll);
-        }
-    }
-
-     */
 }

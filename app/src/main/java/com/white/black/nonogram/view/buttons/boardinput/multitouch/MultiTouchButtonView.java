@@ -25,12 +25,6 @@ public class MultiTouchButtonView extends PicButtonView {
                 bounds.bottom - bounds.height() * 1 / 10), context, paint);
     }
 
-// --Commented out by Inspection START (09/10/2018 20:08):
-//    public int getTouchEventId() {
-//        return touchEventId;
-//    }
-// --Commented out by Inspection STOP (09/10/2018 20:08)
-
     public void setTouchEventId(int touchEventId) {
         this.touchEventId = touchEventId;
     }

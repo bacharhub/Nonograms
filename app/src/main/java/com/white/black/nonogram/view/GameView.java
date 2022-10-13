@@ -300,7 +300,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         boardView.draw(canvas, paint, boardInputValueButtonGroup.getCurrentPressedVal(), colorInputValueButtonGroup.getCurrentPressedVal());
         coverBoardWithBackground(canvas, paint);
 
-        if (!isTutorial) { // player has solved at least one puzzle
+        if (!isTutorial) {
             boardInputValueButtonGroup.draw(canvas, paint);
             if (boardInputValueButtonGroup.getCurrentPressedVal().equals(BoardInputValue.BRUSH)) {
                 colorInputValueButtonGroup.draw(canvas, paint);
@@ -317,9 +317,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         render();
-        /*if (PuzzleSelectionView.INSTANCE.getSelectedPuzzle() != null && !PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isClueAvailable()) {
-            new Thread(redrawWhileClueIsNotAvailable).start();
-        }*/
     }
 
     @Override
@@ -331,25 +328,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder holder) {
 
     }
-
-    /*private final Runnable redrawWhileClueIsNotAvailable = new Runnable() {
-        @Override
-        public void run() {
-            Puzzle puzzle = PuzzleSelectionView.INSTANCE.getSelectedPuzzle();
-            while (!puzzle.isClueAvailable() && GameState.getGameState().equals(GameState.GAME)) {
-                render();
-                PaintManager.INSTANCE.setLastRenderingTime(System.currentTimeMillis());
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            render();
-        }
-    };*/
 
     private void checkIfFaultyPuzzle() {
         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().getSubPuzzles().size() > 0) { // do not report complex puzzles
@@ -394,11 +372,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         boardView.clear();
                         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().finish();
                         ((GameMonitoringListener) gameViewListener).onFinishPuzzle();
-                        if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
-                            /*if (puzzleSolvedView.isShowingPopup()) {
-                                gameViewListener.removeAds();
-                            }*/
-                        } else {
+                        if (!PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
                             gameViewListener.onNextPuzzleButtonPressed();
                         }
                     }
@@ -487,8 +461,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.CLUE);
                     boardView.useClue();
                     gameViewListener.useClue();
-                    // clueButtonView.onButtonPressed();
-                    // new Thread(redrawWhileClueIsNotAvailable).start();
                 } else {
                     popup.setShowPopup(true);
                 }
@@ -553,7 +525,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         taskIcon = BitmapLoader.INSTANCE.getImage(context, R.drawable.task_64);
 
-        int adSizeHeight = 0; // (AdManager.isRemoveAds())? 0 : AdSize.SMART_BANNER.getHeightInPixels(context);
+        int adSizeHeight = 0;
         int top = adSizeHeight + ApplicationSettings.INSTANCE.getScreenHeight() / 100;
         int horizontalDistanceFromEdge = ApplicationSettings.INSTANCE.getScreenHeight() / 22;
         int buttonHeight = ApplicationSettings.INSTANCE.getScreenHeight() / 12;
@@ -580,7 +552,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             initJoystickToolbar(context, paint);
         }
 
-        if (!isTutorial) { // player has solved at least one puzzle
+        if (!isTutorial) {
             RectF returnButtonBounds = new RectF(
                     horizontalDistanceFromEdge,
                     top,
@@ -626,13 +598,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     (error) -> onAdFailedToLoad(error, context),
                     this::render
             );
-        } else {
-            // colorInputValueButtonGroup = new ButtonGroup<>(colorButtonViews(context, paint, Puzzles.getTutorialPuzzleReference().getPuzzle(context)));
-            // boardInputValueButtonGroup = new ButtonGroup<>(groupedBoardInputValueButtons(context, paint));
         }
 
         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().fillPermanentDisqualify();
-
         render();
     }
 
@@ -804,7 +772,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         colorInputValueButtonGroup = new ButtonGroup<>(colorButtonViews);
 
-        int adSizeHeight = 0; // (AdManager.isRemoveAds())? 0 : AdSize.SMART_BANNER.getHeightInPixels(context);
+        int adSizeHeight = 0;
         int boardTop = adSizeHeight + ApplicationSettings.INSTANCE.getScreenHeight() * 11 / 100;
         int boardMaxHeight = ApplicationSettings.INSTANCE.getScreenHeight() - boardTop - 3 * toolbarButtonPadding - 2 * toolbarButtonLength;
         boardMaxHeight -= (yOffset * (toolbarButtonPadding + toolbarButtonLength));
@@ -1060,7 +1028,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         colorInputValueButtonGroup = new ButtonGroup<>(colorButtonViews);
 
-        int adSizeHeight = 0; // (AdManager.isRemoveAds())? 0 : AdSize.SMART_BANNER.getHeightInPixels(context);
+        int adSizeHeight = 0;
         int boardTop = adSizeHeight + ApplicationSettings.INSTANCE.getScreenHeight() * 11 / 100;
         int boardMaxHeight = ApplicationSettings.INSTANCE.getScreenHeight() - boardTop - 4 * toolbarButtonPadding - 3 * toolbarButtonLength;
 

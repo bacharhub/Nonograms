@@ -37,8 +37,6 @@ public class PromoteVipButtonView extends PicButtonView {
 
     @Override
     public void onButtonPressed() {
-        //if (!AdManager.isRemoveAds()) {
-            ((VipPromoter)viewListener).promote();
-        //}
+        ((VipPromoter)viewListener).promote();
     }
 }

@@ -45,7 +45,7 @@ public enum YesNoQuestion {
                 ApplicationSettings.INSTANCE.getScreenHeight() * 45 / 100,
                 ApplicationSettings.INSTANCE.getScreenWidth() * 85 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 65 / 100
-        ) /* windowBounds */;
+        );
 
         float padding = windowBounds.width() / 60;
         RectF windowInnerBackgroundBounds = new RectF(windowBounds.left + padding, windowBounds.top + padding, windowBounds.right - padding, windowBounds.bottom - padding);

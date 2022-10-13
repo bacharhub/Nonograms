@@ -73,8 +73,6 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
     private FirebaseAnalytics mFirebaseAnalytics;
     private MenuView menuView;
     private SkuDetails removeAdsDetails;
-
-    // create new Person
     private BillingClient mBillingClient;
 
     @Override
@@ -86,7 +84,6 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         new Thread(() -> {
             init();
             try {
-                // Obtain the FirebaseAnalytics instance.
                 mFirebaseAnalytics = FirebaseAnalytics.getInstance(MenuActivity.this);
             } catch (Exception ignored) {
 
@@ -193,18 +190,6 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         GameSettings.INSTANCE.initSound(MenuActivity.this.getApplicationContext());
 
         new Thread(() -> {
-            /*try {
-                //AdManager.init(MenuActivity.this.getApplicationContext());
-
-                if (!MemoryManager.isLowMemory() && !AdManager.isRemoveAds()) {
-                    MobileAds.initialize(MenuActivity.this.getApplicationContext());
-                }
-
-
-            } catch (Exception ignored) {
-
-            }*/
-
             Puzzles.init(MenuActivity.this.getApplicationContext());
 
             if (Puzzles.hasPlayerSolvedAtLeastOnePuzzle(MenuActivity.this)) {
@@ -420,7 +405,7 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
 
     private int numOfPuzzlesSolvedSoFar() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MenuActivity.this);
-        int numOfPuzzlesSolved = sharedPreferences.getInt(MenuActivity.this.getString(R.string.most_puzzles_solved), /*-1*/ 0);
+        int numOfPuzzlesSolved = sharedPreferences.getInt(MenuActivity.this.getString(R.string.most_puzzles_solved), 0);
         return numOfPuzzlesSolved;
     }
 
@@ -624,7 +609,6 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
                         bundle.putString(GameMonitoring.CHOOSE_CATEGORY, GameMonitoring.REMOVE_ADS_NO_INTERNET_CONNECTION);
                         mFirebaseAnalytics.logEvent(GameMonitoring.MENU_EVENT, bundle);
                     }
-                    // Process the result.
                 }
         );
     }

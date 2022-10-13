@@ -105,7 +105,6 @@ public enum VipPromotionUtils {
                                         .setNeutralButton(android.R.string.ok, null).show();
                             }
                         }
-                        // Process the result.
                     }
                 }
         );

@@ -62,8 +62,7 @@ public class MyApplication extends Application {
     private final InterstitialAdLoadCallback interstitialAdLoadCallback = new InterstitialAdLoadCallback() {
         @Override
         public void onAdLoaded(@NonNull InterstitialAd ad) {
-            // The mInterstitialAd reference will be null until
-            // an ad is loaded.
+            // The mInterstitialAd reference will be null until an ad is loaded.
             interstitialAd = ad;
             interstitialAd.setFullScreenContentCallback(fullScreenContentCallback);
         }

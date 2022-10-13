@@ -71,8 +71,8 @@ class OptionsView {
         float padding = windowBounds.width() / 60;
         this.windowInnerBackgroundBounds = new RectF(windowBounds.left + padding, windowBounds.top + padding, windowBounds.right - padding, windowBounds.bottom - padding);
 
-        this.toolbarColor = ContextCompat.getColor(context, /*R.color.colorfulPuzzlePink1*/ R.color.settingsBrown1);
-        this.toolbarBackgroundColor = ContextCompat.getColor(context, /*R.color.colorfulPuzzlePink2*/ R.color.settingsBrown2);
+        this.toolbarColor = ContextCompat.getColor(context, R.color.settingsBrown1);
+        this.toolbarBackgroundColor = ContextCompat.getColor(context, R.color.settingsBrown2);
         this.toolbarBackgroundBounds = new RectF(windowBounds.left, windowBounds.top + windowBounds.height() * 9 / 100, windowBounds.right, windowBounds.top + windowBounds.height() * 26 / 100);
         this.toolbarBounds = new RectF(windowInnerBackgroundBounds.left, toolbarBackgroundBounds.top, windowInnerBackgroundBounds.right, toolbarBackgroundBounds.bottom);
 
@@ -130,7 +130,7 @@ class OptionsView {
                 (ViewListener)context,
                 context.getString(R.string.sound),
                 soundButtonBounds,
-                toolbarColor, toolbarBackgroundColor, ContextCompat.getColor(context, /*R.color.colorfulPuzzlePink3*/ R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.audio_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.mute_black_white_100)}, context, paint);
+                toolbarColor, toolbarBackgroundColor, ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.audio_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.mute_black_white_100)}, context, paint);
 
         RectF icons8ButtonBounds = new RectF(
                 toolbarBounds.left + (toolbarBounds.width() - horizontalButtonWidth) / 2,
@@ -143,7 +143,7 @@ class OptionsView {
                 (ViewListener)context,
                 context.getString(R.string.icons8),
                 icons8ButtonBounds,
-                toolbarColor, toolbarBackgroundColor, ContextCompat.getColor(context, /*R.color.colorfulPuzzlePink3*/ R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.icons8_512)}, context, paint);
+                toolbarColor, toolbarBackgroundColor, ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.icons8_512)}, context, paint);
 
 
         windowDescription = context.getString(R.string.settings_description);

@@ -314,22 +314,18 @@ public class PuzzleCategorySelectionView extends ScrollableView {
             if (initializedPuzzleSelectionButtons.get(category).contains(puzzleReference.getUniqueId())) {
                 puzzleSelectionButtonView = puzzleSelectionButtonViewMap.get(category)[i];
             } else {
-                //do we really need to initialize an object?
                 if (bounds.top > ApplicationSettings.INSTANCE.getScreenHeight()) {
                     return;
                 }
 
                 initializedPuzzleSelectionButtons.get(category).add(puzzleReference.getUniqueId());
 
-                Runnable taskToExecute = new Runnable() {
-                    @Override
-                    public void run() {
-                        puzzleSelectionButtonViewMap.get(category)[i] = createPuzzleSelectionButtonView(category, puzzleReference, PaintManager.INSTANCE.createPaint(), bounds);
-                        if (puzzleSelectionButtonViewMap.get(category).length - 1 == i) {
-                            render();
-                        } else {
-                            update();
-                        }
+                Runnable taskToExecute = () -> {
+                    puzzleSelectionButtonViewMap.get(category)[i] = createPuzzleSelectionButtonView(category, puzzleReference, PaintManager.INSTANCE.createPaint(), bounds);
+                    if (puzzleSelectionButtonViewMap.get(category).length - 1 == i) {
+                        render();
+                    } else {
+                        update();
                     }
                 };
 
@@ -413,7 +409,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                     continue;
                 }
 
-                if ((/*boundsTop*/bounds.top > ApplicationSettings.INSTANCE.getScreenHeight())) {
+                if ((bounds.top > ApplicationSettings.INSTANCE.getScreenHeight())) {
                     return;
                 }
 
@@ -604,11 +600,11 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         verticalGapBetweenPuzzles = puzzleHeight / 5;
 
         puzzleSelectionButtonViewMap = new HashMap<>();
-        puzzleSelectionButtonViewMap.put(Puzzles.SMALL, /*new HashMap<>()*/ new PicButtonView[Puzzles.SMALL.getPuzzleReferences().size()]);
-        puzzleSelectionButtonViewMap.put(Puzzles.NORMAL, /*new HashMap<>()*/ new PicButtonView[Puzzles.NORMAL.getPuzzleReferences().size()]);
-        puzzleSelectionButtonViewMap.put(Puzzles.LARGE, /*new HashMap<>()*/ new PicButtonView[Puzzles.LARGE.getPuzzleReferences().size()]);
-        puzzleSelectionButtonViewMap.put(Puzzles.COMPLEX, /*new HashMap<>()*/ new PicButtonView[Puzzles.COMPLEX.getPuzzleReferences().size()]);
-        puzzleSelectionButtonViewMap.put(Puzzles.COLORFUL, /*new HashMap<>()*/ new PicButtonView[Puzzles.COLORFUL.getPuzzleReferences().size()]);
+        puzzleSelectionButtonViewMap.put(Puzzles.SMALL, new PicButtonView[Puzzles.SMALL.getPuzzleReferences().size()]);
+        puzzleSelectionButtonViewMap.put(Puzzles.NORMAL, new PicButtonView[Puzzles.NORMAL.getPuzzleReferences().size()]);
+        puzzleSelectionButtonViewMap.put(Puzzles.LARGE, new PicButtonView[Puzzles.LARGE.getPuzzleReferences().size()]);
+        puzzleSelectionButtonViewMap.put(Puzzles.COMPLEX, new PicButtonView[Puzzles.COMPLEX.getPuzzleReferences().size()]);
+        puzzleSelectionButtonViewMap.put(Puzzles.COLORFUL, new PicButtonView[Puzzles.COLORFUL.getPuzzleReferences().size()]);
 
         initializedPuzzleSelectionButtons = new HashMap<>();
         initializedPuzzleSelectionButtons.put(Puzzles.SMALL, new HashSet<>(Puzzles.getNumOfPuzzlesPerCategory()));

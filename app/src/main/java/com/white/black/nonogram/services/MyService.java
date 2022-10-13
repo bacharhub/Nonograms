@@ -25,15 +25,13 @@ public class MyService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String id = "default_channel_id";
-        String title = getString(R.string.app_name);//"Default Channel";
+        String title = getString(R.string.app_name);
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = notificationManager.getNotificationChannel(id);
-            if (notificationChannel == null) {
-                notificationChannel = new NotificationChannel(id, title, importance);
-                notificationManager.createNotificationChannel(notificationChannel);
-            }
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel notificationChannel = notificationManager.getNotificationChannel(id);
+        if (notificationChannel == null) {
+            notificationChannel = new NotificationChannel(id, title, importance);
+            notificationManager.createNotificationChannel(notificationChannel);
         }
 
         // create and display a notification
@@ -54,10 +52,8 @@ public class MyService extends Service {
 
         notificationManager.notify(334455 /* made up number */, notificationPopup);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(334455 /* made up number */, notificationPopup);
-            stopForeground(false);
-        }
+        startForeground(334455 /* made up number */, notificationPopup);
+        stopForeground(false);
 
         return super.onStartCommand(intent, flags, startId);
     }

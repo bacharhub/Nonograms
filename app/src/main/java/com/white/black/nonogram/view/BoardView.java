@@ -911,27 +911,27 @@ class BoardView {
     }
 
     private void drawRowAndColumn(Canvas canvas, Paint paint, Integer colorToZoomFor) {
-        drawRowAndColumnBackgroundAndBackgroundOutline(canvas, paint); // V
-        drawRowAndColumnCompletion(canvas, paint); // X
-        drawRowAndColumnNumbers(canvas, paint, colorToZoomFor); // V
+        drawRowAndColumnBackgroundAndBackgroundOutline(canvas, paint);
+        drawRowAndColumnCompletion(canvas, paint);
+        drawRowAndColumnNumbers(canvas, paint, colorToZoomFor);
     }
 
     public void draw(Canvas canvas, Paint paint, BoardInputValue boardInputValue, Integer colorToZoomFor) {
-        drawBackgroundAndBackgroundOutline(canvas, paint); // V
-        drawSlotMark(canvas, paint); // V
-        drawRowAndColumn(canvas, paint, colorToZoomFor); // X
-        drawGrid(canvas, paint); // V
+        drawBackgroundAndBackgroundOutline(canvas, paint);
+        drawSlotMark(canvas, paint);
+        drawRowAndColumn(canvas, paint, colorToZoomFor);
+        drawGrid(canvas, paint);
         drawSolutionStep(canvas, paint);
-        fillGridSlots(canvas, paint, colorToZoomFor); // V
+        fillGridSlots(canvas, paint, colorToZoomFor);
 
         if (isTutorial && !TouchMonitor.INSTANCE.touchDown()) {
             fillGridSlotsOnMovementForTutorial(canvas, paint);
         } else {
-            fillGridSlotsOnMovementRouter(canvas, paint, boardInputValue, colorToZoomFor); // V
+            fillGridSlotsOnMovementRouter(canvas, paint, boardInputValue, colorToZoomFor);
         }
 
-        drawSlotNumbers(canvas, paint); // V
-        drawMiniPic(canvas, paint); // V
+        drawSlotNumbers(canvas, paint);
+        drawMiniPic(canvas, paint);
     }
 
     private void drawSlotNumbers(Canvas canvas, Paint paint) {

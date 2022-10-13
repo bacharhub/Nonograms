@@ -23,7 +23,7 @@ public class RectPuzzleSelectionButtonView extends ButtonView {
     private final Bitmap puzzleImageWhite;
     private final int minWidthHeight;
 
-    public RectPuzzleSelectionButtonView(ViewListener viewListener, RectF bounds, Puzzle puzzle, int color1, int color2, int color3/*, int color12*/, Bitmap puzzleImageWhite, int minWidthHeight) {
+    public RectPuzzleSelectionButtonView(ViewListener viewListener, RectF bounds, Puzzle puzzle, int color1, int color2, int color3, Bitmap puzzleImageWhite, int minWidthHeight) {
         super(viewListener, bounds);
         this.puzzle = puzzle;
         this.color1 = color1;

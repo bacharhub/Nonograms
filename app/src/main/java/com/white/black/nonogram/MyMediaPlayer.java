@@ -62,35 +62,9 @@ public class MyMediaPlayer {
 
     private void loadSound(Context context) {
         this.mediaPlayers = new ConcurrentHashMap<>();
-        //this.mediaPlayers.put("achievement_unlocked", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.achievement_unlocked), 1f));
-        //this.mediaPlayers.put("clock_ticking", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.clock_ticking), 1f));
-        //this.mediaPlayers.put("collecting_coins", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.collecting_coins), 1f));
         this.mediaPlayers.put("page_selection", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.page_selection), 1f));
         this.mediaPlayers.put("select", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.select), 1f));
         this.mediaPlayers.put("blop", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.blop), 1f));
         this.mediaPlayers.put("victory", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.victory), 0.7f));
-        /*MediaPlayer skyAndCloud = MediaPlayer.create(context, R.raw.sky_and_cloud);
-        skyAndCloud.setOnCompletionListener(mp -> {
-                    play("family_breakfast");
-                }
-        );
-
-        this.mediaPlayers.put("sky_and_cloud", new MediaPlayerProxy(skyAndCloud, 0.4f));
-
-        MediaPlayer familyBreakfast = MediaPlayer.create(context, R.raw.family_breakfast);
-        familyBreakfast.setOnCompletionListener(mp -> {
-                    play("acoustic_secrets");
-                }
-        );
-
-        this.mediaPlayers.put("family_breakfast", new MediaPlayerProxy(familyBreakfast, 0.4f));
-
-        MediaPlayer acousticSecrets = MediaPlayer.create(context, R.raw.acoustic_secrets);
-        acousticSecrets.setOnCompletionListener(mp -> {
-                    play("sky_and_cloud");
-                }
-        );
-
-        this.mediaPlayers.put("acoustic_secrets", new MediaPlayerProxy(acousticSecrets, 0.4f));*/
     }
 }

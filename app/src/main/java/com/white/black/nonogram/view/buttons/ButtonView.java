@@ -32,10 +32,4 @@ public abstract class ButtonView {
     public RectF getBounds() {
         return this.bounds;
     }
-
-// --Commented out by Inspection START (09/10/2018 20:03):
-//    public void setBounds(RectF bounds) {
-//        this.bounds = bounds;
-//    }
-// --Commented out by Inspection STOP (09/10/2018 20:03)
 }

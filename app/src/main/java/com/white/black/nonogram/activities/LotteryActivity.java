@@ -30,7 +30,7 @@ public class LotteryActivity extends Activity implements LotteryViewListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!Puzzles.isFirstLoadingDone()) /* null static fields */ {
+        if (!Puzzles.isFirstLoadingDone()) {
             Intent intent = new Intent(LotteryActivity.this, MenuActivity.class);
             LotteryActivity.this.startActivity(intent);
             LotteryActivity.this.finish();
@@ -46,7 +46,6 @@ public class LotteryActivity extends Activity implements LotteryViewListener {
             public void run() {
                 lotteryView.init(LotteryActivity.this, PaintManager.INSTANCE.createPaint());
                 try {
-                    // Obtain the FirebaseAnalytics instance.
                     mFirebaseAnalytics = FirebaseAnalytics.getInstance(LotteryActivity.this);
                 } catch (Exception ignored) {
 

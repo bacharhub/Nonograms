@@ -166,13 +166,6 @@ public class LotteryView extends SurfaceView implements SurfaceHolder.Callback{
                 bounds.centerY() + bounds.height() * 45 / 100
         );
 
-        /*RectF paddedBounds = new RectF(
-                topLeftBounds.centerX() - topLeftBounds.width() * 45 / 100,
-                topLeftBounds.centerY() - topLeftBounds.height() * 45 / 100,
-                topLeftBounds.centerX() + topLeftBounds.width() * 45 / 100,
-                topLeftBounds.centerY() + topLeftBounds.height() * 45 / 100
-        );*/
-
         Path path = new Path();
         path.moveTo(bounds.left, bounds.top);
         path.lineTo(topLeftBounds.left, topLeftBounds.bottom);

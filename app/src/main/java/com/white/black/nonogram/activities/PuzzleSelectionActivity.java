@@ -108,7 +108,7 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!Puzzles.isFirstLoadingDone()) /* null static fields */ {
+        if (!Puzzles.isFirstLoadingDone()) {
             Intent intent = new Intent(PuzzleSelectionActivity.this, MenuActivity.class);
             PuzzleSelectionActivity.this.startActivity(intent);
             PuzzleSelectionActivity.this.finish();
@@ -122,7 +122,6 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
         new Thread(() -> {
             puzzleCategorySelectionView.init(PuzzleSelectionActivity.this, PaintManager.INSTANCE.createPaint());
             try {
-                // Obtain the FirebaseAnalytics instance.
                 mFirebaseAnalytics = FirebaseAnalytics.getInstance(PuzzleSelectionActivity.this);
                 rewardedInstanceHandler = new RewardedInstanceHandler();
             } catch (Exception ignored) {
@@ -424,7 +423,7 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
             }
 
             if (!foundUnsolvedSubPuzzle) {
-                PuzzleReference firstPuzzleChecked = PuzzleSelectionView.INSTANCE.getPuzzleReference();/*getOverallPuzzle();*/
+                PuzzleReference firstPuzzleChecked = PuzzleSelectionView.INSTANCE.getPuzzleReference();
                 PuzzleReference currentPuzzleChecked = firstPuzzleChecked.getNextPuzzleNode();
                 while (firstPuzzleChecked != currentPuzzleChecked) {
                     if (currentPuzzleChecked.getPuzzle(PuzzleSelectionActivity.this.getApplicationContext()).getPuzzleClass() == null || currentPuzzleChecked.getPuzzle(PuzzleSelectionActivity.this.getApplicationContext()).getPuzzleClass().equals(Puzzle.PuzzleClass.FREE) || AdManager.isRemoveAds()) {

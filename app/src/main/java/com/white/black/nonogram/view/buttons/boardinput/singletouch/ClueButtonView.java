@@ -73,7 +73,6 @@ public class ClueButtonView extends PicButtonView {
 
     @Override
     public void onButtonPressed() {
-        // puzzle.setClueNotAvailable();
         onClueButtonPressed.run();
     }
 }

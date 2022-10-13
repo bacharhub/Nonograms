@@ -294,18 +294,6 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         float verticalGap = ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 14;
 
         picButtonViews = new LinkedList<>();
-        /*if (Locale.getDefault().getCountry().equals("IL")) {
-            LotteryButtonView lotteryButtonView = new LotteryButtonView(
-                    menuViewListener,
-                    new RectF(
-                            lineLeft + (buttonEdgeLength + horizontalGap) * 2,
-                            lineTop - (buttonEdgeLength + verticalGap),
-                            lineLeft + (buttonEdgeLength + horizontalGap) * 2 + buttonEdgeLength,
-                            lineTop - (buttonEdgeLength + verticalGap) + buttonEdgeLength
-                    ), context.getString(R.string.lottery), Color.LTGRAY, Color.DKGRAY, Color.BLACK, new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.headphones_100)}, context, paint);
-            lotteryButtonView.init(context);
-            picButtonViews.add(lotteryButtonView);
-        }*/
 
         MenuSettingsButtonView settingsButtonView = new MenuSettingsButtonView(
                 menuViewListener,
@@ -335,17 +323,6 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
                 (ViewListener) context,
                 promoteVipButtonBounds,
                 Color.LTGRAY, Color.DKGRAY, Color.BLACK, new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.vip_100)}, context, paint));
-
-        /*picButtonViews.add(new PrivacyPolicyButtonView(
-                menuViewListener,
-                context.getString(R.string.privacy_policy),
-                new RectF(
-                        lineLeft / 2,
-                        lineLeft / 2,
-                        lineLeft / 2 + buttonEdgeLength * 3 / 2,
-                        lineLeft * 3 / 2
-                ), Color.LTGRAY, Color.DKGRAY, Color.BLACK, new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.privacy_policy_100)}, context, paint));
-        */
 
         picButtonViews.add(new SmallPuzzleButtonView(
                 menuViewListener,
