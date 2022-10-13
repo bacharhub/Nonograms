@@ -322,25 +322,22 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
     @Override
     public void onResume() {
         super.onResume();
+        pool = newCachedThreadPool(r -> {
+            Thread t = Executors.defaultThreadFactory().newThread(r);
+            t.setDaemon(true);
+            return t;
+        });
 
-        boolean isTutorial = !Puzzles.hasPlayerSolvedAtLeastOnePuzzle(GameActivity.this);
-        if (isTutorial) {
-            pool = newCachedThreadPool(r -> {
-                Thread t = Executors.defaultThreadFactory().newThread(r);
-                t.setDaemon(true);
-                return t;
-            });
-
-            pool.execute(() -> {
-                while (!Thread.currentThread().isInterrupted() && PuzzleSelectionView.INSTANCE.getSelectedPuzzle().getSolutionStep() != null) {
-                    try {
-                        gameView.render();
-                        Thread.sleep(16);
-                    } catch (InterruptedException ignored) {
-                    }
+        pool.execute(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    gameView.render();
+                    Thread.sleep(16);
+                } catch (InterruptedException ignored) {
                 }
-            });
-        }
+            }
+        });
+
 
         GameState.setGameState(GameState.GAME);
         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().setLastTimeSolvingTimeIncreased(System.currentTimeMillis());

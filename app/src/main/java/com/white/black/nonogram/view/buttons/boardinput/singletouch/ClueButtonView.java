@@ -45,13 +45,23 @@ public class ClueButtonView extends PicButtonView {
     }
 
     public void draw(Canvas canvas, Paint paint) {
+        int numOfAvailableClues = this.numOfAvailableClues.get();
+        if (AdManager.isRemoveAds() || numOfAvailableClues > 0) {
+            innerBackgroundColor = Color.WHITE;
+        } else {
+            long interval = 5_000L;
+            float progress = (float)(Math.abs(interval / 2 - (System.currentTimeMillis() % interval))) / (interval / 2f);
+            float red = 255f;
+            float green = 209f + (255f - 209f) * progress;
+            float blue = 220f + (255f - 220f) * progress;
+            innerBackgroundColor = Color.rgb((int)red, (int)green, (int)blue);
+        }
+
         super.draw(canvas, paint);
         RectF bounds = (isPressed()) ? pressedInnerImageBounds : innerImageBounds;
-
         if (AdManager.isRemoveAds()) {
             canvas.drawBitmap(innerImages[0], null, bounds, paint);
         } else {
-            int numOfAvailableClues = this.numOfAvailableClues.get();
             RectF rechargingClueBounds = new RectF(
                     bounds.centerX() - bounds.width() * 15 / 100,
                     bounds.centerY() - bounds.height() * 15 / 100,
