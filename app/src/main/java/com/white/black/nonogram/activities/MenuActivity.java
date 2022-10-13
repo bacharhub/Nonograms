@@ -165,8 +165,8 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         PendingIntent pendingIntent = PendingIntent.getBroadcast(MenuActivity.this, 0, _intent, PendingIntent.FLAG_IMMUTABLE);
         AlarmManager alarmManager = (AlarmManager)MenuActivity.this.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
-        final long DAY_IN_MILLISECONDS =  1000 * 3600 * 24; // 24 hours
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + DAY_IN_MILLISECONDS, pendingIntent);
+        final long TIME_TO_WAIT_MILLISECONDS =  1000 * 3600 * 6; // 6 hours
+        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + TIME_TO_WAIT_MILLISECONDS, pendingIntent);
     }
 
     @Override
