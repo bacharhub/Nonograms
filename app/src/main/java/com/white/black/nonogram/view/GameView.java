@@ -540,18 +540,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         this.isTutorial = !Puzzles.hasPlayerSolvedAtLeastOnePuzzle(context);
 
-        if (isTutorial) {
-            new Thread(() -> {
-                while (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().getSolutionStep() != null) {
-                    try {
-                        render();
-                        Thread.sleep(25);
-                    } catch (Exception ignored) {
-                    }
-                }
-            }).start();
-        }
-
         if (GameSettings.INSTANCE.getInput().equals(GameSettings.Input.TOUCH)) {
             initTouchToolbar(context, paint);
         } else {

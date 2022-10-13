@@ -1,5 +1,7 @@
 package com.white.black.nonogram.activities;
 
+import static java.util.concurrent.Executors.newCachedThreadPool;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -7,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
@@ -15,11 +16,9 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
-import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.white.black.nonogram.AdManager;
 import com.white.black.nonogram.GameMonitoring;
@@ -31,24 +30,26 @@ import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
 import com.white.black.nonogram.utils.VipPromotionUtils;
-import com.white.black.nonogram.view.VipPopup;
-import com.white.black.nonogram.view.YesNoQuestion;
 import com.white.black.nonogram.view.Appearance;
 import com.white.black.nonogram.view.GameView;
 import com.white.black.nonogram.view.PaintManager;
 import com.white.black.nonogram.view.PuzzleSelectionView;
+import com.white.black.nonogram.view.YesNoQuestion;
 import com.white.black.nonogram.view.listeners.GameMonitoringListener;
 import com.white.black.nonogram.view.listeners.GameOptionsViewListener;
 import com.white.black.nonogram.view.listeners.GameViewListener;
 import com.white.black.nonogram.view.listeners.VipPromoter;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GameActivity extends Activity implements GameViewListener, GameOptionsViewListener, GameMonitoringListener, VipPromoter {
 
     private FirebaseAnalytics mFirebaseAnalytics;
     private GameView gameView;
     private RelativeLayout ll;
+    private ExecutorService pool;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,19 +116,21 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
         int pointerId = event.getPointerId(pointerIndex);
         int maskedAction = event.getActionMasked();
 
-        switch(maskedAction) {
+        switch (maskedAction) {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN: {
-                TouchMonitor.INSTANCE.setTouchDown(pointerId,true, new Point((int)(event.getX(pointerIndex)), (int)(event.getY(pointerIndex))));
-                TouchMonitor.INSTANCE.setTouchUp(pointerId,false);
+                TouchMonitor.INSTANCE.setTouchDown(pointerId, true, new Point((int) (event.getX(pointerIndex)), (int) (event.getY(pointerIndex))));
+                TouchMonitor.INSTANCE.setTouchUp(pointerId, false);
                 PaintManager.INSTANCE.setReadyToRender();
             }
 
-            case MotionEvent.ACTION_MOVE: TouchMonitor.INSTANCE.setMove(pointerId, new Point((int)(event.getX(pointerIndex)), (int)(event.getY(pointerIndex)))); break;
+            case MotionEvent.ACTION_MOVE:
+                TouchMonitor.INSTANCE.setMove(pointerId, new Point((int) (event.getX(pointerIndex)), (int) (event.getY(pointerIndex))));
+                break;
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_UP:
-                TouchMonitor.INSTANCE.setTouchDown(pointerId,false);
-                TouchMonitor.INSTANCE.setTouchUp(pointerId, new Point((int)(event.getX(pointerIndex)), (int)(event.getY(pointerIndex))));
+                TouchMonitor.INSTANCE.setTouchDown(pointerId, false);
+                TouchMonitor.INSTANCE.setTouchUp(pointerId, new Point((int) (event.getX(pointerIndex)), (int) (event.getY(pointerIndex))));
                 TouchMonitor.INSTANCE.setCoordinatesGap(pointerId);
                 PaintManager.INSTANCE.setReadyToRender();
 
@@ -321,8 +324,33 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
     public void onResume() {
         super.onResume();
 
+        boolean isTutorial = !Puzzles.hasPlayerSolvedAtLeastOnePuzzle(GameActivity.this);
+        if (isTutorial) {
+            pool = newCachedThreadPool(r -> {
+                Thread t = Executors.defaultThreadFactory().newThread(r);
+                t.setDaemon(true);
+                return t;
+            });
+
+            pool.execute(() -> {
+                while (!Thread.currentThread().isInterrupted() && PuzzleSelectionView.INSTANCE.getSelectedPuzzle().getSolutionStep() != null) {
+                    try {
+                        gameView.render();
+                        Thread.sleep(16);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            });
+        }
+
         GameState.setGameState(GameState.GAME);
         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().setLastTimeSolvingTimeIncreased(System.currentTimeMillis());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        pool.shutdownNow();
     }
 
     @Override
