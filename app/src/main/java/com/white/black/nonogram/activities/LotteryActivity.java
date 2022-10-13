@@ -41,15 +41,12 @@ public class LotteryActivity extends Activity implements LotteryViewListener {
         setContentView(lotteryView);
         this.overridePendingTransition(R.anim.enter, 0);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                lotteryView.init(LotteryActivity.this, PaintManager.INSTANCE.createPaint());
-                try {
-                    mFirebaseAnalytics = FirebaseAnalytics.getInstance(LotteryActivity.this);
-                } catch (Exception ignored) {
+        new Thread(() -> {
+            lotteryView.init(LotteryActivity.this, PaintManager.INSTANCE.createPaint());
+            try {
+                mFirebaseAnalytics = FirebaseAnalytics.getInstance(LotteryActivity.this);
+            } catch (Exception ignored) {
 
-                }
             }
         }).start();
 
