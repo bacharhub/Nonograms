@@ -41,7 +41,7 @@ public class MyService extends Service {
                 .setContentText(getString(R.string.click_to_play))
                 .setContentIntent(pendingIntentMain)
                 .setSmallIcon(R.drawable.icon_white_512)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.pencil_color_512))
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.puzzle_green_512))
                 .setPriority(Notification.PRIORITY_MAX)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setOngoing(false)
