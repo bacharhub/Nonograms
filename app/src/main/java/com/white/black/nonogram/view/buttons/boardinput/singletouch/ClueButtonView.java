@@ -49,7 +49,7 @@ public class ClueButtonView extends PicButtonView {
         if (AdManager.isRemoveAds() || numOfAvailableClues > 0) {
             innerBackgroundColor = Color.WHITE;
         } else {
-            long interval = 5_000L;
+            long interval = 2_000L;
             float progress = (float)(Math.abs(interval / 2 - (System.currentTimeMillis() % interval))) / (interval / 2f);
             float red = 255f;
             float green = 209f + (255f - 209f) * progress;
