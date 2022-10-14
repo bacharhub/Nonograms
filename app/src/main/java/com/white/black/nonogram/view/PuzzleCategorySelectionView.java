@@ -617,7 +617,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                 context,
                 paint,
                 context.getString(R.string.freePuzzle),
-                null,
+                BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_pink_512),
                 () -> { render(); onRewardedAdOffered(context, false); },
                 () -> { onRewarded(context); onRewardedAdOffered(context, true); },
                 (error) -> onAdFailedToLoad(error, context),
