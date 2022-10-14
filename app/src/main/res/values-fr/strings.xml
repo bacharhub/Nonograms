@@ -28,7 +28,6 @@
     <string name="instructions">Instructions</string>
     <string name="icons8">Icons8</string>
     <string name="icons8_web">https://icons8.com/</string>
-    <string name="fill_cells">Remplir les cellules vides</string>
     <string name="return_button">Retour</string>
     <string name="puzzle_size_format">%1$d x %2$d</string>
     <string name="unknown_puzzle_name">\???</string>
