@@ -29,8 +29,8 @@
     <string name="return_button">חזור</string>
     <string name="puzzle_size_format">%1$d x %2$d</string>
     <string name="unknown_puzzle_name">\???</string>
-    <string name="restart_message">התחל מחדש?</string>
-    <string name="continue_message">המשך פאזל קודם?</string>
+    <string name="restart_message">לנקות את הלוח?</string>
+    <string name="continue_message">המשיכו פאזל קודם?</string>
     <string name="restart">התחל מחדש</string>
     <string name="yes">כן</string>
     <string name="no">לא</string>
@@ -267,9 +267,9 @@
     <string name="fox">שועל</string>
     <string name="super_mario">סופר מריו</string>
     <string name="freePuzzle">פאזל מתנה!</string>
-    <string name="get_hints">5+ רמזים</string>
-    <string name="watchAd">צפה בסרטון</string>
-    <string name="loading">טוען..</string>
+    <string name="get_hints">מתנה: 5 רמזים</string>
+    <string name="watchAd">צפו בסרטון</string>
+    <string name="loading">טוען.. תודה!</string>
     <string name="no_ads">ללא פרסומות!</string>
     <string name="unlock_all_puzzles">כל הפאזלים זמינים!</string>
     <string name="support_programmer">תמכו בנו :)</string>

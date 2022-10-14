@@ -183,17 +183,14 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
 
     @Override
     public void onStartOverButtonPressed() {
-        YesNoQuestion.INSTANCE.init(GameActivity.this, PaintManager.INSTANCE.createPaint(), getString(R.string.restart_message), new Runnable() {
-            @Override
-            public void run() {
-                YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
-                GameSettings.INSTANCE.onGameSettingsButtonPressed();
-                gameView.clear();
-                Bundle bundle = new Bundle();
-                bundle.putString(GameMonitoring.PUZZLE_CATEGORY, Puzzles.getCurrent().name());
-                bundle.putString(GameMonitoring.START_OVER, PuzzleSelectionView.INSTANCE.getOverallPuzzle().getName());
-                mFirebaseAnalytics.logEvent(GameMonitoring.GAME_EVENT, bundle);
-            }
+        YesNoQuestion.INSTANCE.init(GameActivity.this, PaintManager.INSTANCE.createPaint(), getString(R.string.restart_message), () -> {
+            YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED);
+            GameSettings.INSTANCE.onGameSettingsButtonPressed();
+            gameView.clear();
+            Bundle bundle = new Bundle();
+            bundle.putString(GameMonitoring.PUZZLE_CATEGORY, Puzzles.getCurrent().name());
+            bundle.putString(GameMonitoring.START_OVER, PuzzleSelectionView.INSTANCE.getOverallPuzzle().getName());
+            mFirebaseAnalytics.logEvent(GameMonitoring.GAME_EVENT, bundle);
         }, () -> YesNoQuestion.INSTANCE.setAppearance(Appearance.MINIMIZED));
     }
 
