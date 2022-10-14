@@ -166,6 +166,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 }
             }
             paint.setAlpha(255);
+
+            if (isTutorial) {
+                drawInstruction(tempCanvas, paint);
+            }
         }
     }
 
@@ -209,9 +213,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             drawOnTouch(canvas, paint);
         }
 
-        if (isTutorial) {
-            drawInstruction(canvas, paint);
-        } else {
+        if (!isTutorial) {
             returnButtonView.draw(canvas, paint);
             puzzleSelectionSettingsButtonView.draw(canvas, paint);
             ButtonState undoButtonState = (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isUndoable()) ? ButtonState.ENABLED : ButtonState.DISABLED;
@@ -299,6 +301,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 )
         );
 
+        paint.setTextAlign(Paint.Align.CENTER);
         int tutorialInstructionIconSize = 128;
         int verticalGapBetweenInstructions = 128;
         int numbersSize = 96;
