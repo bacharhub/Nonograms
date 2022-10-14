@@ -90,14 +90,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private MultiTouchEraserButtonView multiTouchEraserButtonView;
 
     private Bitmap background;
-    private Bitmap taskIcon;
     private BoardView boardView;
     private PuzzleSolvedView puzzleSolvedView;
 
     private WatchAdPopup popup;
 
     private boolean isTutorial;
-    private String taskInstruction;
+    private Bitmap instructionCorrectIcon;
+    private Bitmap instructionIncorrectIcon;
 
     public VipPopup getVipPopup() {
         return popup.getVipPopup();
@@ -237,43 +237,157 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    class TutorialInstruction {
+        private final boolean correct;
+        private final int[] numbers;
+        private final boolean[] marks;
+
+        public boolean isCorrect() {
+            return this.correct;
+        }
+
+        public boolean[] getMarks() {
+            return this.marks;
+        }
+
+        public int[] getNumbers() {
+            return this.numbers;
+        }
+
+        TutorialInstruction(boolean correct, int[] numbers, boolean[] marks) {
+            this.correct = correct;
+            this.numbers = numbers;
+            this.marks = marks;
+        }
+    }
+
     private void drawInstruction(Canvas canvas, Paint paint) {
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTextSize(ApplicationSettings.INSTANCE.getScreenWidth() / 15);
-        Rect textBounds = new Rect();
-        paint.getTextBounds(taskInstruction, 0, taskInstruction.length(), textBounds);
-
-        int gapBetweenInstructionAndIcon = 30;
-        int taskIconSize = 192;
-        int distanceFromLeftEdge = (ApplicationSettings.INSTANCE.getScreenWidth() - (taskIconSize + gapBetweenInstructionAndIcon + textBounds.width())) / 2;
-
-        paint.setColor(Color.WHITE);
-        paint.setAlpha(165);
-        canvas.drawRect(
-                0,
-                boardView.getBoardBottom() - taskIconSize / 2 - 20,
-                ApplicationSettings.INSTANCE.getScreenWidth(),
-                boardView.getBoardBottom() + taskIconSize / 2 + 20,
-                paint
+        List<TutorialInstruction> tutorialInstructions = new ArrayList<>(5);
+        tutorialInstructions.add(
+                new TutorialInstruction(
+                        false,
+                        new int[]{2, 2},
+                        new boolean[]{true, true, true, true, false}
+                )
+        );
+        tutorialInstructions.add(
+                new TutorialInstruction(
+                        true,
+                        new int[]{2, 2},
+                        new boolean[]{true, true, false, true, true}
+                )
+        );
+        tutorialInstructions.add(
+                new TutorialInstruction(
+                        false,
+                        new int[]{1, 3},
+                        new boolean[]{true, true, true, false, true}
+                )
+        );
+        tutorialInstructions.add(
+                new TutorialInstruction(
+                        true,
+                        new int[]{3, 1},
+                        new boolean[]{true, true, true, false, true}
+                )
+        );
+        tutorialInstructions.add(
+                new TutorialInstruction(
+                        true,
+                        new int[]{0, 5},
+                        new boolean[]{true, true, true, true, true}
+                )
         );
 
-        paint.setAlpha(255);
-        canvas.drawBitmap(taskIcon, null, new RectF(
-                distanceFromLeftEdge,
-                boardView.getBoardBottom() - taskIconSize / 2,
-                taskIconSize + distanceFromLeftEdge,
-                boardView.getBoardBottom() + taskIconSize / 2
-        ), paint);
+        int tutorialInstructionIconSize = 128;
+        int verticalGapBetweenInstructions = 128;
+        int numbersSize = 96;
+        int horizontalGapBetweenNumbers = 3;
+        for (int i = 0; i < tutorialInstructions.size(); i++) {
+            TutorialInstruction tutorialInstruction = tutorialInstructions.get(i);
+            RectF iconBounds = new RectF(
+                    verticalGapBetweenInstructions / 2,
+                    ApplicationSettings.INSTANCE.getScreenHeight() - tutorialInstructionIconSize - i * verticalGapBetweenInstructions - verticalGapBetweenInstructions / 2,
+                    verticalGapBetweenInstructions / 2 + tutorialInstructionIconSize,
+                    ApplicationSettings.INSTANCE.getScreenHeight() - i * verticalGapBetweenInstructions - verticalGapBetweenInstructions / 2
+            );
 
-        paint.setColor(Color.BLACK);
-        canvas.drawText(
-                taskInstruction,
-                distanceFromLeftEdge + taskIconSize + gapBetweenInstructionAndIcon,
-                boardView.getBoardBottom() + textBounds.height() / 2,
-                paint
-        );
+            canvas.drawBitmap(
+                    tutorialInstruction.isCorrect() ? instructionCorrectIcon : instructionIncorrectIcon,
+                    null,
+                    iconBounds,
+                    paint);
 
-        paint.setTextAlign(Paint.Align.CENTER);
+            RectF rightNumberBackgroundBounds = null;
+            for (int j = tutorialInstruction.numbers.length - 1; j >= 0; j--) {
+                int number = tutorialInstruction.numbers[j];
+                if (number > 0) {
+                    paint.setColor(Color.BLACK);
+                    RectF numberBackgroundBounds = new RectF(
+                            iconBounds.right + verticalGapBetweenInstructions / 2 + j * (numbersSize + horizontalGapBetweenNumbers),
+                            iconBounds.centerY() - numbersSize / 2,
+                            iconBounds.right + verticalGapBetweenInstructions / 2 + numbersSize + j * (numbersSize + horizontalGapBetweenNumbers),
+                            iconBounds.centerY() + numbersSize / 2
+                    );
+
+                    if (j == tutorialInstruction.numbers.length - 1) {
+                        rightNumberBackgroundBounds = numberBackgroundBounds;
+                    }
+
+                    canvas.drawRoundRect(
+                            numberBackgroundBounds,
+                            ApplicationSettings.INSTANCE.getScreenWidth() / 50,
+                            ApplicationSettings.INSTANCE.getScreenWidth() / 50,
+                            paint
+                    );
+
+                    paint.setColor(Color.WHITE);
+                    String numberAsString = String.valueOf(number);
+                    paint.setTextSize(ApplicationSettings.INSTANCE.getScreenWidth() / 15);
+                    Rect textBounds = new Rect();
+                    paint.getTextBounds(numberAsString, 0, numberAsString.length(), textBounds);
+                    canvas.drawText(
+                            numberAsString,
+                            numberBackgroundBounds.centerX(),
+                            numberBackgroundBounds.centerY() + textBounds.height() / 2,
+                            paint
+                    );
+                }
+            }
+
+            int strokeWidth = 3;
+            paint.setStrokeWidth(strokeWidth);
+            paint.setColor(Color.BLACK);
+            int cellSize = numbersSize - 14;
+            int gapBetweenNumbersAndCells = 10;
+            int gapBetweenCellBorderAndMark = 4;
+            int markSize = cellSize - gapBetweenCellBorderAndMark * 2;
+            int markIndex = 0;
+            for (int k = 0; k < tutorialInstruction.getMarks().length; k++) {
+                paint.setStyle(Paint.Style.STROKE);
+                RectF cellBounds = new RectF(
+                        rightNumberBackgroundBounds.right + gapBetweenNumbersAndCells + cellSize * k,
+                        rightNumberBackgroundBounds.centerY() - cellSize / 2,
+                        rightNumberBackgroundBounds.right + gapBetweenNumbersAndCells + cellSize * (k + 1),
+                        rightNumberBackgroundBounds.centerY() + cellSize / 2
+                );
+                canvas.drawRect(cellBounds, paint);
+
+                paint.setStyle(Paint.Style.FILL);
+                boolean mark = tutorialInstruction.getMarks()[k];
+                if (mark) {
+                    canvas.drawRect(
+                            new RectF(
+                                    cellBounds.left + gapBetweenCellBorderAndMark,
+                                    cellBounds.top + gapBetweenCellBorderAndMark,
+                                    cellBounds.right - gapBetweenCellBorderAndMark,
+                                    cellBounds.bottom - gapBetweenCellBorderAndMark
+                            ),
+                            paint
+                    );
+                }
+            }
+        }
     }
 
     private void drawOnJoystick(Canvas canvas, Paint paint) {
@@ -529,14 +643,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         animals.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.reindeer_100));
         animals.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.turtle_100));
 
-        taskIcon = BitmapLoader.INSTANCE.getImage(context, R.drawable.task_64);
-
         int adSizeHeight = 0;
         int top = adSizeHeight + ApplicationSettings.INSTANCE.getScreenHeight() / 100;
         int horizontalDistanceFromEdge = ApplicationSettings.INSTANCE.getScreenHeight() / 22;
         int buttonHeight = ApplicationSettings.INSTANCE.getScreenHeight() / 12;
         int buttonWidth = ApplicationSettings.INSTANCE.getScreenWidth() * 22 / 100;
-        taskInstruction = context.getString(R.string.fill_cells);
+
+        instructionCorrectIcon = BitmapLoader.INSTANCE.getImage(context, R.drawable.complete_512);
+        instructionIncorrectIcon = BitmapLoader.INSTANCE.getImage(context, R.drawable.incorrect_512);
 
         this.isTutorial = !Puzzles.hasPlayerSolvedAtLeastOnePuzzle(context);
 
