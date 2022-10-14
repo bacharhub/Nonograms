@@ -1,5 +1,6 @@
 package com.white.black.nonogram.activities;
 
+import static com.white.black.nonogram.Puzzles.numOfSolvedPuzzles;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 import android.app.Activity;
@@ -306,7 +307,7 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
 
     private void increaseNumOfPuzzlesSolved() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(GameActivity.this);
-        int numOfPuzzlesSolved = sharedPreferences.getInt(GameActivity.this.getString(R.string.most_puzzles_solved), 0);
+        int numOfPuzzlesSolved = numOfSolvedPuzzles(GameActivity.this);
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         prefsEditor.putInt(getString(R.string.most_puzzles_solved), numOfPuzzlesSolved + 1);
         prefsEditor.apply();

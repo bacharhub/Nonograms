@@ -134,12 +134,17 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
 
     @Override
     public void onViewTouched(MotionEvent event) {
-        switch(event.getAction()) {
-            case MotionEvent.ACTION_DOWN: TouchMonitor.INSTANCE.setTouchDown(true, new Point((int)(event.getX()), (int)(event.getY()))); TouchMonitor.INSTANCE.setTouchUp(false); PaintManager.INSTANCE.setReadyToRender();
-            case MotionEvent.ACTION_MOVE: TouchMonitor.INSTANCE.setMove(new Point((int)(event.getX()), (int)(event.getY()))); break;
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                TouchMonitor.INSTANCE.setTouchDown(true, new Point((int) (event.getX()), (int) (event.getY())));
+                TouchMonitor.INSTANCE.setTouchUp(false);
+                PaintManager.INSTANCE.setReadyToRender();
+            case MotionEvent.ACTION_MOVE:
+                TouchMonitor.INSTANCE.setMove(new Point((int) (event.getX()), (int) (event.getY())));
+                break;
             case MotionEvent.ACTION_UP:
                 TouchMonitor.INSTANCE.setTouchDown(false);
-                TouchMonitor.INSTANCE.setTouchUp(new Point((int)(event.getX()), (int)(event.getY())));
+                TouchMonitor.INSTANCE.setTouchUp(new Point((int) (event.getX()), (int) (event.getY())));
                 TouchMonitor.INSTANCE.setCoordinatesGap();
                 PaintManager.INSTANCE.setReadyToRender();
                 break;
@@ -215,8 +220,8 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
             Intent intent = new Intent(PuzzleSelectionActivity.this, GameActivity.class);
             PuzzleSelectionActivity.this.startActivityForResult(intent, 0);
 
-            InterstitialAd interstitialAd = ((MyApplication)getApplicationContext()).getInterstitialAd();
-            if (AdManager.isTimeForInterstitial() && !AdManager.isRemoveAds() && interstitialAd != null) {
+            InterstitialAd interstitialAd = ((MyApplication) getApplicationContext()).getInterstitialAd();
+            if (AdManager.isTimeForInterstitial() && !AdManager.isRemoveAds() && interstitialAd != null && Puzzles.numOfSolvedPuzzles(PuzzleSelectionActivity.this) >= 2) {
                 AdManager._muteSound(getApplicationContext());
                 AdManager.showInterstitial(interstitialAd, PuzzleSelectionActivity.this);
             }

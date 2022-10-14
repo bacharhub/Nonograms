@@ -77,9 +77,12 @@ public enum Puzzles {
     }
 
     public static boolean hasPlayerSolvedAtLeastOnePuzzle(Context context) {
+        return numOfSolvedPuzzles(context) > 0;
+    }
+
+    public static int numOfSolvedPuzzles(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int numOfPuzzlesSolved = sharedPreferences.getInt(context.getString(R.string.most_puzzles_solved), 0);
-        return numOfPuzzlesSolved > 0;
+        return sharedPreferences.getInt(context.getString(R.string.most_puzzles_solved), 0);
     }
 
     public static PuzzleReference getTutorialPuzzleReference() {

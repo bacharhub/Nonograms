@@ -1,5 +1,7 @@
 package com.white.black.nonogram.activities;
 
+import static com.white.black.nonogram.Puzzles.numOfSolvedPuzzles;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -388,7 +390,7 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(MenuActivity.this);
         if (googleSignInAccount != null) {
             LeaderboardsClient client = Games.getLeaderboardsClient(MenuActivity.this, googleSignInAccount);
-            client.submitScore(getString(R.string.most_puzzles_solved), numOfPuzzlesSolvedSoFar());
+            client.submitScore(getString(R.string.most_puzzles_solved), numOfSolvedPuzzles(MenuActivity.this));
             client.loadCurrentPlayerLeaderboardScore(
                     getString(R.string.most_puzzles_solved),
                             LeaderboardVariant.TIME_SPAN_ALL_TIME,
@@ -401,12 +403,6 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
                         }
                     });
         }
-    }
-
-    private int numOfPuzzlesSolvedSoFar() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MenuActivity.this);
-        int numOfPuzzlesSolved = sharedPreferences.getInt(MenuActivity.this.getString(R.string.most_puzzles_solved), 0);
-        return numOfPuzzlesSolved;
     }
 
     private void writeScoreToSharedPreferences(String scoreAsString) {

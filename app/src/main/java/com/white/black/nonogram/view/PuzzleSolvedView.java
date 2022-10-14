@@ -1,5 +1,7 @@
 package com.white.black.nonogram.view;
 
+import static com.white.black.nonogram.Puzzles.numOfSolvedPuzzles;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -56,7 +58,7 @@ class PuzzleSolvedView {
     private Popup popup;
 
     public boolean isShowingPopup() {
-        return (!hideRating) && numOfPuzzlesSolved >= 10 && (numOfPuzzlesSolved % 5 == 0);
+        return (!hideRating) && numOfPuzzlesSolved >= 7 && (numOfPuzzlesSolved % 7 == 0);
     }
 
     private void setUpPopup(Context context, Paint paint) {
@@ -166,7 +168,7 @@ class PuzzleSolvedView {
         backgroundColor = ContextCompat.getColor(context, R.color.gameSettingsBackground);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        this.numOfPuzzlesSolved = sharedPreferences.getInt(context.getString(R.string.most_puzzles_solved), 0) + 1; // + 1 for the next solved puzzle
+        this.numOfPuzzlesSolved = numOfSolvedPuzzles(context) + 1; // + 1 for the next solved puzzle
         this.hideRating = sharedPreferences.getBoolean("hideRating", false);
 
         if (isShowingPopup()) {
