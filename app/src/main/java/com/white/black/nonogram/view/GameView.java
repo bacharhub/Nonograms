@@ -645,6 +645,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         animals.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.bug_100));
         animals.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.reindeer_100));
         animals.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.turtle_100));
+        animals.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.pig_100));
 
         int adSizeHeight = 0;
         int top = adSizeHeight + ApplicationSettings.INSTANCE.getScreenHeight() / 100;
@@ -1162,45 +1163,5 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void clear() {
         boardView.clear();
         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().clear();
-    }
-
-    private List<GroupedButtonView<Integer>> colorButtonViews(Context context, Paint paint, Puzzle puzzle) {
-        List<GroupedButtonView<Integer>> colorButtonViews = new ArrayList<>();
-        for (int c : puzzle.getColorSet()) {
-            RectF colorButtonBounds = new RectF();
-
-            colorButtonViews.add(
-                    new ColorButtonView(
-                            (ViewListener) context,
-                            colorButtonBounds,
-                            ContextCompat.getColor(context, R.color.settingsBrown1),
-                            ContextCompat.getColor(context, R.color.settingsBrown2),
-                            ContextCompat.getColor(context, R.color.settingsBrown3),
-                            c,
-                            context,
-                            paint
-                    )
-            );
-        }
-
-        return colorButtonViews;
-    }
-
-    private List<GroupedButtonView<BoardInputValue>> groupedBoardInputValueButtons(Context context, Paint paint) {
-        BrushButtonView brushButtonView = new BrushButtonView(
-                (ViewListener) context,
-                new RectF(),
-                ContextCompat.getColor(context, R.color.settingsBrown1),
-                ContextCompat.getColor(context, R.color.settingsBrown2),
-                ContextCompat.getColor(context, R.color.settingsBrown3),
-                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.paint_brush_100)},
-                context,
-                paint
-        );
-
-        List<GroupedButtonView<BoardInputValue>> groupedBoardInputValueButtons = new LinkedList<>();
-        groupedBoardInputValueButtons.add(brushButtonView);
-
-        return groupedBoardInputValueButtons;
     }
 }

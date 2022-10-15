@@ -525,6 +525,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         socialNetworks.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.line_100));
         socialNetworks.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.twitter_100));
         socialNetworks.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.instagram_100));
+        socialNetworks.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.tiktok_100));
 
         newPuzzleIcon = BitmapLoader.INSTANCE.getImage(context, R.drawable.new_100);
 
@@ -563,9 +564,9 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         menuOptionsView.init(context, paint);
 
         RectF switchCategoryButtonViewBounds = new RectF(
-                returnButtonBounds.right + horizontalDistanceFromEdge,
+                (returnButtonBounds.right + settingsButtonBounds.left) / 2 - returnButtonBounds.width() / 2,
                 top,
-                settingsButtonBounds.left - horizontalDistanceFromEdge,
+                (returnButtonBounds.right + settingsButtonBounds.left) / 2 + returnButtonBounds.width() / 2,
                 top + buttonHeight
         );
 

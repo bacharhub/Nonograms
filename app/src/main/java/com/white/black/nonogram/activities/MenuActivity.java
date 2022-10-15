@@ -18,6 +18,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.DisplayCutout;
 import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
@@ -30,7 +32,6 @@ import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -50,7 +51,6 @@ import com.white.black.nonogram.ApplicationSettings;
 import com.white.black.nonogram.GameMonitoring;
 import com.white.black.nonogram.GameSettings;
 import com.white.black.nonogram.GameState;
-import com.white.black.nonogram.MemoryManager;
 import com.white.black.nonogram.MyMediaPlayer;
 import com.white.black.nonogram.PuzzleReference;
 import com.white.black.nonogram.Puzzles;
@@ -242,8 +242,18 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
 
     private void initGameDimensions() {
         DisplayMetrics dm = new DisplayMetrics();
-        MenuActivity.this.getWindowManager().getDefaultDisplay().getMetrics(dm);
-        ApplicationSettings.INSTANCE.setScreenHeight(dm.heightPixels);
+        Display display = MenuActivity.this.getWindowManager().getDefaultDisplay();
+        display.getMetrics(dm);
+
+        int displayCutoutTop = 0;
+        int displayCutoutBottom = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            DisplayCutout displayCutout = display.getCutout();
+            displayCutoutTop = displayCutout.getSafeInsetTop();
+            displayCutoutBottom = displayCutout.getSafeInsetBottom();
+        }
+
+        ApplicationSettings.INSTANCE.setScreenHeight(dm.heightPixels + displayCutoutTop + displayCutoutBottom);
         ApplicationSettings.INSTANCE.setScreenWidth(dm.widthPixels);
     }
 

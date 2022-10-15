@@ -267,7 +267,7 @@ class PuzzleSolvedView {
 
         Point src = new Point(ApplicationSettings.INSTANCE.getScreenWidth() / 2, ApplicationSettings.INSTANCE.getScreenHeight() / 2);
         int radius = ApplicationSettings.INSTANCE.getScreenHeight() * 3 / 4;
-        double indexWithInterval = System.currentTimeMillis() / 60.0;
+        double indexWithInterval = System.currentTimeMillis() / 100.0;
         for (double i = indexWithInterval; i < indexWithInterval + 360; i += 52) {
             Point start = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i))), (int)(src.y + radius * Math.sin(Math.toRadians(i))));
             Point end = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i + 15))), (int)(src.y + radius * Math.sin(Math.toRadians(i + 15))));
@@ -302,6 +302,7 @@ class PuzzleSolvedView {
         canvas.drawRoundRect(windowInnerBackgroundBounds, curve, curve, paint);
 
         canvas.drawBitmap(clock, null, clockBounds, paint);
+        paint.setTextAlign(Paint.Align.LEFT);
         paint.setTextSize(PuzzleSelectionView.getPuzzleSolvingTimeDescFontSize());
         paint.setColor(Color.BLACK);
         canvas.drawText(puzzle.getSolvingTimeHumanFormat(), clockBounds.right + clockBounds.width() / 4, clockBounds.centerY() + PuzzleSelectionView.INSTANCE.getPuzzleSolvingTimeDescHeight() / 2, paint);

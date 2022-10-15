@@ -262,6 +262,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         food.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.rice_bowl_100));
         food.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.strawberry_100));
         food.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.tomato_100));
+        food.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.sushi_100));
 
         loadingGear = BitmapLoader.INSTANCE.getImage(context, R.drawable.settings_512);
         loadingGearBigBounds = new RectF(
