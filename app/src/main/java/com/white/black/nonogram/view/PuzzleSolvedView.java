@@ -267,10 +267,10 @@ class PuzzleSolvedView {
 
         Point src = new Point(ApplicationSettings.INSTANCE.getScreenWidth() / 2, ApplicationSettings.INSTANCE.getScreenHeight() / 2);
         int radius = ApplicationSettings.INSTANCE.getScreenHeight() * 3 / 4;
-        long indexWithInterval = System.currentTimeMillis() / 100;
-        for (long i = indexWithInterval; i < indexWithInterval + 360; i += 51) {
-            Point start = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i + indexWithInterval))), (int)(src.y + radius * Math.sin(Math.toRadians(i + indexWithInterval))));
-            Point end = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i + indexWithInterval + 10))), (int)(src.y + radius * Math.sin(Math.toRadians(i + indexWithInterval + 10))));
+        double indexWithInterval = System.currentTimeMillis() / 60.0;
+        for (double i = indexWithInterval; i < indexWithInterval + 360; i += 52) {
+            Point start = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i))), (int)(src.y + radius * Math.sin(Math.toRadians(i))));
+            Point end = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i + 15))), (int)(src.y + radius * Math.sin(Math.toRadians(i + 15))));
 
             Path path = new Path();
             path.setFillType(Path.FillType.EVEN_ODD);
