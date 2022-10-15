@@ -22,8 +22,6 @@ import com.white.black.nonogram.Puzzle;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
-import com.white.black.nonogram.view.buttons.NextPuzzleButtonView;
-import com.white.black.nonogram.view.buttons.ReturnButtonView;
 import com.white.black.nonogram.view.buttons.YesNoButtonView;
 import com.white.black.nonogram.view.listeners.GameMonitoringListener;
 import com.white.black.nonogram.view.listeners.GameViewListener;
@@ -50,21 +48,18 @@ class PuzzleSolvedView {
     private Bitmap balloons;
     private Bitmap complete;
 
-    private ReturnButtonView returnButtonView;
-    private NextPuzzleButtonView nextPuzzleButtonView;
-
     private int numOfPuzzlesSolved;
     private boolean hideRating; // hide if a player hates the app
     private Popup popup;
 
     public boolean isShowingPopup() {
-        return (!hideRating) && numOfPuzzlesSolved >= 7 && (numOfPuzzlesSolved % 7 == 0);
+        return (!hideRating) && numOfPuzzlesSolved >= 5 && (numOfPuzzlesSolved % 7 == 0);
     }
 
     private void setUpPopup(Context context, Paint paint) {
         RectF popupWindowBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenWidth() * 6 / 100,
-                returnButtonView.getBackgroundBounds().bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100,
+                ApplicationSettings.INSTANCE.getScreenHeight() * 835 / 1000,
                 ApplicationSettings.INSTANCE.getScreenWidth() * 94 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 98 / 100
         );
@@ -99,60 +94,54 @@ class PuzzleSolvedView {
                 yesButtonBounds,
                 ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.like_100)}, context, paint);
 
-        Runnable onNoAnswer = new Runnable() {
-            @Override
-            public void run() {
-                popup.setMessage(context.getString(R.string.thank_feedback));
-                try {
-                    SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-                    prefsEditor.putBoolean("hideRating", true);
-                    prefsEditor.apply();
+        Runnable onNoAnswer = () -> {
+            popup.setMessage(context.getString(R.string.thank_feedback));
+            try {
+                SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+                prefsEditor.putBoolean("hideRating", true);
+                prefsEditor.apply();
 
-                    ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.DISLIKE_APP);
-                } catch (Exception ignored) {
+                ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.DISLIKE_APP);
+            } catch (Exception ignored) {
 
-                }
             }
         };
 
-        Runnable onYesAnswer = new Runnable() {
-            @Override
-            public void run() {
-                ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.LIKE_APP);
+        Runnable onYesAnswer = () -> {
+            ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.LIKE_APP);
 
-                YesNoButtonView noButtonView = new YesNoButtonView(
-                        (ViewListener)context,
-                        context.getString(R.string.no_thanks),
-                        noButtonBounds,
-                        ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.sad_smiley_100)}, context, paint);
+            YesNoButtonView noButtonView1 = new YesNoButtonView(
+                    (ViewListener)context,
+                    context.getString(R.string.no_thanks),
+                    noButtonBounds,
+                    ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.sad_smiley_100)}, context, paint);
 
-                YesNoButtonView yesButtonView = new YesNoButtonView(
-                        (ViewListener)context,
-                        context.getString(R.string.ok_sure),
-                        yesButtonBounds,
-                        ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.heart_smiley_100)}, context, paint);
+            YesNoButtonView yesButtonView1 = new YesNoButtonView(
+                    (ViewListener)context,
+                    context.getString(R.string.ok_sure),
+                    yesButtonBounds,
+                    ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.heart_smiley_100)}, context, paint);
 
-                String message = context.getString(R.string.would_you_rate);
+            String message1 = context.getString(R.string.would_you_rate);
 
-                popup = new Popup(
-                        context, popupWindowBounds, message, () -> {
-                            popup.setMessage(context.getString(R.string.thank_feedback));
-                            ((GameViewListener) context).onLaunchMarketButtonPressed();
-                            try {
-                                SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-                                prefsEditor.putBoolean("hideRating", true);
-                                prefsEditor.apply();
+            popup = new Popup(
+                    context, popupWindowBounds, message1, () -> {
+                        popup.setMessage(context.getString(R.string.thank_feedback));
+                        ((GameViewListener) context).onLaunchMarketButtonPressed();
+                        try {
+                            SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+                            prefsEditor.putBoolean("hideRating", true);
+                            prefsEditor.apply();
 
-                                ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.VOTE_APP);
-                            } catch (Exception ignored) {
+                            ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.VOTE_APP);
+                        } catch (Exception ignored) {
 
-                            }
-                        }, () -> {
-                            popup.setMessage(context.getString(R.string.thank_feedback));
-                            ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.REFUSE_APP);
-                        }, yesButtonView, noButtonView
-                );
-            }
+                        }
+                    }, () -> {
+                        popup.setMessage(context.getString(R.string.thank_feedback));
+                        ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.REFUSE_APP);
+                    }, yesButtonView1, noButtonView1
+            );
         };
 
         this.popup = new Popup(
@@ -263,25 +252,6 @@ class PuzzleSolvedView {
                 top + buttonHeight
         );
 
-        returnButtonView = new ReturnButtonView(
-                (ViewListener)context,
-                context.getString(R.string.return_button),
-                returnButtonBounds,
-                color1, color2, color3, new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.return_100)}, context, paint);
-
-        RectF nextPuzzleButtonBounds = new RectF(
-                returnButtonBounds.right + verticalGapFromWindowBackground,
-                top,
-                windowBounds.right,
-                top + buttonHeight
-        );
-
-        nextPuzzleButtonView = new NextPuzzleButtonView(
-                (ViewListener)context,
-                context.getString(R.string.next_puzzle),
-                nextPuzzleButtonBounds,
-                color1, color2, color3, new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.play_100)}, context, paint);
-
         setUpPopup(context, paint);
     }
 
@@ -326,9 +296,6 @@ class PuzzleSolvedView {
 
         canvas.drawBitmap(puzzle.getFilteredBitmap(), null, puzzleImageBounds, paint);
 
-        returnButtonView.draw(canvas, paint);
-        nextPuzzleButtonView.draw(canvas, paint);
-
         canvas.drawBitmap(balloons, null, balloonsBounds, paint);
         canvas.drawBitmap(complete, null, completeBounds, paint);
 
@@ -340,14 +307,8 @@ class PuzzleSolvedView {
 
     public void onTouchEvent(GameViewListener gameViewListener) {
         if (TouchMonitor.INSTANCE.touchUp()) {
-            if (returnButtonView.wasPressed()) {
-                gameViewListener.onReturnButtonPressed();
-            } else if (nextPuzzleButtonView.wasPressed()) {
+            if (!(isShowingPopup() && popup.onTouchEvent())) {
                 gameViewListener.onNextPuzzleButtonPressed();
-            } else {
-                if (isShowingPopup()) {
-                    popup.onTouchEvent();
-                }
             }
 
             TouchMonitor.INSTANCE.setTouchUp(false);
