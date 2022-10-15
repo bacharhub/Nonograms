@@ -317,9 +317,13 @@ class PuzzleSolvedView {
         paint.setTextAlign(Paint.Align.CENTER);
         String puzzleNameDesc = puzzle.getName();
 
-        if (puzzleNameDesc.length() > 15) {
-            if (puzzleNameDesc.length() > 20) {
-                paint.setTextSize(PuzzleSelectionView.getPuzzleNameFontSize() * 6 / 10);
+        if (puzzleNameDesc.length() > 12) {
+            if (puzzleNameDesc.length() > 15) {
+                if (puzzleNameDesc.length() > 18) {
+                    paint.setTextSize(PuzzleSelectionView.getPuzzleNameFontSize() * 5 / 10);
+                } else {
+                    paint.setTextSize(PuzzleSelectionView.getPuzzleNameFontSize() * 6 / 10);
+                }
             } else {
                 paint.setTextSize(PuzzleSelectionView.getPuzzleNameFontSize() * 8 / 10);
             }
