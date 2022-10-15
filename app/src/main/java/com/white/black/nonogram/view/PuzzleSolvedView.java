@@ -225,9 +225,6 @@ class PuzzleSolvedView {
         clock = BitmapLoader.INSTANCE.getImage(context, R.drawable.alarm_clock_100);
         complete = BitmapLoader.INSTANCE.getImage(context, R.drawable.complete_512);
 
-        int verticalGapFromWindowBackground = ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100;
-        float top = windowBackgroundBounds.bottom + verticalGapFromWindowBackground;
-        int buttonHeight = ApplicationSettings.INSTANCE.getScreenHeight() / 12;
         int buttonWidth = ApplicationSettings.INSTANCE.getScreenWidth() * 22 / 100;
 
         completeBounds = new RectF(windowBounds.right - buttonWidth / 2, windowBounds.top - buttonWidth / 2, windowBounds.right + buttonWidth / 2, windowBounds.top + buttonWidth / 2);
@@ -252,40 +249,39 @@ class PuzzleSolvedView {
     }
 
     private void drawRays(Canvas canvas, Paint paint) {
-        int point1_returnedX = ApplicationSettings.INSTANCE.getScreenWidth() / 2;
-        int point1_returnedY = ApplicationSettings.INSTANCE.getScreenHeight() / 2;
-        int point2_returnedX = ApplicationSettings.INSTANCE.getScreenWidth() * 4 / 10;
-        int point2_returnedY = 0;
-        int point3_returnedX = ApplicationSettings.INSTANCE.getScreenWidth() * 6 / 10;
-        int point3_returnedY = 0;
-
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
-
-        Point a = new Point(point1_returnedX, point1_returnedY);
-        Point b = new Point(point2_returnedX, point2_returnedY);
-        Point c = new Point(point3_returnedX, point3_returnedY);
-
-        Path path = new Path();
-        path.setFillType(Path.FillType.EVEN_ODD);
-        path.setLastPoint(a.x, a.y);
-        path.lineTo(b.x, b.y);
-        path.lineTo(c.x, c.y);
-        path.lineTo(a.x, a.y);
-        path.close();
-
         paint.setShader(
                 new RadialGradient(
-                        ApplicationSettings.INSTANCE.getScreenWidth() / 2, ApplicationSettings.INSTANCE.getScreenHeight() / 2, ApplicationSettings.INSTANCE.getScreenHeight() / 2,
-                        new int[]{Color.rgb(255, 255, 255), Color.rgb(252, 149, 179)},
+                        ApplicationSettings.INSTANCE.getScreenWidth() / 2,
+                        ApplicationSettings.INSTANCE.getScreenHeight() / 2,
+                        ApplicationSettings.INSTANCE.getScreenHeight() / 2,
+                        new int[]{Color.argb(255,255, 255, 255), Color.argb(0, 255, 255, 255)},
                         new float[]{0f, 1f},
                         Shader.TileMode.CLAMP
                 )
         );
 
         paint.setDither(true);
-        canvas.drawPath(path, paint);
+
+        Point src = new Point(ApplicationSettings.INSTANCE.getScreenWidth() / 2, ApplicationSettings.INSTANCE.getScreenHeight() / 2);
+        int radius = ApplicationSettings.INSTANCE.getScreenHeight() * 3 / 4;
+        long indexWithInterval = System.currentTimeMillis() / 100;
+        for (long i = indexWithInterval; i < indexWithInterval + 360; i += 51) {
+            Point start = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i + indexWithInterval))), (int)(src.y + radius * Math.sin(Math.toRadians(i + indexWithInterval))));
+            Point end = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i + indexWithInterval + 10))), (int)(src.y + radius * Math.sin(Math.toRadians(i + indexWithInterval + 10))));
+
+            Path path = new Path();
+            path.setFillType(Path.FillType.EVEN_ODD);
+            path.setLastPoint(src.x, src.y);
+            path.lineTo(start.x, start.y);
+            path.lineTo(end.x, end.y);
+            path.lineTo(src.x, src.y);
+            path.close();
+            canvas.drawPath(path, paint);
+        }
+
         paint.setShader(null);
         paint.setDither(false);
     }
