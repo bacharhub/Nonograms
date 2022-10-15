@@ -9,6 +9,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
+import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.preference.PreferenceManager;
@@ -29,14 +32,12 @@ import com.white.black.nonogram.view.listeners.ViewListener;
 
 class PuzzleSolvedView {
 
-    private int backgroundColor;
     private RectF windowBounds;
     private RectF windowBackgroundBounds;
     private RectF windowInnerBackgroundBounds;
     private RectF puzzleImageBounds;
     private RectF puzzleImageBackgroundBounds;
     private RectF clockBounds;
-    private RectF balloonsBounds;
     private RectF completeBounds;
 
     private LinearGradient gradient;
@@ -45,7 +46,6 @@ class PuzzleSolvedView {
     private float padding;
 
     private Bitmap clock;
-    private Bitmap balloons;
     private Bitmap complete;
 
     private int numOfPuzzlesSolved;
@@ -76,10 +76,10 @@ class PuzzleSolvedView {
         );
 
         YesNoButtonView noButtonView = new YesNoButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 context.getString(R.string.not_really),
                 noButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.dislike_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.dislike_100)}, context, paint);
 
         RectF yesButtonBounds = new RectF(
                 popupWindowInnerBackgroundBounds.centerX() + popupWindowInnerBackgroundBounds.width() / 30 - popupWindowInnerBackgroundBounds.width() / 35,
@@ -89,10 +89,10 @@ class PuzzleSolvedView {
         );
 
         YesNoButtonView yesButtonView = new YesNoButtonView(
-                (ViewListener)context,
+                (ViewListener) context,
                 context.getString(R.string.yes_),
                 yesButtonBounds,
-                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.like_100)}, context, paint);
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.like_100)}, context, paint);
 
         Runnable onNoAnswer = () -> {
             popup.setMessage(context.getString(R.string.thank_feedback));
@@ -101,46 +101,46 @@ class PuzzleSolvedView {
                 prefsEditor.putBoolean("hideRating", true);
                 prefsEditor.apply();
 
-                ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.DISLIKE_APP);
+                ((GameMonitoringListener) context).onToolbarButtonPressed(GameMonitoring.DISLIKE_APP);
             } catch (Exception ignored) {
 
             }
         };
 
         Runnable onYesAnswer = () -> {
-            ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.LIKE_APP);
+            ((GameMonitoringListener) context).onToolbarButtonPressed(GameMonitoring.LIKE_APP);
 
             YesNoButtonView noButtonView1 = new YesNoButtonView(
-                    (ViewListener)context,
+                    (ViewListener) context,
                     context.getString(R.string.no_thanks),
                     noButtonBounds,
-                    ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.sad_smiley_100)}, context, paint);
+                    ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.sad_smiley_100)}, context, paint);
 
             YesNoButtonView yesButtonView1 = new YesNoButtonView(
-                    (ViewListener)context,
+                    (ViewListener) context,
                     context.getString(R.string.ok_sure),
                     yesButtonBounds,
-                    ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.heart_smiley_100)}, context, paint);
+                    ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.heart_smiley_100)}, context, paint);
 
             String message1 = context.getString(R.string.would_you_rate);
 
             popup = new Popup(
                     context, popupWindowBounds, message1, () -> {
-                        popup.setMessage(context.getString(R.string.thank_feedback));
-                        ((GameViewListener) context).onLaunchMarketButtonPressed();
-                        try {
-                            SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-                            prefsEditor.putBoolean("hideRating", true);
-                            prefsEditor.apply();
+                popup.setMessage(context.getString(R.string.thank_feedback));
+                ((GameViewListener) context).onLaunchMarketButtonPressed();
+                try {
+                    SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+                    prefsEditor.putBoolean("hideRating", true);
+                    prefsEditor.apply();
 
-                            ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.VOTE_APP);
-                        } catch (Exception ignored) {
+                    ((GameMonitoringListener) context).onToolbarButtonPressed(GameMonitoring.VOTE_APP);
+                } catch (Exception ignored) {
 
-                        }
-                    }, () -> {
-                        popup.setMessage(context.getString(R.string.thank_feedback));
-                        ((GameMonitoringListener)context).onToolbarButtonPressed(GameMonitoring.REFUSE_APP);
-                    }, yesButtonView1, noButtonView1
+                }
+            }, () -> {
+                popup.setMessage(context.getString(R.string.thank_feedback));
+                ((GameMonitoringListener) context).onToolbarButtonPressed(GameMonitoring.REFUSE_APP);
+            }, yesButtonView1, noButtonView1
             );
         };
 
@@ -154,27 +154,16 @@ class PuzzleSolvedView {
         int color2 = Puzzles.getCurrent().getColorPack().getColor2();
         int color3 = Puzzles.getCurrent().getColorPack().getColor3();
 
-        backgroundColor = ContextCompat.getColor(context, R.color.gameSettingsBackground);
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         this.numOfPuzzlesSolved = numOfSolvedPuzzles(context) + 1; // + 1 for the next solved puzzle
         this.hideRating = sharedPreferences.getBoolean("hideRating", false);
 
-        if (isShowingPopup()) {
-            windowBounds = new RectF(
-                    ApplicationSettings.INSTANCE.getScreenWidth() * 2 / 10,
-                    ApplicationSettings.INSTANCE.getScreenHeight() * 10 / 100,
-                    ApplicationSettings.INSTANCE.getScreenWidth() * 8 / 10,
-                    ApplicationSettings.INSTANCE.getScreenHeight() * 70 / 100
-            );
-        } else {
-            windowBounds = new RectF(
-                    ApplicationSettings.INSTANCE.getScreenWidth() * 2 / 10,
-                    ApplicationSettings.INSTANCE.getScreenHeight() * 18 / 100,
-                    ApplicationSettings.INSTANCE.getScreenWidth() * 8 / 10,
-                    ApplicationSettings.INSTANCE.getScreenHeight() * 78 / 100
-            );
-        }
+        windowBounds = new RectF(
+                ApplicationSettings.INSTANCE.getScreenWidth() * 3 / 10,
+                ApplicationSettings.INSTANCE.getScreenHeight() * 3 / 10,
+                ApplicationSettings.INSTANCE.getScreenWidth() * 7 / 10,
+                ApplicationSettings.INSTANCE.getScreenHeight() * 7 / 10
+        );
 
         int windowInnerBackgroundColor = color1;
         int windowInnerBackgroundGradientTo = color2;
@@ -234,7 +223,6 @@ class PuzzleSolvedView {
         );
 
         clock = BitmapLoader.INSTANCE.getImage(context, R.drawable.alarm_clock_100);
-        balloons = BitmapLoader.INSTANCE.getImage(context, R.drawable.balloons_100);
         complete = BitmapLoader.INSTANCE.getImage(context, R.drawable.complete_512);
 
         int verticalGapFromWindowBackground = ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100;
@@ -242,29 +230,75 @@ class PuzzleSolvedView {
         int buttonHeight = ApplicationSettings.INSTANCE.getScreenHeight() / 12;
         int buttonWidth = ApplicationSettings.INSTANCE.getScreenWidth() * 22 / 100;
 
-        balloonsBounds = new RectF(windowBounds.right - buttonWidth * 2 / 3, windowBounds.bottom - buttonWidth * 2 / 3, windowBounds.right + buttonWidth / 3, windowBounds.bottom + buttonWidth / 3);
         completeBounds = new RectF(windowBounds.right - buttonWidth / 2, windowBounds.top - buttonWidth / 2, windowBounds.right + buttonWidth / 2, windowBounds.top + buttonWidth / 2);
-
-        RectF returnButtonBounds = new RectF(
-                windowBackgroundBounds.left,
-                top,
-                windowBackgroundBounds.left + buttonWidth,
-                top + buttonHeight
-        );
 
         setUpPopup(context, paint);
     }
 
-    public void draw(Canvas canvas, Paint paint) {
-        paint.setTextAlign(Paint.Align.LEFT);
-        Puzzle puzzle = PuzzleSelectionView.INSTANCE.getOverallPuzzle();
-        paint.setColor(backgroundColor);
-        canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
+    private void drawBackground(Canvas canvas, Paint paint) {
+        paint.setShader(
+                new LinearGradient(
+                        0, 0, 0, ApplicationSettings.INSTANCE.getScreenHeight(),
+                        new int[]{Color.rgb(252, 149, 179), Color.rgb(255, 232, 206)},
+                        new float[]{0f, 1f},
+                        Shader.TileMode.CLAMP
+                )
+        );
 
-        paint.setAlpha(255);
+        paint.setDither(true);
+        canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
+        paint.setShader(null);
+        paint.setDither(false);
+    }
+
+    private void drawRays(Canvas canvas, Paint paint) {
+        int point1_returnedX = ApplicationSettings.INSTANCE.getScreenWidth() / 2;
+        int point1_returnedY = ApplicationSettings.INSTANCE.getScreenHeight() / 2;
+        int point2_returnedX = ApplicationSettings.INSTANCE.getScreenWidth() * 4 / 10;
+        int point2_returnedY = 0;
+        int point3_returnedX = ApplicationSettings.INSTANCE.getScreenWidth() * 6 / 10;
+        int point3_returnedY = 0;
+
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAntiAlias(true);
+
+        Point a = new Point(point1_returnedX, point1_returnedY);
+        Point b = new Point(point2_returnedX, point2_returnedY);
+        Point c = new Point(point3_returnedX, point3_returnedY);
+
+        Path path = new Path();
+        path.setFillType(Path.FillType.EVEN_ODD);
+        path.setLastPoint(a.x, a.y);
+        path.lineTo(b.x, b.y);
+        path.lineTo(c.x, c.y);
+        path.lineTo(a.x, a.y);
+        path.close();
+
+        paint.setShader(
+                new RadialGradient(
+                        ApplicationSettings.INSTANCE.getScreenWidth() / 2, ApplicationSettings.INSTANCE.getScreenHeight() / 2, ApplicationSettings.INSTANCE.getScreenHeight() / 2,
+                        new int[]{Color.rgb(255, 255, 255), Color.rgb(252, 149, 179)},
+                        new float[]{0f, 1f},
+                        Shader.TileMode.CLAMP
+                )
+        );
+
+        paint.setDither(true);
+        canvas.drawPath(path, paint);
+        paint.setShader(null);
+        paint.setDither(false);
+    }
+
+    public void draw(Canvas canvas, Paint paint) {
+        drawBackground(canvas, paint);
+        drawRays(canvas, paint);
+
+        Puzzle puzzle = PuzzleSelectionView.INSTANCE.getOverallPuzzle();
 
         paint.setColor(windowBackgroundColor);
         canvas.drawRoundRect(windowBackgroundBounds, curve, curve, paint);
+
         paint.setShader(gradient);
         canvas.drawRoundRect(windowBounds, curve, curve, paint);
         paint.setShader(null);
@@ -296,7 +330,6 @@ class PuzzleSolvedView {
 
         canvas.drawBitmap(puzzle.getFilteredBitmap(), null, puzzleImageBounds, paint);
 
-        canvas.drawBitmap(balloons, null, balloonsBounds, paint);
         canvas.drawBitmap(complete, null, completeBounds, paint);
 
         if (isShowingPopup()) {
