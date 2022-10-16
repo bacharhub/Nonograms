@@ -21,7 +21,7 @@
         <activity android:name=".activities.PuzzleSelectionActivity"/>
         <activity android:name=".activities.MenuActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/TransparentAppTheme"
+            android:theme="@style/Theme.App.Starting"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

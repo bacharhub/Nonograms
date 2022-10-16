@@ -53,7 +53,7 @@ public abstract class LabeledHorizontalButtonView extends PicButtonView {
     protected void drawText(Canvas canvas, Paint paint, RectF superBounds) {
         paint.setTextSize(labeledPicFontSizeFactor * ApplicationSettings.INSTANCE.getScreenWidth() / 24);
         paint.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText(description, superBounds.left + superBounds.width() * 36 / 100, superBounds.centerY() + descriptionHeight / 2, paint);
+        canvas.drawText(description, superBounds.left + superBounds.width() * 4 / 10, superBounds.centerY() + descriptionHeight / 2, paint);
     }
 
     public void draw(Canvas canvas, Paint paint) {

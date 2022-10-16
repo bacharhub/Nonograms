@@ -1,5 +1,6 @@
 package com.white.black.nonogram.activities;
 
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.white.black.nonogram.Puzzles.numOfSolvedPuzzles;
 
 import android.app.Activity;
@@ -11,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -21,6 +23,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.DisplayCutout;
 import android.view.MotionEvent;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
@@ -81,6 +84,14 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         menuView = new MenuView(this);
+        View decorView = getWindow().getDecorView();
+        // Hide both the navigation bar and the status bar.
+        // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+        // a general rule, you should design your app to hide the status bar whenever you
+        // hide the navigation bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
         setContentView(menuView);
 
         new Thread(() -> {
@@ -165,20 +176,25 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
     private void triggerNotificationAlarm() {
         Intent _intent = new Intent(MenuActivity.this, AlarmBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(MenuActivity.this, 0, _intent, PendingIntent.FLAG_IMMUTABLE);
-        AlarmManager alarmManager = (AlarmManager)MenuActivity.this.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) MenuActivity.this.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
-        final long TIME_TO_WAIT_MILLISECONDS =  1000 * 3600 * 6; // 6 hours
+        final long TIME_TO_WAIT_MILLISECONDS = 1000 * 3600 * 6; // 6 hours
         alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + TIME_TO_WAIT_MILLISECONDS, pendingIntent);
     }
 
     @Override
     public void onViewTouched(MotionEvent event) {
-        switch(event.getAction()) {
-            case MotionEvent.ACTION_DOWN: TouchMonitor.INSTANCE.setTouchDown(true, new Point((int)(event.getX()), (int)(event.getY()))); TouchMonitor.INSTANCE.setTouchUp(false); PaintManager.INSTANCE.setReadyToRender();
-            case MotionEvent.ACTION_MOVE: TouchMonitor.INSTANCE.setMove(new Point((int)(event.getX()), (int)(event.getY()))); break;
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                TouchMonitor.INSTANCE.setTouchDown(true, new Point((int) (event.getX()), (int) (event.getY())));
+                TouchMonitor.INSTANCE.setTouchUp(false);
+                PaintManager.INSTANCE.setReadyToRender();
+            case MotionEvent.ACTION_MOVE:
+                TouchMonitor.INSTANCE.setMove(new Point((int) (event.getX()), (int) (event.getY())));
+                break;
             case MotionEvent.ACTION_UP:
                 TouchMonitor.INSTANCE.setTouchDown(false);
-                TouchMonitor.INSTANCE.setTouchUp(new Point((int)(event.getX()), (int)(event.getY())));
+                TouchMonitor.INSTANCE.setTouchUp(new Point((int) (event.getX()), (int) (event.getY())));
                 TouchMonitor.INSTANCE.setCoordinatesGap();
                 PaintManager.INSTANCE.setReadyToRender();
                 break;
@@ -249,12 +265,29 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         int displayCutoutBottom = 0;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             DisplayCutout displayCutout = display.getCutout();
-            displayCutoutTop = displayCutout.getSafeInsetTop();
-            displayCutoutBottom = displayCutout.getSafeInsetBottom();
+            if (displayCutout != null) {
+                displayCutoutTop = displayCutout.getSafeInsetTop();
+                displayCutoutBottom = displayCutout.getSafeInsetBottom();
+            }
         }
 
-        ApplicationSettings.INSTANCE.setScreenHeight(dm.heightPixels + displayCutoutTop + displayCutoutBottom);
+        int navigationBarHeight = getNavigationBarHeight(MenuActivity.this, ORIENTATION_PORTRAIT);
+        ApplicationSettings.INSTANCE.setScreenHeight(dm.heightPixels + displayCutoutTop + displayCutoutBottom + navigationBarHeight);
         ApplicationSettings.INSTANCE.setScreenWidth(dm.widthPixels);
+    }
+
+    private int getNavigationBarHeight(Context context, int orientation) {
+        Resources resources = context.getResources();
+        if (resources != null) {
+            int id = resources.getIdentifier(
+                    orientation == ORIENTATION_PORTRAIT ? "navigation_bar_height" : "navigation_bar_height_landscape",
+                    "dimen", "android");
+            if (id > 0) {
+                return resources.getDimensionPixelSize(id);
+            }
+        }
+
+        return 0;
     }
 
     @Override
@@ -403,15 +436,15 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
             client.submitScore(getString(R.string.most_puzzles_solved), numOfSolvedPuzzles(MenuActivity.this));
             client.loadCurrentPlayerLeaderboardScore(
                     getString(R.string.most_puzzles_solved),
-                            LeaderboardVariant.TIME_SPAN_ALL_TIME,
-                            LeaderboardVariant.COLLECTION_PUBLIC
-                    ).addOnSuccessListener(scoreAnnotatedData -> {
-                        LeaderboardScore score = scoreAnnotatedData.get();
-                        if (score != null) {
-                            String scoreAsString = "#" + score.getRank();
-                            writeScoreToSharedPreferences(scoreAsString);
-                        }
-                    });
+                    LeaderboardVariant.TIME_SPAN_ALL_TIME,
+                    LeaderboardVariant.COLLECTION_PUBLIC
+            ).addOnSuccessListener(scoreAnnotatedData -> {
+                LeaderboardScore score = scoreAnnotatedData.get();
+                if (score != null) {
+                    String scoreAsString = "#" + score.getRank();
+                    writeScoreToSharedPreferences(scoreAsString);
+                }
+            });
         }
     }
 
@@ -420,7 +453,8 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
             SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(MenuActivity.this).edit();
             prefsEditor.putString(MenuActivity.this.getString(R.string.leaderboards_score), scoreAsString);
             prefsEditor.apply();
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -655,6 +689,7 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
                     );
                 }
             }
+
             @Override
             public void onBillingServiceDisconnected() {
                 // Try to restart the connection on the next request to
