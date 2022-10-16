@@ -244,7 +244,7 @@ class PuzzleSolvedView {
 
     private void drawBackground(Canvas canvas, Paint paint) {
         if (background != null && !background.isRecycled()) {
-            canvas.drawBitmap(background, backgroundBounds, backgroundBounds, paint);
+            canvas.drawBitmap(background, null, backgroundBounds, paint);
             return;
         }
 
@@ -317,7 +317,7 @@ class PuzzleSolvedView {
 
     private void initBackground(Paint paint) {
         if (background == null || background.isRecycled()) {
-            Bitmap background = Bitmap.createBitmap(backgroundBounds.width(), backgroundBounds.height(), Bitmap.Config.ARGB_8888);
+            Bitmap background = Bitmap.createBitmap(backgroundBounds.width(), backgroundBounds.height(), Bitmap.Config.RGB_565);
             background.setDensity(Bitmap.DENSITY_NONE);
             Canvas tempCanvas = new Canvas(background);
             drawBackground(tempCanvas, paint);
