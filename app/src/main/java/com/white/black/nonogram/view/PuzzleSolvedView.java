@@ -62,6 +62,15 @@ class PuzzleSolvedView {
             ApplicationSettings.INSTANCE.getScreenHeight()
     );
 
+    private final RadialGradient radialGradient = new RadialGradient(
+            ApplicationSettings.INSTANCE.getScreenWidth() / 2,
+            ApplicationSettings.INSTANCE.getScreenHeight() / 2,
+            ApplicationSettings.INSTANCE.getScreenHeight() / 2,
+            new int[]{Color.argb(255, 255, 255, 255), Color.argb(0, 255, 255, 255)},
+            new float[]{0f, 1f},
+            Shader.TileMode.CLAMP
+    );
+
     public boolean isShowingPopup() {
         return (!hideRating) && numOfPuzzlesSolved >= 5 && (numOfPuzzlesSolved % 7 == 0);
     }
@@ -267,17 +276,7 @@ class PuzzleSolvedView {
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
-        paint.setShader(
-                new RadialGradient(
-                        ApplicationSettings.INSTANCE.getScreenWidth() / 2,
-                        ApplicationSettings.INSTANCE.getScreenHeight() / 2,
-                        ApplicationSettings.INSTANCE.getScreenHeight() / 2,
-                        new int[]{Color.argb(255, 255, 255, 255), Color.argb(0, 255, 255, 255)},
-                        new float[]{0f, 1f},
-                        Shader.TileMode.CLAMP
-                )
-        );
-
+        paint.setShader(radialGradient);
         paint.setDither(true);
 
         Point src = new Point(ApplicationSettings.INSTANCE.getScreenWidth() / 2, ApplicationSettings.INSTANCE.getScreenHeight() / 2);
