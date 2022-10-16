@@ -195,6 +195,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         if (background != null) {
             this.background.recycle();
         }
+
+        this.puzzleSolvedView.clearBackground();
     }
 
     private void coverBoardWithBackground(Canvas canvas, Paint paint) {

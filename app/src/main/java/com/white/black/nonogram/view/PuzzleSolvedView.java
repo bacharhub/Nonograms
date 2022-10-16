@@ -12,6 +12,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RadialGradient;
+
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.preference.PreferenceManager;
@@ -21,6 +23,7 @@ import androidx.core.content.ContextCompat;
 import com.white.black.nonogram.ApplicationSettings;
 import com.white.black.nonogram.BitmapLoader;
 import com.white.black.nonogram.GameMonitoring;
+import com.white.black.nonogram.MemoryManager;
 import com.white.black.nonogram.Puzzle;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
@@ -51,6 +54,13 @@ class PuzzleSolvedView {
     private int numOfPuzzlesSolved;
     private boolean hideRating; // hide if a player hates the app
     private Popup popup;
+    private Bitmap background;
+    private final Rect backgroundBounds = new Rect(
+            0,
+            0,
+            ApplicationSettings.INSTANCE.getScreenWidth(),
+            ApplicationSettings.INSTANCE.getScreenHeight()
+    );
 
     public boolean isShowingPopup() {
         return (!hideRating) && numOfPuzzlesSolved >= 5 && (numOfPuzzlesSolved % 7 == 0);
@@ -233,6 +243,11 @@ class PuzzleSolvedView {
     }
 
     private void drawBackground(Canvas canvas, Paint paint) {
+        if (background != null && !background.isRecycled()) {
+            canvas.drawBitmap(background, backgroundBounds, backgroundBounds, paint);
+            return;
+        }
+
         paint.setShader(
                 new LinearGradient(
                         0, 0, 0, ApplicationSettings.INSTANCE.getScreenHeight(),
@@ -243,7 +258,7 @@ class PuzzleSolvedView {
         );
 
         paint.setDither(true);
-        canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
+        canvas.drawRect(backgroundBounds, paint);
         paint.setShader(null);
         paint.setDither(false);
     }
@@ -257,7 +272,7 @@ class PuzzleSolvedView {
                         ApplicationSettings.INSTANCE.getScreenWidth() / 2,
                         ApplicationSettings.INSTANCE.getScreenHeight() / 2,
                         ApplicationSettings.INSTANCE.getScreenHeight() / 2,
-                        new int[]{Color.argb(255,255, 255, 255), Color.argb(0, 255, 255, 255)},
+                        new int[]{Color.argb(255, 255, 255, 255), Color.argb(0, 255, 255, 255)},
                         new float[]{0f, 1f},
                         Shader.TileMode.CLAMP
                 )
@@ -269,8 +284,8 @@ class PuzzleSolvedView {
         int radius = ApplicationSettings.INSTANCE.getScreenHeight() * 3 / 4;
         double indexWithInterval = System.currentTimeMillis() / 100.0;
         for (double i = indexWithInterval; i < indexWithInterval + 360; i += 52) {
-            Point start = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i))), (int)(src.y + radius * Math.sin(Math.toRadians(i))));
-            Point end = new Point((int)(src.x + radius * Math.cos(Math.toRadians(i + 15))), (int)(src.y + radius * Math.sin(Math.toRadians(i + 15))));
+            Point start = new Point((int) (src.x + radius * Math.cos(Math.toRadians(i))), (int) (src.y + radius * Math.sin(Math.toRadians(i))));
+            Point end = new Point((int) (src.x + radius * Math.cos(Math.toRadians(i + 15))), (int) (src.y + radius * Math.sin(Math.toRadians(i + 15))));
 
             Path path = new Path();
             path.setFillType(Path.FillType.EVEN_ODD);
@@ -286,8 +301,32 @@ class PuzzleSolvedView {
         paint.setDither(false);
     }
 
-    public void draw(Canvas canvas, Paint paint) {
+    public void clearBackground() {
+        if (background != null) {
+            this.background.recycle();
+        }
+    }
+
+    private void handleBackground(Canvas canvas, Paint paint) {
+        if (!MemoryManager.isCriticalMemory()) {
+            initBackground(paint);
+        }
+
         drawBackground(canvas, paint);
+    }
+
+    private void initBackground(Paint paint) {
+        if (background == null || background.isRecycled()) {
+            Bitmap background = Bitmap.createBitmap(backgroundBounds.width(), backgroundBounds.height(), Bitmap.Config.ARGB_8888);
+            background.setDensity(Bitmap.DENSITY_NONE);
+            Canvas tempCanvas = new Canvas(background);
+            drawBackground(tempCanvas, paint);
+            this.background = background;
+        }
+    }
+
+    public void draw(Canvas canvas, Paint paint) {
+        handleBackground(canvas, paint);
         drawRays(canvas, paint);
 
         Puzzle puzzle = PuzzleSelectionView.INSTANCE.getOverallPuzzle();
