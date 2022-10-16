@@ -205,6 +205,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private void draw(Canvas canvas, Paint paint) {
         super.draw(canvas);
 
+        if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
+            puzzleSolvedView.draw(canvas, paint);
+            return;
+        }
+
         handleBackground(canvas, paint, new Rect(0, boardView.getBoardTop(), ApplicationSettings.INSTANCE.getScreenWidth(), boardView.getBoardBottom()));
 
         if (GameSettings.INSTANCE.getInput().equals(GameSettings.Input.JOYSTICK)) {
@@ -232,10 +237,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
             popup.draw(canvas, paint);
-        }
-
-        if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
-            puzzleSolvedView.draw(canvas, paint);
         }
     }
 
