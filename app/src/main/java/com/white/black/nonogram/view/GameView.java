@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.ads.LoadAdError;
@@ -441,8 +442,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        render();
+    public void surfaceCreated(@NonNull SurfaceHolder holder) {
+
     }
 
     @Override
@@ -509,11 +510,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 } else {
                     gameOptionsView.onTouchEvent();
                 }
-            }
-
-            if (PaintManager.INSTANCE.isReadyToRender(System.currentTimeMillis())) {
-                render();
-                PaintManager.INSTANCE.setLastRenderingTime(System.currentTimeMillis());
             }
         }
 
@@ -703,7 +699,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     context.getString(R.string.get_hints),
                     BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512),
                     () -> {
-                        render();
                         onRewardedAdOffered(context, false);
                     },
                     () -> {
@@ -711,12 +706,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         onRewardedAdOffered(context, true);
                     },
                     (error) -> onAdFailedToLoad(error, context),
-                    this::render
+                    () -> {}
             );
         }
 
         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().fillPermanentDisqualify();
-        render();
     }
 
     private void onRewarded(Context context) {
@@ -1024,8 +1018,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             } else {
                 boardView.moveTouchUpSlotUsingJoystick(0, -1);
             }
-
-            render();
         });
 
         RectF slideDownButtonBounds = new RectF(
@@ -1046,8 +1038,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             } else {
                 boardView.moveTouchUpSlotUsingJoystick(0, +1);
             }
-
-            render();
         });
 
         RectF slideLeftButtonBounds = new RectF(
@@ -1068,8 +1058,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             } else {
                 boardView.moveTouchUpSlotUsingJoystick(-1, 0);
             }
-
-            render();
         });
 
         RectF slideRightButtonBounds = new RectF(
@@ -1092,8 +1080,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 } else {
                     boardView.moveTouchUpSlotUsingJoystick(+1, 0);
                 }
-
-                render();
             }
         });
 

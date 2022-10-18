@@ -16,8 +16,8 @@ android {
         applicationId "com.white.black.nonogram"
         minSdkVersion 28
         targetSdkVersion 33
-        versionCode 93
-        versionName "1.93"
+        versionCode 94
+        versionName "1.94"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

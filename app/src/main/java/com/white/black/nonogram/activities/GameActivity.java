@@ -162,13 +162,10 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                 } else {
                     onOptionsButtonPressed();
                 }
-
-                gameView.render();
             } else if (gameView.isShowPopup()) {
                 if (gameView.isShowVipPopup()) {
                     MyMediaPlayer.play("blop");
                     gameView.setShowVipPopup(false);
-                    gameView.render();
                 } else {
                     gameView.getPopup().doOnNoAnswer();
                     gameView.getPopup().setAnswered(false);
@@ -338,13 +335,18 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
         pool.execute(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
+                    long start = System.currentTimeMillis();
                     gameView.render();
-                    Thread.sleep(16);
+                    long end = System.currentTimeMillis();
+                    long duration = end - start;
+                    long timeToSleep = Math.max(5, 16 - duration);
+                    if (timeToSleep > 0) {
+                        Thread.sleep(timeToSleep);
+                    }
                 } catch (InterruptedException ignored) {
                 }
             }
         });
-
 
         GameState.setGameState(GameState.GAME);
         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().setLastTimeSolvingTimeIncreased(System.currentTimeMillis());
@@ -367,11 +369,9 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
         gameView.getVipPopup().update();
         if (AdManager.isRemoveAds()) {
             gameView.setShowVipPopup(true);
-            gameView.render();
         } else {
             gameView.getVipPopup().setPrice("Loading..");
             gameView.setShowVipPopup(true);
-            gameView.render();
             onPromoteVipPressed(GameActivity.this);
         }
     }
@@ -385,7 +385,6 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                 () -> {
                     gameView.setShowVipPopup(false);
                     gameView.setShowPopupFalse();
-                    gameView.render();
                 },
                 this::itemAlreadyOwned,
                 () -> gameView.getVipPopup().getPopup().setAnswered(AdManager.isRemoveAds()),
@@ -395,7 +394,6 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
 
     private void onBillingSetupFailed(Context context) {
         gameView.setShowVipPopup(false);
-        gameView.render();
         Handler mainHandler = new Handler(context.getMainLooper());
         mainHandler.post(
                 () -> new AlertDialog.Builder(context).setMessage(R.string.no_internet_connection)
@@ -406,13 +404,11 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
     private void onRemoveAdsPurchaseFound(String price) {
         gameView.getVipPopup().setPrice(price);
         gameView.setShowVipPopup(true);
-        gameView.render();
     }
 
     private void itemAlreadyOwned() {
         AdManager.setRemoveAdsTrue(GameActivity.this.getApplicationContext());
         gameView.setShowPopupFalse();
-        gameView.render();
         Bundle bundle = new Bundle();
         bundle.putString(GameMonitoring.VIP, GameMonitoring.REMOVE_ADS_ALREADY_OWNED);
         mFirebaseAnalytics.logEvent(GameMonitoring.GAME_EVENT, bundle);
