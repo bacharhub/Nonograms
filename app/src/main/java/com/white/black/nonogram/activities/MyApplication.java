@@ -34,6 +34,7 @@ public class MyApplication extends Application {
         testDevices.add("09C786AA0313E7BD913792B9330CAB47");
         testDevices.add("A033C8466F1C5F4E9E80D9500024587F");
         testDevices.add("63A8CC2D9D953FF4F0231700B27EBC6B");
+        testDevices.add("B948E78CFEF1B53FBD4A086A40F1C20D");
 
         RequestConfiguration requestConfiguration
                 = new RequestConfiguration.Builder()
