@@ -271,7 +271,11 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
             }
         }
 
-        int navigationBarHeight = getNavigationBarHeight(MenuActivity.this, ORIENTATION_PORTRAIT);
+        int navigationBarHeight = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            navigationBarHeight = getNavigationBarHeight(MenuActivity.this, ORIENTATION_PORTRAIT);
+        }
+
         ApplicationSettings.INSTANCE.setScreenHeight(dm.heightPixels + displayCutoutTop + displayCutoutBottom + navigationBarHeight);
         ApplicationSettings.INSTANCE.setScreenWidth(dm.widthPixels);
     }
