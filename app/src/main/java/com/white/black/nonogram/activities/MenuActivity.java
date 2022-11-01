@@ -672,7 +672,7 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
 
     @Override
     public void onPromoteVipPressed() {
-        menuView.getVipPopup().setPrice("Loading..");
+        menuView.getVipPopup().setPrice(getString(R.string.loading));
         menuView.setShowVipPopup(true);
         menuView.render();
         mBillingClient = BillingClient.newBuilder(MenuActivity.this).enablePendingPurchases().setListener(this).build();

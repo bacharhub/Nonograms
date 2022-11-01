@@ -13,14 +13,7 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.OnUserEarnedRewardListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.white.black.nonogram.AdManager;
 import com.white.black.nonogram.GameMonitoring;
@@ -32,7 +25,6 @@ import com.white.black.nonogram.Puzzle;
 import com.white.black.nonogram.PuzzleReference;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
-import com.white.black.nonogram.RewardedInstanceHandler;
 import com.white.black.nonogram.SubPuzzle;
 import com.white.black.nonogram.TouchMonitor;
 import com.white.black.nonogram.utils.VipPromotionUtils;
@@ -48,62 +40,8 @@ import com.white.black.nonogram.view.listeners.VipPromoter;
 
 public class PuzzleSelectionActivity extends Activity implements PuzzleSelectionViewListener, MenuOptionsViewListener, Renderable, VipPromoter {
 
-    private void onRewarded() {
-        puzzleCategorySelectionView.refreshPuzzleSelectionButtonView(PuzzleSelectionView.INSTANCE.getPuzzleReference());
-        PuzzleSelectionView.INSTANCE.getPuzzleReference().getPuzzle(PuzzleSelectionActivity.this.getApplicationContext()).setPuzzleClass(Puzzle.PuzzleClass.FREE);
-        PuzzleSelectionView.INSTANCE.getPuzzleReference().writeToSharedPreferences(PuzzleSelectionActivity.this.getApplicationContext());
-    }
-
-    private void onRewardedVideoAdClosed() {
-        puzzleCategorySelectionView.setShowPopupFalse();
-        puzzleCategorySelectionView.initPopup(PuzzleSelectionActivity.this);
-        rewardedInstanceHandler.setRewardedVideoAd(null);
-        puzzleCategorySelectionView.render();
-    }
-
-    private final OnUserEarnedRewardListener userEarnedRewardListener = rewardItem -> onRewarded();
-
-    private final FullScreenContentCallback fullScreenContentCallback =
-            new FullScreenContentCallback() {
-                @Override
-                public void onAdDismissedFullScreenContent() {
-                    // Code to be invoked when the ad dismissed full screen content.
-                    onRewardedVideoAdClosed();
-                }
-            };
-
-    private final RewardedAdLoadCallback rewardedAdLoadCallback = new RewardedAdLoadCallback() {
-        @Override
-        public void onAdLoaded(@NonNull RewardedAd rewardedAd) {
-            rewardedInstanceHandler.setRewardedVideoAd(rewardedAd);
-            rewardedInstanceHandler.setLoadingRewardedAd(false);
-            rewardedAd.setFullScreenContentCallback(fullScreenContentCallback);
-
-            if (puzzleCategorySelectionView.isShowPopup()) {
-                AdManager.showRewardedVideo(rewardedInstanceHandler, PuzzleSelectionActivity.this, userEarnedRewardListener);
-            }
-        }
-
-        @Override
-        public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-            rewardedInstanceHandler.setLoadingRewardedAd(false);
-            onRewarded();
-            onRewardedVideoAdClosed();
-
-            Bundle bundle = new Bundle();
-            bundle.putString(GameMonitoring.LOAD_VIDEO_AD_ERROR_CODE, loadAdError.toString());
-            if (mFirebaseAnalytics != null) {
-                mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
-            }
-
-            super.onAdFailedToLoad(loadAdError);
-        }
-    };
-
     private FirebaseAnalytics mFirebaseAnalytics;
     private PuzzleCategorySelectionView puzzleCategorySelectionView;
-
-    private RewardedInstanceHandler rewardedInstanceHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +70,6 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
             puzzleCategorySelectionView.init(PuzzleSelectionActivity.this, PaintManager.INSTANCE.createPaint());
             try {
                 mFirebaseAnalytics = FirebaseAnalytics.getInstance(PuzzleSelectionActivity.this);
-                rewardedInstanceHandler = new RewardedInstanceHandler();
             } catch (Exception ignored) {
 
             }
@@ -476,7 +413,7 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
             puzzleCategorySelectionView.setShowVipPopup(true);
             puzzleCategorySelectionView.render();
         } else {
-            puzzleCategorySelectionView.getVipPopup().setPrice("Loading..");
+            puzzleCategorySelectionView.getVipPopup().setPrice(getString(R.string.loading));
             puzzleCategorySelectionView.setShowVipPopup(true);
             puzzleCategorySelectionView.render();
             onPromoteVipPressed(PuzzleSelectionActivity.this);

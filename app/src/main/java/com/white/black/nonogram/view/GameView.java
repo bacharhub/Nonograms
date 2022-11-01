@@ -583,7 +583,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.CLUE);
                     boardView.useClue();
                     gameViewListener.useClue();
-                } else {
+                }
+
+                if (gameViewListener.numOfAvailableClues() == 0 && !AdManager.isRemoveAds()) {
                     popup.setShowPopup(true);
                 }
             } else {
@@ -698,9 +700,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     paint,
                     context.getString(R.string.get_hints),
                     BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512),
-                    () -> {
-                        onRewardedAdOffered(context, false);
-                    },
+                    () -> onRewardedAdOffered(context, false),
                     () -> {
                         onRewarded(context);
                         onRewardedAdOffered(context, true);

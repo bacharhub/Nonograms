@@ -370,7 +370,7 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
         if (AdManager.isRemoveAds()) {
             gameView.setShowVipPopup(true);
         } else {
-            gameView.getVipPopup().setPrice("Loading..");
+            gameView.getVipPopup().setPrice(getString(R.string.loading));
             gameView.setShowVipPopup(true);
             onPromoteVipPressed(GameActivity.this);
         }

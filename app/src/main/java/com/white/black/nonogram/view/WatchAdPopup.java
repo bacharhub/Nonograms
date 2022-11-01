@@ -240,16 +240,22 @@ public class WatchAdPopup {
             canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
             popup.draw(canvas, paint);
 
-            closeWindowButtonView.draw(canvas, paint);
-            promoteVipButtonView.draw(canvas, paint);
+            if (!popup.isAnswered()) { // loading ad
+                closeWindowButtonView.draw(canvas, paint);
+                promoteVipButtonView.draw(canvas, paint);
 
-            if (showVipPopup) {
-                vipPopup.draw(canvas, paint);
+                if (showVipPopup) {
+                    vipPopup.draw(canvas, paint);
+                }
             }
         }
     }
 
     public void onTouchEvent() {
+        if (popup.isAnswered()) { // loading ad, don't allow other actions
+            return;
+        }
+
         if (showVipPopup) {
             if (TouchMonitor.INSTANCE.touchUp()) {
                 vipPopup.onTouchEvent();

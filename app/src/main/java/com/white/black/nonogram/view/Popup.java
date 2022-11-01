@@ -51,7 +51,7 @@ public class Popup {
         this.message = message;
     }
 
-    private boolean isAnswered() {
+    public boolean isAnswered() {
         return this.answered;
     }
 
