@@ -94,21 +94,23 @@ public enum Puzzles {
     }
 
     private static void addPuzzleReference(Puzzle.PuzzleClass puzzleClass, String puzzleName, int puzzleId, int imageId) {
-        addPuzzleReference(puzzleClass, puzzleName, puzzleId, imageId, null);
+        addPuzzleReference(puzzleClass, puzzleName, puzzleId, imageId, false, null);
     }
 
-    private static void addPuzzleReference(Puzzle.PuzzleClass puzzleClass, String puzzleName, int puzzleId, int imageId, Puzzle.SolutionStep solutionStep) {
-        current.puzzleReferences.add(new PuzzleReference(puzzleClass, puzzleName, puzzleId, imageId, solutionStep));
+    private static void addPuzzleReference(Puzzle.PuzzleClass puzzleClass, String puzzleName, int puzzleId, int imageId, boolean isTutorial, Puzzle.SolutionSteps solutionSteps) {
+        current.puzzleReferences.add(new PuzzleReference(puzzleClass, puzzleName, puzzleId, imageId, isTutorial, solutionSteps));
     }
 
     private static void loadSmallPuzzles(Context context) {
         current = SMALL;
 
-        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.smile), 5, R.drawable.smile_5, new Puzzle.SolutionStep(
-                0, 4, 3, 3, new Puzzle.SolutionStep(
-                4, 4, 2, 3, new Puzzle.SolutionStep(
-                3, 3, 0, 1, new Puzzle.SolutionStep(
-                1, 1, 0, 1, null))))); // 00:05
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.smile), 5, R.drawable.smile_5, true, new Puzzle.SolutionSteps(new Puzzle.SolutionStep[]{
+                        new Puzzle.SolutionStep(0, 4, 3, 3),
+                        new Puzzle.SolutionStep(4, 4, 2, 3),
+                        new Puzzle.SolutionStep(3, 3, 0, 1),
+                        new Puzzle.SolutionStep(1, 1, 0, 1)
+                })
+        ); // 00:05
 
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.hashtag), 12, R.drawable.hashtag_12); // 00:05
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.ticket), 11, R.drawable.ticket_11); // 00:06

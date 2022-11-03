@@ -15,15 +15,17 @@ public class PuzzleReference {
     private PuzzleReference nextPuzzleNode;
     private Puzzle.PuzzleClass puzzleClass;
     private final String uniqueId;
-    private final Puzzle.SolutionStep solutionStep;
+    private final Puzzle.SolutionSteps solutionSteps;
+    private final boolean isTutorial;
 
-    public PuzzleReference(Puzzle.PuzzleClass puzzleClass, String puzzleName, int puzzleId, int imageId, Puzzle.SolutionStep solutionStep) {
+    public PuzzleReference(Puzzle.PuzzleClass puzzleClass, String puzzleName, int puzzleId, int imageId, boolean isTutorial, Puzzle.SolutionSteps solutionSteps) {
         this.puzzleName = puzzleName;
         this.puzzleId = puzzleId;
         this.imageId = imageId;
         this.puzzleClass = puzzleClass;
         this.uniqueId = puzzleName + "_" + puzzleId;
-        this.solutionStep = solutionStep;
+        this.solutionSteps = solutionSteps;
+        this.isTutorial = isTutorial;
     }
 
     public void load(Context context) {
@@ -34,6 +36,10 @@ public class PuzzleReference {
                 }
             }
         }
+    }
+
+    public boolean isTutorial() {
+        return isTutorial;
     }
 
     public String getUniqueId() {
@@ -90,7 +96,8 @@ public class PuzzleReference {
         if (!readFromSharedPreferences(context)) {
             puzzle = PuzzleFactory.INSTANCE.createOfBitmap(puzzleId, puzzleName, BitmapLoader.INSTANCE.getImage(context, imageId));
             puzzle.setPuzzleClass(puzzleClass);
-            puzzle.addSolutionStep(solutionStep);
+            puzzle.addSolutionSteps(solutionSteps);
+            puzzle.setIsTutorial(isTutorial);
             writeToSharedPreferences(context);
         }
     }

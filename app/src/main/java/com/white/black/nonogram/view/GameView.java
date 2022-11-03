@@ -657,7 +657,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         instructionCorrectIcon = BitmapLoader.INSTANCE.getImage(context, R.drawable.complete_512);
         instructionIncorrectIcon = BitmapLoader.INSTANCE.getImage(context, R.drawable.incorrect_512);
 
-        this.isTutorial = !Puzzles.hasPlayerSolvedAtLeastOnePuzzle(context);
+        this.isTutorial = PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isTutorial();
 
         if (GameSettings.INSTANCE.getInput().equals(GameSettings.Input.TOUCH)) {
             initTouchToolbar(context, paint);

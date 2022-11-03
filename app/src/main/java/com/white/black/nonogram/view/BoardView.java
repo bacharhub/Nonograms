@@ -801,7 +801,7 @@ class BoardView {
     }
 
     public void init(Context context) {
-        isTutorial = !Puzzles.hasPlayerSolvedAtLeastOnePuzzle(context);
+        isTutorial = puzzle.isTutorial();
         slotMarkClueColor = Color.CYAN;
         bulb = BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512);
         handCursor = BitmapLoader.INSTANCE.getImage(context, R.drawable.hand_cursor_512);

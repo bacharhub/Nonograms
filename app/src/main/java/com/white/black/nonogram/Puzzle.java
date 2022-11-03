@@ -9,12 +9,36 @@ import java.util.Stack;
 
 public class Puzzle {
 
+    public static class SolutionSteps {
+        public int index = 0;
+        public SolutionStep[] steps;
+
+        public void clear() {
+            this.index = 0;
+        }
+
+        public void nextSolutionStep() {
+            index++;
+        }
+
+        public SolutionStep getSolutionStep() {
+            if (index >= steps.length) {
+                return null;
+            }
+
+            return steps[index];
+        }
+
+        public SolutionSteps(SolutionStep[] steps) {
+            this.steps = steps;
+        }
+    }
+
     public static class SolutionStep {
         private int xLeft;
         private int xRight;
         private int yTop;
         private int yBottom;
-        private SolutionStep nextStep;
 
         public int getXLeft() {
             return xLeft;
@@ -32,27 +56,39 @@ public class Puzzle {
             return yBottom;
         }
 
-        public SolutionStep(int xLeft, int xRight, int yTop, int yBottom, SolutionStep nextStep) {
+        public SolutionStep(int xLeft, int xRight, int yTop, int yBottom) {
             this.xLeft = xLeft;
             this.xRight = xRight;
             this.yTop = yTop;
             this.yBottom = yBottom;
-            this.nextStep = nextStep;
         }
     }
 
-    private volatile SolutionStep solutionStep;
+    private volatile SolutionSteps solutionSteps;
+    private boolean isTutorial;
 
     public SolutionStep getSolutionStep() {
-        return solutionStep;
+        if (solutionSteps != null) {
+            return solutionSteps.getSolutionStep();
+        }
+
+        return null;
+    }
+
+    public boolean isTutorial() {
+        return isTutorial;
     }
 
     public synchronized void nextSolutionStep() {
-        solutionStep = solutionStep.nextStep;
+        if (solutionSteps != null) solutionSteps.nextSolutionStep();
     }
 
-    public void addSolutionStep(SolutionStep solutionStep) {
-        this.solutionStep = solutionStep;
+    public void addSolutionSteps(SolutionSteps solutionSteps) {
+        this.solutionSteps = solutionSteps;
+    }
+
+    public void setIsTutorial(boolean isTutorial) {
+        this.isTutorial = isTutorial;
     }
 
     public PuzzleClass getPuzzleClass() {
@@ -107,7 +143,7 @@ public class Puzzle {
         return fixedUndo;
     }
 
-    public Puzzle(long puzzleFirstLoadTime, int id, String name, int[][] filteredColors, List<Integer> colorSet, Numbers numbers, SolutionStep solutionStep) {
+    public Puzzle(long puzzleFirstLoadTime, int id, String name, int[][] filteredColors, List<Integer> colorSet, Numbers numbers, boolean isTutorial, SolutionSteps solutionSteps) {
         this.puzzleFirstLoadTime = puzzleFirstLoadTime;
         this.id = id;
         this.name = name;
@@ -115,7 +151,8 @@ public class Puzzle {
         this.colorSet = colorSet;
         this.subPuzzles = new LinkedList<>();
         this.numbers = numbers;
-        this.solutionStep = solutionStep;
+        this.solutionSteps = solutionSteps;
+        this.isTutorial = isTutorial;
     }
 
     private void initializeColoringProgress() {
@@ -458,6 +495,7 @@ public class Puzzle {
         fillPermanentDisqualify();
         clearUndoRedo();
         this.initializeSolvingTime();
+        if (solutionSteps != null) this.solutionSteps.clear();
 
         if (subPuzzles.size() > 0) {
             for (SubPuzzle subPuzzle : subPuzzles) {
