@@ -161,8 +161,9 @@ public enum Puzzles {
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.octopus), 16, R.drawable.octopus_16); // 02:35
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.lock), 18, R.drawable.lock_18); // 02:46
         addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.fox), 16, R.drawable.fox_15); // 02:50
-        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.golf_ball), 16, R.drawable.golf_ball_16); // 02:57
+        addPuzzleReference(Puzzle.PuzzleClass.FREE, context.getString(R.string.coat), 16, R.drawable.coat_16); // 02:54
 
+        addPuzzleReference(context.getString(R.string.golf_ball), 16, R.drawable.golf_ball_16); // 02:57
         addPuzzleReference(context.getString(R.string.mosque), 16, R.drawable.mosque_16); // 03:05
         addPuzzleReference(context.getString(R.string.skull), 16, R.drawable.skull_16); // 03:17
         addPuzzleReference(context.getString(R.string.heart), 16, R.drawable.heart_16); // 03:17
