@@ -1,5 +1,7 @@
 package com.white.black.nonogram.view;
 
+import static com.white.black.nonogram.AdManager.isRemoveAds;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -520,7 +522,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().finish();
                         ((GameMonitoringListener) gameViewListener).onFinishPuzzle();
                         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
-                            onPuzzleFinishedReward((Context) gameViewListener, 15);
+                            int numOfWonCoins = isRemoveAds() ? 30 : 15;
+                            onPuzzleFinishedReward((Context) gameViewListener, numOfWonCoins);
                         } else {
                             gameViewListener.onNextPuzzleButtonPressed();
                         }

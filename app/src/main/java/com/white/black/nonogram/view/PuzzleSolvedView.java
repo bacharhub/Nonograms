@@ -1,5 +1,6 @@
 package com.white.black.nonogram.view;
 
+import static com.white.black.nonogram.AdManager.isRemoveAds;
 import static com.white.black.nonogram.GameMonitoring.REWARDED_AD_EXTRA_COINS;
 import static com.white.black.nonogram.GameMonitoring.REWARDED_AD_EXTRA_COINS_CANCELED;
 import static com.white.black.nonogram.Puzzles.numOfSolvedPuzzles;
@@ -65,7 +66,7 @@ class PuzzleSolvedView {
     private Bitmap videoAdIcon;
     private Bitmap rewardCheck;
     private WatchAdButtonView watchAdButtonView;
-    private boolean isVideoWatched;
+    private boolean isVideoWatched = isRemoveAds();
     private WatchAdPopup videoPopup;
     private String rewardString;
 
