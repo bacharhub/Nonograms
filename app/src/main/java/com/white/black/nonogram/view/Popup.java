@@ -165,14 +165,18 @@ public class Popup {
         canvas.drawBitmap(topLeftImage, null, this.topLeftImageBounds, paint);
     }
 
+    public void doOnYesAnswered() {
+        TouchMonitor.INSTANCE.setTouchUp(false);
+        onYesAnswer.run();
+        MyMediaPlayer.play("blop");
+        answered = true;
+    }
+
     public boolean onTouchEvent() {
         if (TouchMonitor.INSTANCE.touchUp()) {
             if (!isAnswered()) {
                 if (yesButtonView != null && yesButtonView.wasPressed()) {
-                    TouchMonitor.INSTANCE.setTouchUp(false);
-                    onYesAnswer.run();
-                    MyMediaPlayer.play("blop");
-                    answered = true;
+                    doOnYesAnswered();
                     return true;
                 } else if (noButtonView != null && noButtonView.wasPressed()) {
                     doOnNoAnswer();

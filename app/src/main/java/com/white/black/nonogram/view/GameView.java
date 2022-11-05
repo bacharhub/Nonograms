@@ -112,12 +112,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         this.popup.setShowPopup(false);
     }
 
+    public void watchVideoDoOnYesAnswered() {
+        this.puzzleSolvedView.showRewardedAdVideo();
+    }
+
     public boolean isShowPopup() {
         return popup != null && popup.isShowingPopup();
     }
 
+    public boolean isShowingExtraCoinsPopup() {
+        return puzzleSolvedView.isShowingExtraCoinsVideo();
+    }
+
     public boolean isShowVipPopup() {
         return popup.isShowingVipPopup();
+    }
+
+    public Popup getExtraCoinsPopup() {
+        return puzzleSolvedView.getExtraCoinsPopup();
     }
 
     public Popup getPopup() {
@@ -485,11 +497,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public synchronized boolean onTouchEvent(MotionEvent event) {
         if (initDone) {
             gameViewListener.onViewTouched(event);
-            if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
-                puzzleSolvedView.onTouchEvent(gameViewListener);
-            } else if (popup != null && popup.isShowingPopup()) {
+            if (popup != null && popup.isShowingPopup()) {
                 popup.onTouchEvent();
                 TouchMonitor.INSTANCE.setTouchUp(false);
+            } else if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
+                puzzleSolvedView.onTouchEvent(gameViewListener);
             } else if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED)) {
                 if (!PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isDone()) {
                     PuzzleSelectionView.INSTANCE.getSelectedPuzzle().increaseSolvingTime();

@@ -60,4 +60,6 @@ public class GameMonitoring {
     public static final String REWARDED_AD_OFFER = "rewarded_ad_offer";
     public static final String REWARDED_AD_OFFER_ACCEPTED = "rewarded_ad_offer_accepted";
     public static final String REWARDED_AD_OFFER_REFUSED = "rewarded_ad_offer_refused";
+    public static final String REWARDED_AD_EXTRA_COINS = "rewarded_ad_extra_coins";
+    public static final String REWARDED_AD_EXTRA_COINS_CANCELED = "rewarded_ad_extra_coins_canceled";
 }

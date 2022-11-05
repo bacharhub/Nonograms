@@ -10,4 +10,5 @@ public interface GameViewListener extends SecondaryViewListener {
     int numOfAvailableClues();
     void useClue();
     void onPromoteVipPressed(Context context);
+    void onWatchVideo();
 }

@@ -170,6 +170,9 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                     gameView.getPopup().doOnNoAnswer();
                     gameView.getPopup().setAnswered(false);
                 }
+            } else if (gameView.isShowingExtraCoinsPopup()) {
+                    gameView.getExtraCoinsPopup().doOnNoAnswer();
+                    gameView.getExtraCoinsPopup().setAnswered(false);
             } else {
                 GameState.setGameState(GameState.PUZZLE_SELECTION);
                 GameActivity.this.finish();
@@ -390,6 +393,11 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                 () -> gameView.getVipPopup().getPopup().setAnswered(AdManager.isRemoveAds()),
                 mFirebaseAnalytics
         );
+    }
+
+    @Override
+    public void onWatchVideo() {
+        gameView.watchVideoDoOnYesAnswered();
     }
 
     private void onBillingSetupFailed(Context context) {
