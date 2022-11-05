@@ -65,6 +65,7 @@ class PuzzleSolvedView {
     private WatchAdButtonView watchAdButtonView;
     private boolean isVideoWatched;
     private WatchAdPopup videoPopup;
+    private String rewardString;
 
     private int windowBackgroundColor;
     private int curve;
@@ -232,6 +233,8 @@ class PuzzleSolvedView {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         this.numOfPuzzlesSolved = numOfSolvedPuzzles(context) + 1; // + 1 for the next solved puzzle
         this.hideRating = sharedPreferences.getBoolean("hideRating", false);
+
+        rewardString = context.getString(R.string.reward);
 
         videoPopup = new WatchAdPopup(
                 context,

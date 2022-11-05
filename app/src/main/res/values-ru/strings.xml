@@ -46,6 +46,7 @@
     <string name="click_to_play">Нажмите, чтобы играть</string>
     <string name="app_id">842719909943</string>
     <string name="most_puzzles_solved">CgkIt7CVsMMYEAIQAQ</string>
+    <string name="reward">награда:</string>
     <string name="signin_other_error">Проверьте свое соединение и попробуйте позже</string>
     <string name="no_internet_connection">Проверьте свое соединение и попробуйте позже</string>
     <string name="leaderboard">Таблица лидеров</string>
