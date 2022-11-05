@@ -493,6 +493,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    private void onPuzzleFinishedReward(Context context, int numOfCoins) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int coins = sharedPreferences.getInt("coins", Puzzles.numOfSolvedPuzzles(context) * 15);
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        prefsEditor.putInt("coins", coins + numOfCoins);
+        prefsEditor.apply();
+    }
+
     @Override
     public synchronized boolean onTouchEvent(MotionEvent event) {
         if (initDone) {
@@ -511,7 +519,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         boardView.clear();
                         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().finish();
                         ((GameMonitoringListener) gameViewListener).onFinishPuzzle();
-                        if (!PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
+                        if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
+                            onPuzzleFinishedReward((Context) gameViewListener, 15);
+                        } else {
                             gameViewListener.onNextPuzzleButtonPressed();
                         }
                     }
