@@ -355,7 +355,7 @@ class PuzzleSolvedView {
                 ApplicationSettings.INSTANCE.getScreenWidth() * 3 / 10,
                 windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 100,
                 ApplicationSettings.INSTANCE.getScreenWidth() * 7 / 10,
-                windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 19 / 100
+                windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 24 / 100
         );
 
         this.rewardWindowGradient = new LinearGradient(
@@ -544,6 +544,9 @@ class PuzzleSolvedView {
         paint.setColor(Color.BLACK);
         canvas.drawText(rewardString, rewardWindowBounds.centerX(), rewardWindowBounds.top + rewardWindowBounds.height() / 5, paint);
         canvas.drawBitmap(coin, null, coinRewardBounds, paint);
+        paint.setStrokeWidth(3);
+        paint.setColor(Color.GRAY);
+        canvas.drawLine(coinRewardBounds.left, (coinRewardBounds.bottom + coinAdRewardBounds.top) / 2, rewardCheckBounds.right, (coinRewardBounds.bottom + coinAdRewardBounds.top) / 2, paint);
         canvas.drawBitmap(coin, null, coinAdRewardBounds, paint);
         canvas.drawBitmap(rewardCheck, null, rewardCheckBounds, paint);
         if (isVideoWatched) {
@@ -552,6 +555,7 @@ class PuzzleSolvedView {
             canvas.drawBitmap(videoAdIcon, null, rewardAdVideoBounds, paint);
         }
 
+        paint.setColor(Color.BLACK);
         paint.setTextAlign(Paint.Align.LEFT);
         Rect numOfCoinsDescriptionBounds = new Rect();
         paint.getTextBounds("+15", 0, "+15".length(), numOfCoinsDescriptionBounds);

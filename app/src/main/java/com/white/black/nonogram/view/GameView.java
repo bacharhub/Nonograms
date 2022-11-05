@@ -497,7 +497,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void onPuzzleFinishedReward(Context context, int numOfCoins) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int coins = sharedPreferences.getInt("coins", Puzzles.numOfSolvedPuzzles(context) * 15);
+        int coins = sharedPreferences.getInt("coins", (Puzzles.numOfSolvedPuzzles(context) - 1) * 15);
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         prefsEditor.putInt("coins", coins + numOfCoins);
         prefsEditor.apply();
