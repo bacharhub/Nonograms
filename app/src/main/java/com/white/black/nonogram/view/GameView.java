@@ -522,7 +522,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().finish();
                         ((GameMonitoringListener) gameViewListener).onFinishPuzzle();
                         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
-                            int numOfWonCoins = isRemoveAds() ? 30 : 15;
+                            int numOfWonCoins = isRemoveAds() ? 45 : 15;
                             onPuzzleFinishedReward((Context) gameViewListener, numOfWonCoins);
                         } else {
                             gameViewListener.onNextPuzzleButtonPressed();
