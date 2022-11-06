@@ -6,9 +6,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MotionEvent;
@@ -71,6 +74,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
     private Bitmap newPuzzleIcon;
     private Bitmap background;
     private Supplier<Integer> availableKeysSupplier;
+    private BankView bankView;
 
     private final ExecutorService pool = Executors.newFixedThreadPool(4);
 
@@ -269,6 +273,10 @@ public class PuzzleCategorySelectionView extends ScrollableView {
 
             useKeyPopup.draw(canvas, paint);
             rewardedAdPopup.draw(canvas, paint);
+
+            if (useKeyPopup.isShowingPopup() || rewardedAdPopup.isShowingPopup()) {
+                bankView.draw(canvas, paint);
+            }
         }
     }
 
@@ -547,7 +555,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
 
     private int availableKeys(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int keys = sharedPreferences.getInt("keys", 1);
+        int keys = sharedPreferences.getInt("keys", 0);
         return keys;
     }
 
@@ -572,6 +580,8 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         backgroundColor = ContextCompat.getColor(context, R.color.puzzleSelectionBackground);
 
         availableKeysSupplier = () -> availableKeys(context);
+        bankView = new BankView();
+        bankView.init(context);
 
         socialNetworks = new LinkedList<>();
         socialNetworks.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.facebook_100));

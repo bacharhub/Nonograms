@@ -49,10 +49,6 @@ public class UseKeyPopup {
         setup(context, paint, rewardDescription, rewardIcon);
     }
 
-    public VipPopup getVipPopup() {
-        return this.vipPopup;
-    }
-
     public Popup getPopup() {
         return this.popup;
     }

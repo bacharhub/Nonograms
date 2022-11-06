@@ -55,28 +55,14 @@ class PuzzleSolvedView {
     private LinearGradient windowGradient;
 
     private RectF rewardWindowBounds;
-    private RectF rewardWindowBackgroundBounds;
-    private RectF rewardWindowInnerBackgroundBounds;
-    private RectF coinRewardBounds;
     private RectF coinAdRewardBounds;
-    private RectF rewardCheckBounds;
     private RectF rewardAdCheckBounds;
-    private RectF rewardAdVideoBounds;
-    private LinearGradient rewardWindowGradient;
     private Bitmap coin;
     private Bitmap videoAdIcon;
-    private Bitmap rewardCheck;
     private WatchAdButtonView watchAdButtonView;
     private boolean isVideoWatched = isRemoveAds();
     private WatchAdPopup videoPopup;
-    private String rewardString;
-
-    private Supplier<Integer> coinsAvailable;
-    private RectF coinsBankWindowBounds;
-    private RectF coinsBankBackgroundBounds;
-    private RectF coinsWindowInnerBackgroundBounds;
-    private LinearGradient coinsBankWindowGradient;
-    private RectF coinsBankCoinBounds;
+    private BankView bankView;
 
     private int windowBackgroundColor;
     private int curve;
@@ -249,9 +235,8 @@ class PuzzleSolvedView {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         this.numOfPuzzlesSolved = numOfSolvedPuzzles(context) + 1; // + 1 for the next solved puzzle
         this.hideRating = sharedPreferences.getBoolean("hideRating", false);
-
-        rewardString = context.getString(R.string.reward);
-        coinsAvailable = () -> coinsAvailable(context);
+        bankView = new BankView();
+        bankView.init(context);
 
         videoPopup = new WatchAdPopup(
                 context,
@@ -353,7 +338,6 @@ class PuzzleSolvedView {
         complete = BitmapLoader.INSTANCE.getImage(context, R.drawable.complete_512);
         coin = BitmapLoader.INSTANCE.getImage(context, R.drawable.coin_64);
         videoAdIcon = BitmapLoader.INSTANCE.getImage(context, R.drawable.video_64);
-        rewardCheck = BitmapLoader.INSTANCE.getImage(context, R.drawable.done_512);
 
         int buttonWidth = ApplicationSettings.INSTANCE.getScreenWidth() * 22 / 100;
 
@@ -364,29 +348,6 @@ class PuzzleSolvedView {
                 windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 100,
                 ApplicationSettings.INSTANCE.getScreenWidth() * 7 / 10,
                 windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 100 + 150
-        );
-
-        this.rewardWindowGradient = new LinearGradient(
-                rewardWindowBounds.left,
-                rewardWindowBounds.top,
-                rewardWindowBounds.right,
-                rewardWindowBounds.bottom,
-                new int[]{windowInnerBackgroundColor, windowInnerBackgroundGradientTo},
-                new float[]{0f, 1f},
-                Shader.TileMode.MIRROR);
-
-        rewardWindowInnerBackgroundBounds = new RectF(
-                rewardWindowBounds.left + padding,
-                rewardWindowBounds.top + padding,
-                rewardWindowBounds.right - padding,
-                rewardWindowBounds.bottom - padding
-        );
-
-        rewardWindowBackgroundBounds = new RectF(
-                rewardWindowBounds.left,
-                rewardWindowBounds.top,
-                rewardWindowBounds.right + rewardWindowBounds.width() * 2 / 100,
-                rewardWindowBounds.bottom + rewardWindowBounds.height() * 2 / 100
         );
 
         coinAdRewardBounds = new RectF(
@@ -403,13 +364,6 @@ class PuzzleSolvedView {
                 coinAdRewardBounds.bottom - rewardWindowBounds.height() * 3 / 100
         );
 
-        rewardAdVideoBounds = new RectF(
-                rewardAdCheckBounds.left,
-                rewardAdCheckBounds.top + rewardWindowBounds.height() * 2 / 100,
-                rewardAdCheckBounds.right,
-                rewardAdCheckBounds.bottom + rewardWindowBounds.height() * 2 / 100
-        );
-
         watchAdButtonView = new WatchAdButtonView(
                 (ViewListener) context,
                 "+30",
@@ -420,34 +374,6 @@ class PuzzleSolvedView {
                 new Bitmap[]{videoAdIcon, coin},
                 context,
                 paint
-        );
-
-        coinsBankWindowBounds = new RectF(
-                ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100,
-                ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100,
-                ApplicationSettings.INSTANCE.getScreenHeight() * 20 / 100,
-                ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100 + 150
-        );
-
-        coinsBankBackgroundBounds =
-                new RectF(coinsBankWindowBounds.left, coinsBankWindowBounds.top, coinsBankWindowBounds.right + coinsBankWindowBounds.width() * 2 / 100, coinsBankWindowBounds.bottom + coinsBankWindowBounds.height() * 2 / 100);
-        coinsWindowInnerBackgroundBounds =
-                new RectF(coinsBankWindowBounds.left + padding, coinsBankWindowBounds.top + padding, coinsBankWindowBounds.right - padding, coinsBankWindowBounds.bottom - padding);
-
-        coinsBankWindowGradient = new LinearGradient(
-                coinsBankWindowBounds.left,
-                coinsBankWindowBounds.top,
-                coinsBankWindowBounds.right,
-                coinsBankWindowBounds.bottom,
-                new int[]{windowInnerBackgroundColor, windowInnerBackgroundGradientTo},
-                new float[]{0f, 1f},
-                Shader.TileMode.MIRROR);
-
-        coinsBankCoinBounds = new RectF(
-                coinsBankWindowBounds.left + 30,
-                coinsBankWindowBounds.centerY() - 64,
-                coinsBankWindowBounds.left + 30 + 128,
-                coinsBankWindowBounds.centerY() + 64
         );
 
         setUpPopup(context, paint);
@@ -526,50 +452,6 @@ class PuzzleSolvedView {
         }
     }
 
-    private void drawRewardWindow(Canvas canvas, Paint paint) {
-        paint.setColor(windowBackgroundColor);
-        canvas.drawRoundRect(rewardWindowBackgroundBounds, curve, curve, paint);
-        paint.setShader(rewardWindowGradient);
-        canvas.drawRoundRect(rewardWindowBounds, curve, curve, paint);
-        paint.setShader(null);
-        paint.setColor(Color.WHITE);
-        canvas.drawRoundRect(rewardWindowInnerBackgroundBounds, curve, curve, paint);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(ApplicationSettings.INSTANCE.getScreenHeight() / 40);
-        paint.setColor(Color.BLACK);
-        //canvas.drawText(rewardString, rewardWindowBounds.centerX(), rewardWindowBounds.top + rewardWindowBounds.height() / 5, paint);
-        //canvas.drawBitmap(coin, null, coinAdRewardBounds, paint);
-        //if (isVideoWatched) {
-        //    canvas.drawBitmap(rewardCheck, null, rewardAdCheckBounds, paint);
-        //} else {
-        //    canvas.drawBitmap(videoAdIcon, null, rewardAdVideoBounds, paint);
-        //}
-
-        //paint.setColor(Color.BLACK);
-        //paint.setTextAlign(Paint.Align.LEFT);
-        //Rect numOfCoinsDescriptionBounds = new Rect();
-        //paint.getTextBounds("+30", 0, "+30".length(), numOfCoinsDescriptionBounds);
-        //canvas.drawText("+30", coinAdRewardBounds.right + 10, coinAdRewardBounds.centerY() + numOfCoinsDescriptionBounds.height() / 3, paint);
-    }
-
-    private void drawCoinsBank(Canvas canvas, Paint paint) {
-        paint.setColor(windowBackgroundColor);
-        canvas.drawRoundRect(coinsBankBackgroundBounds, curve, curve, paint);
-        paint.setShader(coinsBankWindowGradient);
-        canvas.drawRoundRect(coinsBankWindowBounds, curve, curve, paint);
-        paint.setShader(null);
-        paint.setColor(Color.WHITE);
-        canvas.drawRoundRect(coinsWindowInnerBackgroundBounds, curve, curve, paint);
-        canvas.drawBitmap(coin, null, coinsBankCoinBounds, paint);
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTextSize(ApplicationSettings.INSTANCE.getScreenHeight() / 40);
-        Rect numOfCoinsDescriptionBounds = new Rect();
-        String numOfCoinsAvailable = String.valueOf(coinsAvailable.get());
-        paint.getTextBounds(numOfCoinsAvailable, 0, numOfCoinsAvailable.length(), numOfCoinsDescriptionBounds);
-        paint.setColor(Color.BLACK);
-        canvas.drawText(numOfCoinsAvailable, coinsBankCoinBounds.right + 15, coinsBankCoinBounds.centerY() + numOfCoinsDescriptionBounds.height() / 2, paint);
-    }
-
     public void draw(Canvas canvas, Paint paint) {
         handleBackground(canvas, paint);
         drawRays(canvas, paint);
@@ -587,8 +469,6 @@ class PuzzleSolvedView {
         if (!isVideoWatched) {
             watchAdButtonView.draw(canvas, paint);
         }
-
-        drawCoinsBank(canvas, paint);
 
         canvas.drawBitmap(coin, null, coinBounds, paint);
         canvas.drawBitmap(clock, null, clockBounds, paint);
@@ -629,6 +509,7 @@ class PuzzleSolvedView {
         }
 
         videoPopup.draw(canvas, paint);
+        bankView.draw(canvas, paint);
     }
 
 
