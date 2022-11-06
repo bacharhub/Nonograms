@@ -111,21 +111,31 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
 
             MyMediaPlayer.play("blop");
             puzzleCategorySelectionView.render();
-        } else if (puzzleCategorySelectionView.isShowPopup()) {
-            if (puzzleCategorySelectionView.isShowVipPopup()) {
+        } else if (puzzleCategorySelectionView.isShowingRewardedAdPopup()) {
+            if (puzzleCategorySelectionView.isShowingRewardedAdVipPopup()) {
                 MyMediaPlayer.play("blop");
-                puzzleCategorySelectionView.setShowVipPopup(false);
-                puzzleCategorySelectionView.render();
+                puzzleCategorySelectionView.setShowRewardedAdVipPopup(false);
             } else {
-                puzzleCategorySelectionView.getPopup().doOnNoAnswer();
-                puzzleCategorySelectionView.getPopup().setAnswered(false);
+                puzzleCategorySelectionView.getRewardedAdPopup().doOnNoAnswered();
+                puzzleCategorySelectionView.getRewardedAdPopup().setAnswered(false);
             }
+
+            puzzleCategorySelectionView.render();
+        } else if (puzzleCategorySelectionView.isShowingUseKeyPopup()) {
+            if (puzzleCategorySelectionView.isShowingUseKeyVipPopup()) {
+                MyMediaPlayer.play("blop");
+                puzzleCategorySelectionView.setShowUseKeyVipPopup(false);
+            } else {
+                puzzleCategorySelectionView.getUseKeyPopup().doOnNoAnswered();
+                puzzleCategorySelectionView.getUseKeyPopup().setAnswered(false);
+            }
+
+            puzzleCategorySelectionView.render();
         } else {
             GameState.setGameState(GameState.MENU);
             PuzzleSelectionActivity.this.finish();
             this.overridePendingTransition(0, R.anim.leave);
             MyMediaPlayer.play("page_selection");
-
             puzzleCategorySelectionView.clearBackground();
         }
     }
@@ -410,18 +420,18 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
         MyMediaPlayer.play("blop");
         puzzleCategorySelectionView.getVipPopup().update();
         if (AdManager.isRemoveAds()) {
-            puzzleCategorySelectionView.setShowVipPopup(true);
+            puzzleCategorySelectionView.setShowRewardedAdVipPopup(true);
             puzzleCategorySelectionView.render();
         } else {
             puzzleCategorySelectionView.getVipPopup().setPrice(getString(R.string.loading));
-            puzzleCategorySelectionView.setShowVipPopup(true);
+            puzzleCategorySelectionView.setShowRewardedAdVipPopup(true);
             puzzleCategorySelectionView.render();
             onPromoteVipPressed(PuzzleSelectionActivity.this);
         }
     }
 
     private void onBillingSetupFailed(Context context) {
-        puzzleCategorySelectionView.setShowVipPopup(false);
+        puzzleCategorySelectionView.setShowRewardedAdVipPopup(false);
         puzzleCategorySelectionView.render();
         Handler mainHandler = new Handler(context.getMainLooper());
         mainHandler.post(
@@ -437,7 +447,7 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
                 () -> onBillingSetupFailed(PuzzleSelectionActivity.this),
                 this::onRemoveAdsPurchaseFound,
                 () -> {
-                    puzzleCategorySelectionView.setShowVipPopup(false);
+                    puzzleCategorySelectionView.setShowRewardedAdVipPopup(false);
                     puzzleCategorySelectionView.setShowPopupFalse();
                     puzzleCategorySelectionView.clearAllBitmaps();
                     puzzleCategorySelectionView.render();
@@ -450,7 +460,7 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
 
     private void onRemoveAdsPurchaseFound(String price) {
         puzzleCategorySelectionView.getVipPopup().setPrice(price);
-        puzzleCategorySelectionView.setShowVipPopup(true);
+        puzzleCategorySelectionView.setShowRewardedAdVipPopup(true);
         puzzleCategorySelectionView.render();
     }
 

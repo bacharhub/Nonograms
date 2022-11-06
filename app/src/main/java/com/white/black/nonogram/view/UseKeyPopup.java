@@ -7,20 +7,12 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.OnUserEarnedRewardListener;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
-import com.white.black.nonogram.AdManager;
 import com.white.black.nonogram.ApplicationSettings;
 import com.white.black.nonogram.BitmapLoader;
 import com.white.black.nonogram.MyMediaPlayer;
 import com.white.black.nonogram.R;
-import com.white.black.nonogram.RewardedInstanceHandler;
 import com.white.black.nonogram.TouchMonitor;
 import com.white.black.nonogram.utils.VipPromotionUtils;
 import com.white.black.nonogram.view.buttons.CloseWindowButtonView;
@@ -28,15 +20,11 @@ import com.white.black.nonogram.view.buttons.YesNoButtonView;
 import com.white.black.nonogram.view.buttons.menu.PromoteVipButtonView;
 import com.white.black.nonogram.view.listeners.ViewListener;
 
-import java.util.function.Consumer;
-
-public class WatchAdPopup {
+public class UseKeyPopup {
 
     private final String rewardDescription;
     private final Runnable onNoAnswer;
-    private Runnable onRewarded;
-    private final Consumer<LoadAdError> onAdFailedToLoad;
-    private final Runnable onRewardedVideoAdClosed;
+    private Runnable onYesAnswer;
 
     private Popup popup;
     private VipPopup vipPopup;
@@ -47,26 +35,17 @@ public class WatchAdPopup {
     private PromoteVipButtonView promoteVipButtonView;
     private int darkBackgroundColor;
 
-    private final RewardedInstanceHandler rewardedInstanceHandler = new RewardedInstanceHandler();
-    private final OnUserEarnedRewardListener userEarnedRewardListener = rewardItem -> onRewarded.run();
-    private RewardedAdLoadCallback rewardedAdLoadCallback;
-    private FullScreenContentCallback fullScreenContentCallback;
-
-    public WatchAdPopup(
+    public UseKeyPopup(
             Context context,
             Paint paint,
             String rewardDescription,
             Bitmap rewardIcon,
             Runnable onNoAnswer,
-            Runnable onRewarded,
-            Consumer<LoadAdError> onAdFailedToLoad,
-            Runnable onRewardedVideoAdClosed
+            Runnable onYesAnswer
     ) {
         this.rewardDescription = rewardDescription;
         this.onNoAnswer = onNoAnswer;
-        this.onRewarded = onRewarded;
-        this.onAdFailedToLoad = onAdFailedToLoad;
-        this.onRewardedVideoAdClosed = onRewardedVideoAdClosed;
+        this.onYesAnswer = onYesAnswer;
         setup(context, paint, rewardDescription, rewardIcon);
     }
 
@@ -94,13 +73,6 @@ public class WatchAdPopup {
         this.showVipPopup = showVipPopup;
     }
 
-    public void initPopup(Context context) {
-        popup.setMessage(rewardDescription);
-        popup.setTopLeftImage(BitmapLoader.INSTANCE.getImage(context, R.drawable.gift_100));
-        popup.setAnswered(false);
-        this.showVipPopup = false;
-    }
-
     private void setup(Context context, Paint paint, String rewardDescription, Bitmap rewardIcon) {
         popupBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenWidth() * 16 / 100,
@@ -109,35 +81,50 @@ public class WatchAdPopup {
                 ApplicationSettings.INSTANCE.getScreenHeight() * 59 / 100
         );
 
-        RectF yesButtonBounds = new RectF(
-                popupBounds.centerX() - popupBounds.width() / 3,
+        float closeButtonEdgeLength = popupBounds.width() / 6;
+
+        RectF noButtonBounds = new RectF(
+                popupBounds.centerX() + closeButtonEdgeLength / 5,
                 popupBounds.bottom - popupBounds.height() * 4 / 10,
-                popupBounds.centerX() + popupBounds.width() / 3,
+                popupBounds.right - closeButtonEdgeLength / 4,
                 popupBounds.bottom - popupBounds.height() / 8
         );
 
+        RectF yesButtonBounds = new RectF(
+                popupBounds.left + closeButtonEdgeLength / 4,
+                popupBounds.bottom - popupBounds.height() * 4 / 10,
+                popupBounds.centerX() - closeButtonEdgeLength / 5,
+                popupBounds.bottom - popupBounds.height() / 8
+        );
+
+        YesNoButtonView noButtonView = new YesNoButtonView(
+                (ViewListener) context,
+                context.getString(R.string.no),
+                noButtonBounds,
+                ContextCompat.getColor(context, R.color.settingsBrown1), ContextCompat.getColor(context, R.color.settingsBrown2), ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.close_window_100)}, context, paint);
+
+
         YesNoButtonView yesButtonView = new YesNoButtonView(
                 (ViewListener) context,
-                context.getString(R.string.watchAd),
+                context.getString(R.string.yes),
                 yesButtonBounds,
                 ContextCompat.getColor(context, R.color.settingsBrown1),
                 ContextCompat.getColor(context, R.color.settingsBrown2),
                 ContextCompat.getColor(context, R.color.settingsBrown3),
-                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.play_512)},
+                new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.key_512)},
                 context,
                 paint);
 
         Runnable onNoAnswer = () -> {
-            setShowPopup(false);
-            initPopup(context);
-            MyMediaPlayer.play("blop");
             this.onNoAnswer.run();
+            showPopup = false;
+            showVipPopup = false;
         };
 
         Runnable onYesAnswer = () -> {
-            popup.setMessage(context.getString(R.string.loading));
-            popup.setTopLeftImage(BitmapLoader.INSTANCE.getImage(context, R.drawable.sand_watch_100));
-            AdManager.loadRewardedVideo(rewardedInstanceHandler, (Activity) context, userEarnedRewardListener, rewardedAdLoadCallback);
+            this.onYesAnswer.run();
+            showPopup = false;
+            showVipPopup = false;
         };
 
         this.popup = new Popup(
@@ -147,12 +134,10 @@ public class WatchAdPopup {
                 onYesAnswer,
                 onNoAnswer,
                 yesButtonView,
-                null,
-                BitmapLoader.INSTANCE.getImage(context, R.drawable.gift_100),
-                rewardIcon
+                noButtonView,
+                BitmapLoader.INSTANCE.getImage(context, R.drawable.lock_512),
+                null
         );
-
-        float closeButtonEdgeLength = popupBounds.width() / 6;
 
         int closeButton1 = ContextCompat.getColor(context, R.color.menuBackground);
         int closeButton2 = ContextCompat.getColor(context, R.color.gameSettingsWindowGradientTo);
@@ -182,38 +167,6 @@ public class WatchAdPopup {
                 promoteVipButtonBounds,
                 closeButton1, closeButton2, closeButton3, new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.vip_100)}, context, paint);
 
-        rewardedAdLoadCallback = new RewardedAdLoadCallback() {
-            @Override
-            public void onAdLoaded(@NonNull RewardedAd rewardedAd) {
-                rewardedInstanceHandler.setRewardedVideoAd(rewardedAd);
-                rewardedInstanceHandler.setLoadingRewardedAd(false);
-                rewardedAd.setFullScreenContentCallback(fullScreenContentCallback);
-
-                if (showPopup) {
-                    AdManager.showRewardedVideo(rewardedInstanceHandler, (Activity) context, userEarnedRewardListener);
-                }
-            }
-
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                rewardedInstanceHandler.setLoadingRewardedAd(false);
-                onRewarded.run();
-                onRewardedVideoAdClosed(context);
-                onAdFailedToLoad.accept(loadAdError);
-
-                super.onAdFailedToLoad(loadAdError);
-            }
-        };
-
-        fullScreenContentCallback =
-                new FullScreenContentCallback() {
-                    @Override
-                    public void onAdDismissedFullScreenContent() {
-                        // Code to be invoked when the ad dismissed full screen content.
-                        onRewardedVideoAdClosed(context);
-                    }
-                };
-
         darkBackgroundColor = ContextCompat.getColor(context, R.color.gameSettingsBackground);
 
         this.vipPopup = new VipPopup(
@@ -227,20 +180,13 @@ public class WatchAdPopup {
         );
     }
 
-    private void onRewardedVideoAdClosed(Context context) {
-        setShowPopup(false);
-        initPopup(context);
-        rewardedInstanceHandler.setRewardedVideoAd(null);
-        onRewardedVideoAdClosed.run();
-    }
-
     public void draw(Canvas canvas, Paint paint) {
         if (showPopup) {
             paint.setColor(darkBackgroundColor);
             canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
             popup.draw(canvas, paint);
 
-            if (!popup.isAnswered()) { // loading ad
+            if (!popup.isAnswered()) {
                 closeWindowButtonView.draw(canvas, paint);
                 promoteVipButtonView.draw(canvas, paint);
 
@@ -252,10 +198,6 @@ public class WatchAdPopup {
     }
 
     public void onTouchEvent() {
-        if (popup.isAnswered()) { // loading ad, don't allow other actions
-            return;
-        }
-
         if (showVipPopup) {
             if (TouchMonitor.INSTANCE.touchUp()) {
                 vipPopup.onTouchEvent();
@@ -271,8 +213,8 @@ public class WatchAdPopup {
                         popup.setAnswered(false);
                     }
                 }
-            } else {
-                popup.onTouchEvent();
+            } else if (popup.onTouchEvent()) {
+                popup.setAnswered(false);
             }
         }
     }

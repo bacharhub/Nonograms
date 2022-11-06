@@ -167,11 +167,11 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                     MyMediaPlayer.play("blop");
                     gameView.setShowVipPopup(false);
                 } else {
-                    gameView.getPopup().doOnNoAnswer();
+                    gameView.getPopup().doOnNoAnswered();
                     gameView.getPopup().setAnswered(false);
                 }
             } else if (gameView.isShowingExtraCoinsPopup()) {
-                    gameView.getExtraCoinsPopup().doOnNoAnswer();
+                    gameView.getExtraCoinsPopup().doOnNoAnswered();
                     gameView.getExtraCoinsPopup().setAnswered(false);
             } else {
                 GameState.setGameState(GameState.PUZZLE_SELECTION);

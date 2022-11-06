@@ -273,7 +273,7 @@ class PuzzleSolvedView {
                 ApplicationSettings.INSTANCE.getScreenWidth() * 28 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 15 / 100,
                 ApplicationSettings.INSTANCE.getScreenWidth() * 72 / 100,
-                ApplicationSettings.INSTANCE.getScreenHeight() * 59 / 100
+                ApplicationSettings.INSTANCE.getScreenHeight() * 64 / 100
         );
 
         radialGradient = new RadialGradient(

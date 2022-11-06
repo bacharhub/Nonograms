@@ -114,7 +114,7 @@ public enum YesNoQuestion {
     public void onTouchEvent() {
         if (!windowBackgroundBounds.contains(TouchMonitor.INSTANCE.getUpCoordinates().x, TouchMonitor.INSTANCE.getUpCoordinates().y) &&
                 !windowBackgroundBounds.contains(TouchMonitor.INSTANCE.getDownCoordinates().x, TouchMonitor.INSTANCE.getDownCoordinates().y)) {
-            popup.doOnNoAnswer();
+            popup.doOnNoAnswered();
         } else {
             popup.onTouchEvent();
         }

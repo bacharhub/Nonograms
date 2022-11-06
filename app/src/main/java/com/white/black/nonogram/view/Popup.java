@@ -40,13 +40,6 @@ public class Popup {
 
     private boolean answered;
 
-    public void doOnNoAnswer() {
-        TouchMonitor.INSTANCE.setTouchUp(false);
-        onNoAnswer.run();
-        MyMediaPlayer.play("blop");
-        answered = true;
-    }
-
     public void setMessage(String message) {
         this.message = message;
     }
@@ -165,6 +158,13 @@ public class Popup {
         canvas.drawBitmap(topLeftImage, null, this.topLeftImageBounds, paint);
     }
 
+    public void doOnNoAnswered() {
+        TouchMonitor.INSTANCE.setTouchUp(false);
+        onNoAnswer.run();
+        MyMediaPlayer.play("blop");
+        answered = true;
+    }
+
     public void doOnYesAnswered() {
         TouchMonitor.INSTANCE.setTouchUp(false);
         onYesAnswer.run();
@@ -179,7 +179,7 @@ public class Popup {
                     doOnYesAnswered();
                     return true;
                 } else if (noButtonView != null && noButtonView.wasPressed()) {
-                    doOnNoAnswer();
+                    doOnNoAnswered();
                     return true;
                 }
             }

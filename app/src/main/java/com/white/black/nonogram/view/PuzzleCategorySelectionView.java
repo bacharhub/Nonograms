@@ -1,12 +1,16 @@
 package com.white.black.nonogram.view;
 
+import static com.white.black.nonogram.GameMonitoring.UNLOCKED_PUZZLE_WITH_KEY;
+
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
@@ -27,15 +31,11 @@ import com.white.black.nonogram.PuzzleReference;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
-import com.white.black.nonogram.activities.PuzzleSelectionActivity;
-import com.white.black.nonogram.view.buttons.CloseWindowButtonView;
 import com.white.black.nonogram.view.buttons.PicButtonView;
 import com.white.black.nonogram.view.buttons.PuzzleSelectionButtonView;
 import com.white.black.nonogram.view.buttons.PuzzleSelectionSettingsButtonView;
 import com.white.black.nonogram.view.buttons.ReturnButtonView;
 import com.white.black.nonogram.view.buttons.SwitchCategoryButtonView;
-import com.white.black.nonogram.view.buttons.YesNoButtonView;
-import com.white.black.nonogram.view.buttons.menu.PromoteVipButtonView;
 import com.white.black.nonogram.view.listeners.PuzzleSelectionViewListener;
 import com.white.black.nonogram.view.listeners.ViewListener;
 
@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 public class PuzzleCategorySelectionView extends ScrollableView {
 
@@ -69,41 +70,55 @@ public class PuzzleCategorySelectionView extends ScrollableView {
     private Map<Puzzles, Set<String>> initializedPuzzleSelectionButtons;
     private Bitmap newPuzzleIcon;
     private Bitmap background;
+    private Supplier<Integer> availableKeysSupplier;
 
     private final ExecutorService pool = Executors.newFixedThreadPool(4);
 
     public VipPopup getVipPopup() {
-        return popup.getVipPopup();
+        return rewardedAdPopup.getVipPopup();
     }
 
-    public boolean isShowVipPopup() {
-        return popup.isShowingVipPopup();
+    public boolean isShowingRewardedAdVipPopup() {
+        return rewardedAdPopup.isShowingVipPopup();
     }
 
-    public void setShowVipPopup(boolean showVipPopup) {
-        popup.setShowVipPopup(showVipPopup);
+    public boolean isShowingUseKeyVipPopup() {
+        return useKeyPopup.isShowingVipPopup();
     }
 
-    private WatchAdPopup popup;
+    public void setShowRewardedAdVipPopup(boolean showVipPopup) {
+        rewardedAdPopup.setShowVipPopup(showVipPopup);
+    }
+
+    public void setShowUseKeyVipPopup(boolean showVipPopup) {
+        useKeyPopup.setShowVipPopup(showVipPopup);
+    }
+
+    private WatchAdPopup rewardedAdPopup;
+    private UseKeyPopup useKeyPopup;
 
     public void setShowPopupFalse() {
-        this.popup.setShowPopup(false);
+        this.rewardedAdPopup.setShowPopup(false);
     }
 
-    public boolean isShowPopup() {
-        return popup.isShowingPopup();
+    public boolean isShowingRewardedAdPopup() {
+        return rewardedAdPopup.isShowingPopup();
+    }
+
+    public boolean isShowingUseKeyPopup() {
+        return useKeyPopup.isShowingPopup();
     }
 
     public void clearPool() {
         pool.shutdown();
     }
 
-    public void initPopup(Context context) {
-        popup.initPopup(context);
+    public Popup getRewardedAdPopup() {
+        return rewardedAdPopup.getPopup();
     }
 
-    public Popup getPopup() {
-        return popup.getPopup();
+    public Popup getUseKeyPopup() {
+        return useKeyPopup.getPopup();
     }
 
     /* used for calculating scrolled items */
@@ -248,7 +263,8 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                 PuzzleSelectionView.INSTANCE.draw(canvas, paint);
             }
 
-            popup.draw(canvas, paint);
+            useKeyPopup.draw(canvas, paint);
+            rewardedAdPopup.draw(canvas, paint);
         }
     }
 
@@ -435,7 +451,13 @@ public class PuzzleCategorySelectionView extends ScrollableView {
             puzzleSelectionViewListener.onViewTouched(event);
             if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED)) {
                 if (PuzzleSelectionView.INSTANCE.getAppearance().equals(Appearance.MINIMIZED)) {
-                    if (!popup.isShowingPopup()) {
+                    if (useKeyPopup.isShowingPopup()) {
+                        useKeyPopup.onTouchEvent();
+                        TouchMonitor.INSTANCE.setTouchUp(false);
+                    } else if (rewardedAdPopup.isShowingPopup()) {
+                        rewardedAdPopup.onTouchEvent();
+                        TouchMonitor.INSTANCE.setTouchUp(false);
+                    } else {
                         if (returnButtonView.wasPressed()) {
                             TouchMonitor.INSTANCE.setTouchUp(false);
                             returnButtonView.onButtonPressed();
@@ -448,15 +470,22 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                         } else {
                             for (int i = 0; i < puzzleSelectionButtonViewMap.get(Puzzles.getCurrent()).length; i++) {
                                 PicButtonView puzzleSelectionButtonView = puzzleSelectionButtonViewMap.get(Puzzles.getCurrent())[i];
-                                if (puzzleSelectionButtonView != null && puzzleSelectionButtonView instanceof PuzzleSelectionButtonView && puzzleSelectionButtonView.wasPressed()) {
+                                if (puzzleSelectionButtonView instanceof PuzzleSelectionButtonView && puzzleSelectionButtonView.wasPressed()) {
                                     MyMediaPlayer.play("blop");
                                     TouchMonitor.INSTANCE.setTouchUp(false);
 
                                     Puzzle.PuzzleClass puzzleClass = ((PuzzleSelectionButtonView) puzzleSelectionButtonView).getPuzzleReference().getPuzzle((Context) puzzleSelectionViewListener).getPuzzleClass();
 
                                     PuzzleSelectionView.INSTANCE.init((Context) puzzleSelectionViewListener, ((PuzzleSelectionButtonView) puzzleSelectionButtonView).getPuzzleReference(), puzzleSelectionViewListener, PaintManager.INSTANCE.createPaint());
-                                    if (puzzleClass != null && puzzleClass.equals(Puzzle.PuzzleClass.VIP) && !AdManager.isRemoveAds()) {
-                                        popup.setShowPopup(true);
+                                    if (AdManager.isRemoveAds()) {
+                                        PuzzleSelectionView.INSTANCE.setAppearance(Appearance.MAXIMIZED);
+                                    } else if (puzzleClass != null && puzzleClass.equals(Puzzle.PuzzleClass.VIP)) {
+                                        int availableKeys = availableKeysSupplier.get();
+                                        if (availableKeys > 0) {
+                                            useKeyPopup.setShowPopup(true);
+                                        } else {
+                                            rewardedAdPopup.setShowPopup(true);
+                                        }
                                     } else {
                                         PuzzleSelectionView.INSTANCE.setAppearance(Appearance.MAXIMIZED);
                                     }
@@ -465,9 +494,6 @@ public class PuzzleCategorySelectionView extends ScrollableView {
                                 }
                             }
                         }
-                    } else {
-                        popup.onTouchEvent();
-                        TouchMonitor.INSTANCE.setTouchUp(false);
                     }
                 } else {
                     PuzzleSelectionView.INSTANCE.onTouchEvent();
@@ -478,7 +504,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
 
             if (PuzzleSelectionView.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED) ||
                     GameSettings.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED) ||
-                    popup.isShowingPopup()) {
+                    rewardedAdPopup.isShowingPopup() || useKeyPopup.isShowingPopup()) {
                 render();
                 return true;
             }
@@ -489,7 +515,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         return true;
     }
 
-    private void onRewarded(Context context) {
+    private void unlockPuzzle(Context context) {
         refreshPuzzleSelectionButtonView(PuzzleSelectionView.INSTANCE.getPuzzleReference());
         PuzzleSelectionView.INSTANCE.getPuzzleReference().getPuzzle(context.getApplicationContext()).setPuzzleClass(Puzzle.PuzzleClass.FREE);
         PuzzleSelectionView.INSTANCE.getPuzzleReference().writeToSharedPreferences(context.getApplicationContext());
@@ -511,13 +537,37 @@ public class PuzzleCategorySelectionView extends ScrollableView {
             bundle.putString(GameMonitoring.LOAD_VIDEO_AD_ERROR_CODE, loadAdError.toString());
             FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
             mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private int availableKeys(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int keys = sharedPreferences.getInt("keys", 1);
+        return keys;
+    }
+
+    private void useKey(Context context) {
+        int availableKeys = availableKeys(context);
+        SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefsEditor.putInt("keys", availableKeys - 1);
+        prefsEditor.apply();
+
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString(GameMonitoring.REWARDED_AD_OFFER, UNLOCKED_PUZZLE_WITH_KEY);
+            FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+            mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
+        } catch (Exception ignored) {
+        }
     }
 
     public void init(Context context, Paint paint) {
         this.initDone = false;
         PuzzleSelectionView.INSTANCE.setAppearance(Appearance.MINIMIZED);
         backgroundColor = ContextCompat.getColor(context, R.color.puzzleSelectionBackground);
+
+        availableKeysSupplier = () -> availableKeys(context);
 
         socialNetworks = new LinkedList<>();
         socialNetworks.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.facebook_100));
@@ -614,15 +664,33 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         initializedPuzzleSelectionButtons.put(Puzzles.COMPLEX, new HashSet<>(Puzzles.getNumOfPuzzlesPerCategory()));
         initializedPuzzleSelectionButtons.put(Puzzles.COLORFUL, new HashSet<>(Puzzles.getNumOfPuzzlesPerCategory()));
 
-        this.popup = new WatchAdPopup(
+        this.rewardedAdPopup = new WatchAdPopup(
                 context,
                 paint,
                 context.getString(R.string.freePuzzle),
                 BitmapLoader.INSTANCE.getImage(context, R.drawable.puzzle_pink_512),
-                () -> { render(); onRewardedAdOffered(context, false); },
-                () -> { onRewarded(context); onRewardedAdOffered(context, true); },
+                () -> {
+                    render();
+                    onRewardedAdOffered(context, false);
+                },
+                () -> {
+                    unlockPuzzle(context);
+                    onRewardedAdOffered(context, true);
+                },
                 (error) -> onAdFailedToLoad(error, context),
                 this::render
+        );
+
+        this.useKeyPopup = new UseKeyPopup(
+                context,
+                paint,
+                "Unlock weird puzzle?",
+                null,
+                this::render,
+                () -> {
+                    unlockPuzzle(context);
+                    useKey(context);
+                }
         );
 
         this.initDone = true;
