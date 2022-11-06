@@ -295,6 +295,25 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
     }
 
     @Override
+    public void onCloseShopButtonPressed() {
+        if (GameState.getGameState().equals(GameState.MENU)) {
+            MyMediaPlayer.play("blop");
+            menuView.hideShop();
+        }
+    }
+
+    @Override
+    public void onShopButtonPressed() {
+        if (GameState.getGameState().equals(GameState.MENU)) {
+            MyMediaPlayer.play("blop");
+            menuView.showShop();
+            Bundle bundle = new Bundle();
+            bundle.putString(GameMonitoring.CHOOSE_CATEGORY, GameMonitoring.SHOP);
+            mFirebaseAnalytics.logEvent(GameMonitoring.MENU_EVENT, bundle);
+        }
+    }
+
+    @Override
     public void onSmallPuzzleButtonPressed() {
         if (GameState.getGameState().equals(GameState.MENU)) {
             GameState.setGameState(GameState.PUZZLE_SELECTION);
@@ -569,6 +588,10 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
             menuView.render();
         } else if (menuView.isShowVipPopup()) {
             menuView.setShowVipPopup(false);
+            MyMediaPlayer.play("blop");
+            menuView.render();
+        } else if (menuView.getShopView().isShown()) {
+            menuView.getShopView().hide();
             MyMediaPlayer.play("blop");
             menuView.render();
         } else {

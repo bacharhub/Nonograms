@@ -64,6 +64,10 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean showVipPopup;
     private ShopView shopView;
 
+    public ShopView getShopView() {
+        return this.shopView;
+    }
+
     public VipPopup getVipPopup() {
         return vipPopup;
     }
@@ -146,6 +150,14 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    public void showShop() {
+        this.shopView.show();
+    }
+
+    public void hideShop() {
+        this.shopView.hide();
+    }
+
     public void clearBackground() {
         if (background != null) {
             this.background.recycle();
@@ -172,7 +184,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
             this.vipPopup.draw(canvas, paint);
         }
 
-        // shopView.draw(canvas, paint);
+        shopView.draw(canvas, paint);
 
         if (!Puzzles.isFirstLoadingDone()) {
             paint.setColor(darkBackgroundColor);
@@ -221,25 +233,30 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
     public synchronized boolean onTouchEvent(MotionEvent event) {
         if (Puzzles.isFirstLoadingDone() && initDone) {
             menuViewListener.onViewTouched(event);
-            if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED) && YesNoQuestion.INSTANCE.getAppearance().equals(Appearance.MINIMIZED) && !isShowVipPopup()) {
-                for (PicButtonView picButtonView : picButtonViews) {
-                    if (picButtonView.wasPressed()) {
-                        TouchMonitor.INSTANCE.setTouchUp(false);
-                        picButtonView.onButtonPressed();
-                        break;
-                    }
-                }
+            if (shopView.isShown()) {
+                shopView.onTouch();
+                TouchMonitor.INSTANCE.setTouchUp(false);
             } else {
-                if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
-                    menuOptionsView.onTouchEvent();
-                } else if (YesNoQuestion.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
-                    if (TouchMonitor.INSTANCE.touchUp()) {
-                        YesNoQuestion.INSTANCE.onTouchEvent();
+                if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MINIMIZED) && YesNoQuestion.INSTANCE.getAppearance().equals(Appearance.MINIMIZED) && !isShowVipPopup()) {
+                    for (PicButtonView picButtonView : picButtonViews) {
+                        if (picButtonView.wasPressed()) {
+                            TouchMonitor.INSTANCE.setTouchUp(false);
+                            picButtonView.onButtonPressed();
+                            break;
+                        }
                     }
-                } else if (isShowVipPopup()) {
-                    if (TouchMonitor.INSTANCE.touchUp()) {
-                        this.vipPopup.onTouchEvent();
-                        TouchMonitor.INSTANCE.setTouchUp(false);
+                } else {
+                    if (GameSettings.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
+                        menuOptionsView.onTouchEvent();
+                    } else if (YesNoQuestion.INSTANCE.getAppearance().equals(Appearance.MAXIMIZED)) {
+                        if (TouchMonitor.INSTANCE.touchUp()) {
+                            YesNoQuestion.INSTANCE.onTouchEvent();
+                        }
+                    } else if (isShowVipPopup()) {
+                        if (TouchMonitor.INSTANCE.touchUp()) {
+                            this.vipPopup.onTouchEvent();
+                            TouchMonitor.INSTANCE.setTouchUp(false);
+                        }
                     }
                 }
             }
@@ -294,7 +311,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
                 ApplicationSettings.INSTANCE.getScreenWidth() * 52 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() / 11 + ApplicationSettings.INSTANCE.getScreenWidth() * 25 / 100);
 
-        float lineTop = ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 10;
+        float lineTop = ApplicationSettings.INSTANCE.getScreenHeight() * 45 / 100;
         float buttonEdgeLength = ApplicationSettings.INSTANCE.getScreenWidth() * 3 / 13;
         float lineLeft = ApplicationSettings.INSTANCE.getScreenWidth() / 13;
         float horizontalGap = ApplicationSettings.INSTANCE.getScreenWidth() / 13;
@@ -306,10 +323,10 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
                 new ShopButtonView(
                         menuViewListener,
                         new RectF(
-                                300,
-                                300,
-                                300 + buttonEdgeLength,
-                                300 + buttonEdgeLength
+                                lineLeft + (buttonEdgeLength + horizontalGap),
+                                lineTop - verticalGap - buttonEdgeLength,
+                                lineLeft + (buttonEdgeLength + horizontalGap) + buttonEdgeLength,
+                                lineTop + buttonEdgeLength - verticalGap - buttonEdgeLength
                         ),
                         context.getString(R.string.shop),
                         ContextCompat.getColor(context, R.color.shop1),
@@ -325,9 +342,9 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
                 menuViewListener,
                 new RectF(
                         ApplicationSettings.INSTANCE.getScreenWidth() - lineLeft - (buttonEdgeLength * 2 / 3),
-                        lineLeft + lineLeft / 2 + (buttonEdgeLength * 2 / 3),
+                        lineLeft,
                         ApplicationSettings.INSTANCE.getScreenWidth() - lineLeft,
-                        lineLeft + (buttonEdgeLength * 2 / 3) + lineLeft / 2 + (buttonEdgeLength * 2 / 3)
+                        lineLeft + (buttonEdgeLength * 2 / 3)
                 ),
                 Color.LTGRAY,
                 Color.DKGRAY,
@@ -339,9 +356,9 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         picButtonViews.add(settingsButtonView);
 
         RectF promoteVipButtonBounds = new RectF(
-                ApplicationSettings.INSTANCE.getScreenWidth() - lineLeft - (buttonEdgeLength * 2 / 3) * 94 / 70,
                 lineLeft,
-                ApplicationSettings.INSTANCE.getScreenWidth() - lineLeft,
+                lineLeft,
+                lineLeft + (buttonEdgeLength * 2 / 3) * 94 / 70,
                 lineLeft + (buttonEdgeLength * 2 / 3)
         );
 

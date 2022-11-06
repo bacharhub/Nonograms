@@ -28,6 +28,6 @@ public class ShopButtonView extends LabeledPicButtonView {
 
     @Override
     public void onButtonPressed() {
-        ((MenuViewListener)viewListener).onSmallPuzzleButtonPressed();
+        ((MenuViewListener)viewListener).onShopButtonPressed();
     }
 }
