@@ -688,7 +688,7 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         this.useKeyPopup = new UseKeyPopup(
                 context,
                 paint,
-                "Unlock weird puzzle?",
+                context.getString(R.string.use_key_question),
                 null,
                 this::render,
                 () -> {
