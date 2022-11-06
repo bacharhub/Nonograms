@@ -80,9 +80,9 @@ public class ShopView {
 
     private void drawClues(Canvas canvas, Paint paint) {
         paint.setColor(Color.WHITE);
-        int gap = ApplicationSettings.INSTANCE.getScreenWidth() * 10 / 100;
-        int verticalItemWidth = ApplicationSettings.INSTANCE.getScreenWidth() * 35 / 100;
-        int verticalItemHeight = ApplicationSettings.INSTANCE.getScreenHeight() * 25 / 100;
+        int gap = ApplicationSettings.INSTANCE.getScreenWidth() * 7 / 100;
+        int verticalItemWidth = ApplicationSettings.INSTANCE.getScreenWidth() * 24 / 100;
+        int verticalItemHeight = ApplicationSettings.INSTANCE.getScreenHeight() * 18 / 100;
 
         canvas.drawRoundRect(
                 new RectF(
@@ -102,10 +102,42 @@ public class ShopView {
 
         canvas.drawRoundRect(
                 new RectF(
+                        3 * gap + 2 * verticalItemWidth,
+                        280,
+                        3 * gap + 3 * verticalItemWidth,
+                        280 + verticalItemHeight
+                ), 45, 45, paint);
+
+        canvas.drawRoundRect(
+                new RectF(
                         gap,
                         280 + verticalItemHeight + gap,
+                        gap + verticalItemWidth,
+                        280 + verticalItemHeight + gap + verticalItemHeight
+                ), 45, 45, paint);
+
+        canvas.drawRoundRect(
+                new RectF(
+                        2 * gap + verticalItemWidth,
+                        280 + verticalItemHeight + gap,
                         2 * gap + 2 * verticalItemWidth,
-                        280 + verticalItemHeight + gap + verticalItemWidth
+                        280 + verticalItemHeight + gap + verticalItemHeight
+                ), 45, 45, paint);
+
+        canvas.drawRoundRect(
+                new RectF(
+                        3 * gap + 2 * verticalItemWidth,
+                        280 + verticalItemHeight + gap,
+                        3 * gap + 3 * verticalItemWidth,
+                        280 + verticalItemHeight + gap + verticalItemHeight
+                ), 45, 45, paint);
+
+        canvas.drawRoundRect(
+                new RectF(
+                        gap,
+                        280 + verticalItemHeight + gap + verticalItemHeight + gap,
+                        3 * gap + 3 * verticalItemWidth,
+                        280 + verticalItemHeight + gap + verticalItemHeight + gap + verticalItemHeight
                 ), 45, 45, paint);
     }
 
