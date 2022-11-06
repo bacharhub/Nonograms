@@ -61,6 +61,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
 
     private VipPopup vipPopup;
     private boolean showVipPopup;
+    private ShopView shopView;
 
     public VipPopup getVipPopup() {
         return vipPopup;
@@ -170,6 +171,8 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
             this.vipPopup.draw(canvas, paint);
         }
 
+        shopView.draw(canvas, paint);
+
         if (!Puzzles.isFirstLoadingDone()) {
             paint.setColor(darkBackgroundColor);
             canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
@@ -255,6 +258,8 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
 
         backgroundColor = ContextCompat.getColor(context, R.color.menuBackground);
         darkBackgroundColor = ContextCompat.getColor(context, R.color.gameSettingsBackground);
+        shopView = new ShopView();
+        shopView.init(context);
 
         food = new LinkedList<>();
         food.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.bread_100));

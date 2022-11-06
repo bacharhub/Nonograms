@@ -24,6 +24,7 @@
     <color name="menuBackground">#FCFBE3</color>
     <color name="lotteryBackground">#EDEDED</color>
     <color name="gameSettingsBackground">#BB000000</color>
+    <color name="shopBackground">#DD000000</color>
     <color name="gameSettingsWindowGradientTo">#C6C5AB</color>
     <color name="gameSettingsWindowBackground">#9B9A81</color>
     <color name="puzzleSelectionBackground">#FCE6E3</color>
