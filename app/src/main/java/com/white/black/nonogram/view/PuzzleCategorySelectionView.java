@@ -160,6 +160,10 @@ public class PuzzleCategorySelectionView extends ScrollableView {
         update((((Puzzles.getCurrent().getPuzzleReferences().size() - 1) / NUM_OF_PUZZLES_A_ROW) + 1) * (puzzleHeight + verticalGapBetweenPuzzles), PUZZLES_TOP, PUZZLES_BOTTOM);
     }
 
+    public void stopScrolling() {
+        verticalBoost = 0;
+    }
+
     public void clearBitmapByCategory(Puzzles category) {
         if (puzzleSelectionButtonViewMap != null) {
             PicButtonView[] listPuzzleSelectionButtonView = puzzleSelectionButtonViewMap.get(category);

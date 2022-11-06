@@ -132,6 +132,7 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
 
             puzzleCategorySelectionView.render();
         } else {
+            puzzleCategorySelectionView.stopScrolling();
             GameState.setGameState(GameState.MENU);
             PuzzleSelectionActivity.this.finish();
             this.overridePendingTransition(0, R.anim.leave);

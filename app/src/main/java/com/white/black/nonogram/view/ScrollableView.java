@@ -84,22 +84,30 @@ public abstract class ScrollableView extends SurfaceView implements SurfaceHolde
             return;
         }
 
-        new Thread(() -> synchronizedUpdate(viewHeight, viewTop, viewBottom)).start();
+        new Thread(() -> {
+            try {
+                synchronizedUpdate(viewHeight, viewTop, viewBottom);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    private synchronized void synchronizedUpdate(int viewHeight, int viewTop, int viewBottom) {
+    private synchronized void synchronizedUpdate(int viewHeight, int viewTop, int viewBottom) throws InterruptedException {
         do {
-            boolean isAcceleratingBeforeScroll = isAccelerating();
-
             scroll(
                     viewBottom - viewHeight,
                     viewTop
             );
 
-            if (PaintManager.INSTANCE.isReadyToRender(System.currentTimeMillis()) || (isAcceleratingBeforeScroll && !isAccelerating())) {
-                render();
-                PaintManager.INSTANCE.setLastRenderingTime(System.currentTimeMillis());
-            }
+            long lastRenderingTimestamp = PaintManager.INSTANCE.getLastRenderingTime();
+            long now = System.currentTimeMillis();
+            long duration = now - lastRenderingTimestamp;
+            long timeToSleep = Math.max(5, 16 - duration);
+
+            Thread.sleep(timeToSleep);
+            PaintManager.INSTANCE.setLastRenderingTime(now);
+            render();
         } while (isAccelerating());
     }
 

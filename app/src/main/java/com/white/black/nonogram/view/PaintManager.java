@@ -20,6 +20,10 @@ public enum PaintManager {
         this.lastRenderingTime = lastRenderingTime;
     }
 
+    public long getLastRenderingTime() {
+        return this.lastRenderingTime;
+    }
+
     public void setReadyToRender() {
         this.lastRenderingTime = 0;
     }
