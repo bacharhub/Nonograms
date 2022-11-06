@@ -31,6 +31,7 @@ import com.white.black.nonogram.view.buttons.menu.NormalPuzzleButtonView;
 import com.white.black.nonogram.view.buttons.PicButtonView;
 import com.white.black.nonogram.view.buttons.menu.MenuSettingsButtonView;
 import com.white.black.nonogram.view.buttons.menu.PromoteVipButtonView;
+import com.white.black.nonogram.view.buttons.menu.ShopButtonView;
 import com.white.black.nonogram.view.buttons.menu.SmallPuzzleButtonView;
 import com.white.black.nonogram.view.listeners.MenuViewListener;
 import com.white.black.nonogram.view.listeners.ViewListener;
@@ -108,8 +109,8 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
             } else {
                 paint.setColor(backgroundColor);
                 canvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
-                canvas.drawBitmap(sun, null, sunBounds, paint);
-                canvas.drawBitmap(pencil, null, pencilBounds, paint);
+                // canvas.drawBitmap(sun, null, sunBounds, paint);
+                // canvas.drawBitmap(pencil, null, pencilBounds, paint);
             }
 
             return;
@@ -128,8 +129,8 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
 
             paint.setColor(backgroundColor);
             tempCanvas.drawRect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), paint);
-            tempCanvas.drawBitmap(sun, null, sunBounds, paint);
-            tempCanvas.drawBitmap(pencil, null, pencilBounds, paint);
+            // tempCanvas.drawBitmap(sun, null, sunBounds, paint);
+            // tempCanvas.drawBitmap(pencil, null, pencilBounds, paint);
             paint.setAlpha(30);
             int foodItemDrawnCounter = 0;
             for (int x = 0; x < ApplicationSettings.INSTANCE.getScreenWidth(); x += 150) {
@@ -171,7 +172,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
             this.vipPopup.draw(canvas, paint);
         }
 
-        shopView.draw(canvas, paint);
+        // shopView.draw(canvas, paint);
 
         if (!Puzzles.isFirstLoadingDone()) {
             paint.setColor(darkBackgroundColor);
@@ -300,6 +301,25 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         float verticalGap = ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 14;
 
         picButtonViews = new LinkedList<>();
+
+        picButtonViews.add(
+                new ShopButtonView(
+                        menuViewListener,
+                        new RectF(
+                                300,
+                                300,
+                                300 + buttonEdgeLength,
+                                300 + buttonEdgeLength
+                        ),
+                        context.getString(R.string.shop),
+                        ContextCompat.getColor(context, R.color.shop1),
+                        ContextCompat.getColor(context, R.color.shop2),
+                        ContextCompat.getColor(context, R.color.shop3),
+                        new Bitmap[]{BitmapLoader.INSTANCE.getImage(context, R.drawable.online_store_64)},
+                        context,
+                        paint
+                )
+        );
 
         MenuSettingsButtonView settingsButtonView = new MenuSettingsButtonView(
                 menuViewListener,
