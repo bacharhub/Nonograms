@@ -1,4 +1,4 @@
-package com.white.black.nonogram.view.buttons;
+package com.white.black.nonogram.view.buttons.shop;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,12 +6,13 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
+import com.white.black.nonogram.view.buttons.PicButtonView;
 import com.white.black.nonogram.view.listeners.MenuViewListener;
 import com.white.black.nonogram.view.listeners.ViewListener;
 
-public class LeaveShopButton extends PicButtonView {
+public class LeaveShopButtonView extends PicButtonView {
 
-    public LeaveShopButton(ViewListener viewListener, RectF bounds, int color1, int color2, int color3, Bitmap[] innerImages, Context context, Paint paint) {
+    public LeaveShopButtonView(ViewListener viewListener, RectF bounds, int color1, int color2, int color3, Bitmap[] innerImages, Context context, Paint paint) {
         super(viewListener, bounds, color1, color2, color3, innerImages, new RectF(
                 bounds.left + bounds.width() * 1 / 10,
                 bounds.top + bounds.height() * 1 / 10,

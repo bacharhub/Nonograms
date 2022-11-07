@@ -66,5 +66,6 @@ public class MyMediaPlayer {
         this.mediaPlayers.put("select", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.select), 1f));
         this.mediaPlayers.put("blop", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.blop), 1f));
         this.mediaPlayers.put("victory", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.victory), 0.7f));
+        this.mediaPlayers.put("purchase", new MediaPlayerProxy(MediaPlayer.create(context, R.raw.purchase), 0.7f));
     }
 }

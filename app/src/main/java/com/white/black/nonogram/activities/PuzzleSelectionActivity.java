@@ -419,12 +419,17 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
         bundle.putString(GameMonitoring.VIP, GameMonitoring.VIP_PROMOTION_APPEARED);
         mFirebaseAnalytics.logEvent(GameMonitoring.GALLERY_EVENT, bundle);
         MyMediaPlayer.play("blop");
-        puzzleCategorySelectionView.getVipPopup().update();
+        puzzleCategorySelectionView.getUseKeyVipPopup().update();
+        puzzleCategorySelectionView.getRewardedAdVipPopup().update();
+
         if (AdManager.isRemoveAds()) {
+            puzzleCategorySelectionView.setShowUseKeyVipPopup(true);
             puzzleCategorySelectionView.setShowRewardedAdVipPopup(true);
             puzzleCategorySelectionView.render();
         } else {
-            puzzleCategorySelectionView.getVipPopup().setPrice(getString(R.string.loading));
+            puzzleCategorySelectionView.getUseKeyVipPopup().setPrice(getString(R.string.loading));
+            puzzleCategorySelectionView.setShowUseKeyVipPopup(true);
+            puzzleCategorySelectionView.getRewardedAdVipPopup().setPrice(getString(R.string.loading));
             puzzleCategorySelectionView.setShowRewardedAdVipPopup(true);
             puzzleCategorySelectionView.render();
             onPromoteVipPressed(PuzzleSelectionActivity.this);
@@ -433,6 +438,7 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
 
     private void onBillingSetupFailed(Context context) {
         puzzleCategorySelectionView.setShowRewardedAdVipPopup(false);
+        puzzleCategorySelectionView.setShowUseKeyVipPopup(false);
         puzzleCategorySelectionView.render();
         Handler mainHandler = new Handler(context.getMainLooper());
         mainHandler.post(
@@ -448,26 +454,34 @@ public class PuzzleSelectionActivity extends Activity implements PuzzleSelection
                 () -> onBillingSetupFailed(PuzzleSelectionActivity.this),
                 this::onRemoveAdsPurchaseFound,
                 () -> {
+                    puzzleCategorySelectionView.setShowUseKeyVipPopup(false);
+                    puzzleCategorySelectionView.setUseKeyShowPopupFalse();
                     puzzleCategorySelectionView.setShowRewardedAdVipPopup(false);
-                    puzzleCategorySelectionView.setShowPopupFalse();
+                    puzzleCategorySelectionView.setRewardedAdShowPopupFalse();
                     puzzleCategorySelectionView.clearAllBitmaps();
                     puzzleCategorySelectionView.render();
                 },
                 this::itemAlreadyOwned,
-                () -> puzzleCategorySelectionView.getVipPopup().getPopup().setAnswered(AdManager.isRemoveAds()),
+                () -> {
+                    puzzleCategorySelectionView.getRewardedAdVipPopup().getPopup().setAnswered(AdManager.isRemoveAds());
+                    puzzleCategorySelectionView.getUseKeyVipPopup().getPopup().setAnswered(AdManager.isRemoveAds());
+                },
                 mFirebaseAnalytics
         );
     }
 
     private void onRemoveAdsPurchaseFound(String price) {
-        puzzleCategorySelectionView.getVipPopup().setPrice(price);
+        puzzleCategorySelectionView.getRewardedAdVipPopup().setPrice(price);
         puzzleCategorySelectionView.setShowRewardedAdVipPopup(true);
+        puzzleCategorySelectionView.getUseKeyVipPopup().setPrice(price);
+        puzzleCategorySelectionView.setShowUseKeyVipPopup(true);
         puzzleCategorySelectionView.render();
     }
 
     private void itemAlreadyOwned() {
         AdManager.setRemoveAdsTrue(PuzzleSelectionActivity.this.getApplicationContext());
-        puzzleCategorySelectionView.setShowPopupFalse();
+        puzzleCategorySelectionView.setRewardedAdShowPopupFalse();
+        puzzleCategorySelectionView.setUseKeyShowPopupFalse();
         puzzleCategorySelectionView.clearAllBitmaps();
         puzzleCategorySelectionView.render();
         Bundle bundle = new Bundle();

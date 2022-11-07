@@ -6,12 +6,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Shader;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MotionEvent;
@@ -78,8 +75,12 @@ public class PuzzleCategorySelectionView extends ScrollableView {
 
     private final ExecutorService pool = Executors.newFixedThreadPool(4);
 
-    public VipPopup getVipPopup() {
+    public VipPopup getRewardedAdVipPopup() {
         return rewardedAdPopup.getVipPopup();
+    }
+
+    public VipPopup getUseKeyVipPopup() {
+        return useKeyPopup.getVipPopup();
     }
 
     public boolean isShowingRewardedAdVipPopup() {
@@ -101,8 +102,12 @@ public class PuzzleCategorySelectionView extends ScrollableView {
     private WatchAdPopup rewardedAdPopup;
     private UseKeyPopup useKeyPopup;
 
-    public void setShowPopupFalse() {
+    public void setRewardedAdShowPopupFalse() {
         this.rewardedAdPopup.setShowPopup(false);
+    }
+
+    public void setUseKeyShowPopupFalse() {
+        this.useKeyPopup.setShowPopup(false);
     }
 
     public boolean isShowingRewardedAdPopup() {

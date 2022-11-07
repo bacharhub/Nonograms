@@ -130,7 +130,12 @@ class OptionsView {
                 (ViewListener)context,
                 context.getString(R.string.sound),
                 soundButtonBounds,
-                toolbarColor, toolbarBackgroundColor, ContextCompat.getColor(context, R.color.settingsBrown3), new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.audio_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.mute_black_white_100)}, context, paint);
+                toolbarColor,
+                toolbarBackgroundColor,
+                ContextCompat.getColor(context, R.color.settingsBrown3),
+                new Bitmap[] {BitmapLoader.INSTANCE.getImage(context, R.drawable.audio_100), BitmapLoader.INSTANCE.getImage(context, R.drawable.mute_black_white_100)},
+                context,
+                paint);
 
         RectF icons8ButtonBounds = new RectF(
                 toolbarBounds.left + (toolbarBounds.width() - horizontalButtonWidth) / 2,

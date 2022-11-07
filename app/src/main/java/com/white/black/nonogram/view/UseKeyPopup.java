@@ -35,6 +35,10 @@ public class UseKeyPopup {
     private PromoteVipButtonView promoteVipButtonView;
     private int darkBackgroundColor;
 
+    public VipPopup getVipPopup() {
+        return this.vipPopup;
+    }
+
     public UseKeyPopup(
             Context context,
             Paint paint,

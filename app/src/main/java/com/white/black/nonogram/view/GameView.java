@@ -497,7 +497,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void onPuzzleFinishedReward(Context context, int numOfCoins) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int coins = sharedPreferences.getInt("coins", (Puzzles.numOfSolvedPuzzles(context) - 1) * 15);
+        int coins = sharedPreferences.getInt("coins", (Puzzles.numOfSolvedPuzzles(context) - 1) * 10);
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         prefsEditor.putInt("coins", coins + numOfCoins);
         prefsEditor.apply();
@@ -522,7 +522,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         PuzzleSelectionView.INSTANCE.getSelectedPuzzle().finish();
                         ((GameMonitoringListener) gameViewListener).onFinishPuzzle();
                         if (PuzzleSelectionView.INSTANCE.getOverallPuzzle().isDone()) {
-                            int numOfWonCoins = isRemoveAds() ? 45 : 15;
+                            int numOfWonCoins = isRemoveAds() ? 40 : 10;
                             onPuzzleFinishedReward((Context) gameViewListener, numOfWonCoins);
                         } else {
                             gameViewListener.onNextPuzzleButtonPressed();
@@ -741,7 +741,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private void onRewarded(Context context) {
         int numberOfAvailableClues = gameViewListener.numOfAvailableClues();
         SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        prefsEditor.putInt("clue_count", numberOfAvailableClues + 5);
+        prefsEditor.putInt("clue_count", numberOfAvailableClues + 3);
         prefsEditor.apply();
     }
 

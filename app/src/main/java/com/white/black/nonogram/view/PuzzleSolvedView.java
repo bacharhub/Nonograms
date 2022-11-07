@@ -4,6 +4,7 @@ import static com.white.black.nonogram.AdManager.isRemoveAds;
 import static com.white.black.nonogram.GameMonitoring.REWARDED_AD_EXTRA_COINS;
 import static com.white.black.nonogram.GameMonitoring.REWARDED_AD_EXTRA_COINS_CANCELED;
 import static com.white.black.nonogram.Puzzles.numOfSolvedPuzzles;
+import static com.white.black.nonogram.utils.SharedPreferenceUtils.coinsAvailable;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -219,12 +220,6 @@ class PuzzleSolvedView {
             mFirebaseAnalytics.logEvent(GameMonitoring.GAME_EVENT, bundle);
         } catch (Exception ignored) {
         }
-    }
-
-    private int coinsAvailable(Context context) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int coins = sharedPreferences.getInt("coins", Puzzles.numOfSolvedPuzzles(context) * 15);
-        return coins;
     }
 
     public void init(Context context, Paint paint) {
@@ -475,7 +470,7 @@ class PuzzleSolvedView {
         paint.setTextSize(PuzzleSelectionView.getPuzzleSolvingTimeDescFontSize());
         paint.setColor(Color.BLACK);
         canvas.drawText(puzzle.getSolvingTimeHumanFormat(), clockBounds.right + clockBounds.width() / 4, clockBounds.centerY() + PuzzleSelectionView.INSTANCE.getPuzzleSolvingTimeDescHeight() / 2, paint);
-        String numOfCoinsEarned = isVideoWatched ? "+45" : "+15";
+        String numOfCoinsEarned = isVideoWatched ? "+40" : "+10";
         canvas.drawText(numOfCoinsEarned, clockBounds.right + clockBounds.width() / 4, coinBounds.centerY() + PuzzleSelectionView.INSTANCE.getPuzzleSolvingTimeDescHeight() / 2, paint);
         paint.setTextSize(PuzzleSelectionView.getPuzzleDimensionsFontSize());
         float distFromEdge = windowInnerBackgroundBounds.width() / 30;

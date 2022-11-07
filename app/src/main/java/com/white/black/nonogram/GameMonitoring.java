@@ -31,6 +31,14 @@ public class GameMonitoring {
     public static final String TUTORIAL_PUZZLE = "tutorial_puzzle";
     public static final String SMALL_PUZZLES = "small_puzzles";
     public static final String SHOP = "shop";
+    public static final String SHOP_ENTERED = "shop_entered";
+    public static final String SHOP_LEFT = "shop_left";
+    public static final String SHOP_CLUE_1_PURCHASE = "clue_1_purchase";
+    public static final String SHOP_CLUE_10_PURCHASE = "clue_10_purchase";
+    public static final String SHOP_CLUE_50_PURCHASE = "clue_50_purchase";
+    public static final String SHOP_KEY_1_PURCHASE = "key_1_purchase";
+    public static final String SHOP_KEY_5_PURCHASE = "key_5_purchase";
+    public static final String SHOP_KEY_20_PURCHASE = "key_20_purchase";
     public static final String NORMAL_PUZZLES = "normal_puzzles";
     public static final String LARGE_PUZZLES = "large_puzzles";
     public static final String COMPLEX_PUZZLES = "complex_puzzles";

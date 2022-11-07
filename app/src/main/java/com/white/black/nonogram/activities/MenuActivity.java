@@ -299,6 +299,9 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         if (GameState.getGameState().equals(GameState.MENU)) {
             MyMediaPlayer.play("blop");
             menuView.hideShop();
+            Bundle bundle = new Bundle();
+            bundle.putString(GameMonitoring.SHOP, GameMonitoring.SHOP_LEFT);
+            mFirebaseAnalytics.logEvent(GameMonitoring.MENU_EVENT, bundle);
         }
     }
 
@@ -308,7 +311,7 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
             MyMediaPlayer.play("blop");
             menuView.showShop();
             Bundle bundle = new Bundle();
-            bundle.putString(GameMonitoring.CHOOSE_CATEGORY, GameMonitoring.SHOP);
+            bundle.putString(GameMonitoring.SHOP, GameMonitoring.SHOP_ENTERED);
             mFirebaseAnalytics.logEvent(GameMonitoring.MENU_EVENT, bundle);
         }
     }

@@ -22,7 +22,6 @@ import com.white.black.nonogram.MemoryManager;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
 import com.white.black.nonogram.TouchMonitor;
-import com.white.black.nonogram.activities.MenuActivity;
 import com.white.black.nonogram.view.buttons.menu.ColorfulPuzzleButtonView;
 import com.white.black.nonogram.view.buttons.menu.ComplexPuzzleButtonView;
 import com.white.black.nonogram.view.buttons.menu.LargePuzzleButtonView;
@@ -31,7 +30,7 @@ import com.white.black.nonogram.view.buttons.menu.NormalPuzzleButtonView;
 import com.white.black.nonogram.view.buttons.PicButtonView;
 import com.white.black.nonogram.view.buttons.menu.MenuSettingsButtonView;
 import com.white.black.nonogram.view.buttons.menu.PromoteVipButtonView;
-import com.white.black.nonogram.view.buttons.menu.ShopButtonView;
+import com.white.black.nonogram.view.buttons.shop.MenuShopButtonView;
 import com.white.black.nonogram.view.buttons.menu.SmallPuzzleButtonView;
 import com.white.black.nonogram.view.listeners.MenuViewListener;
 import com.white.black.nonogram.view.listeners.ViewListener;
@@ -277,7 +276,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         backgroundColor = ContextCompat.getColor(context, R.color.menuBackground);
         darkBackgroundColor = ContextCompat.getColor(context, R.color.gameSettingsBackground);
         shopView = new ShopView();
-        shopView.init(context);
+        shopView.init(context, paint);
 
         food = new LinkedList<>();
         food.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.bread_100));
@@ -320,7 +319,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         picButtonViews = new LinkedList<>();
 
         picButtonViews.add(
-                new ShopButtonView(
+                new MenuShopButtonView(
                         menuViewListener,
                         new RectF(
                                 lineLeft + (buttonEdgeLength + horizontalGap),

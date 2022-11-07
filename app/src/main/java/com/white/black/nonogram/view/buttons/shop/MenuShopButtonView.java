@@ -1,4 +1,4 @@
-package com.white.black.nonogram.view.buttons.menu;
+package com.white.black.nonogram.view.buttons.shop;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,9 +9,9 @@ import android.graphics.RectF;
 import com.white.black.nonogram.view.buttons.LabeledPicButtonView;
 import com.white.black.nonogram.view.listeners.MenuViewListener;
 
-public class ShopButtonView extends LabeledPicButtonView {
+public class MenuShopButtonView extends LabeledPicButtonView {
 
-    public ShopButtonView(MenuViewListener menuViewListener, RectF bounds, String description, int color1, int color2, int color3, Bitmap[] innerImages, Context context, Paint paint) {
+    public MenuShopButtonView(MenuViewListener menuViewListener, RectF bounds, String description, int color1, int color2, int color3, Bitmap[] innerImages, Context context, Paint paint) {
         super(menuViewListener, bounds, description, color1, color2, color3, innerImages, new RectF(
                 bounds.left + bounds.width() * 15 / 100,
                 bounds.top + bounds.height() * 15 / 100,

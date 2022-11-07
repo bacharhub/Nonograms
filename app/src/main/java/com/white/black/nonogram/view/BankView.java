@@ -1,5 +1,7 @@
 package com.white.black.nonogram.view;
 
+import static com.white.black.nonogram.utils.SharedPreferenceUtils.coinsAvailable;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -161,12 +163,6 @@ public class BankView {
                 cluesBankWindowBounds.left + 30 + 128,
                 cluesBankWindowBounds.centerY() + 64
         );
-    }
-
-    private int coinsAvailable(Context context) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int coins = sharedPreferences.getInt("coins", Puzzles.numOfSolvedPuzzles(context) * 15);
-        return coins;
     }
 
     private int availableKeys(Context context) {
