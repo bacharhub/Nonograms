@@ -187,6 +187,7 @@ public enum Puzzles {
         addPuzzleReference(context.getString(R.string.scooter), 16, R.drawable.scooter_16); // 05:35
         addPuzzleReference(context.getString(R.string.car), 16, R.drawable.car_16); // 05:53
         addPuzzleReference(context.getString(R.string.bus), 16, R.drawable.bus_16); // 05:57
+        addPuzzleReference( context.getString(R.string.doughnut), 16, R.drawable.doughnut_14); // 06:18
         addPuzzleReference(context.getString(R.string.emoji), 15, R.drawable.emoji_15); // 07:02
     }
 
