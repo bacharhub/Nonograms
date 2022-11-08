@@ -1,6 +1,8 @@
 package com.white.black.nonogram.view.listeners;
 
 public interface MenuViewListener extends ViewListener {
+    void onClaimDailyRewardButtonPressed();
+
     void onCloseShopButtonPressed();
 
     void onShopButtonPressed();

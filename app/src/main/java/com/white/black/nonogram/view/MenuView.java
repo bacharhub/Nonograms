@@ -62,6 +62,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
     private VipPopup vipPopup;
     private boolean showVipPopup;
     private ShopView shopView;
+    private DailyRewardView dailyRewardView;
 
     public ShopView getShopView() {
         return this.shopView;
@@ -184,6 +185,7 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         shopView.draw(canvas, paint);
+        dailyRewardView.draw(canvas, paint);
 
         if (!Puzzles.isFirstLoadingDone()) {
             paint.setColor(darkBackgroundColor);
@@ -277,6 +279,8 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         darkBackgroundColor = ContextCompat.getColor(context, R.color.gameSettingsBackground);
         shopView = new ShopView();
         shopView.init(context, paint);
+        dailyRewardView = new DailyRewardView();
+        dailyRewardView.init(context, paint);
 
         food = new LinkedList<>();
         food.add(BitmapLoader.INSTANCE.getImage(context, R.drawable.bread_100));

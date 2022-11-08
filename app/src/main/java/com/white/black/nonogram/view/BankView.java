@@ -1,5 +1,6 @@
 package com.white.black.nonogram.view;
 
+import static com.white.black.nonogram.utils.SharedPreferenceUtils.cluesAvailable;
 import static com.white.black.nonogram.utils.SharedPreferenceUtils.coinsAvailable;
 
 import android.content.Context;
@@ -131,7 +132,7 @@ public class BankView {
         );
 
         clue = BitmapLoader.INSTANCE.getImage(context, R.drawable.bulb_512);
-        availableCluesSupplier = () -> availableClues(context);
+        availableCluesSupplier = () -> cluesAvailable(context);
         cluesColor1 = ContextCompat.getColor(context, R.color.colorfulPuzzlePink1);
         cluesColor2 = ContextCompat.getColor(context, R.color.colorfulPuzzlePink2);
         cluesColor3 = ContextCompat.getColor(context, R.color.colorfulPuzzlePink3);
@@ -169,12 +170,6 @@ public class BankView {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         int keys = sharedPreferences.getInt("keys", 0);
         return keys;
-    }
-
-    private int availableClues(Context context) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int clues = sharedPreferences.getInt("clue_count", 3);
-        return clues;
     }
 
     public void draw(Canvas canvas, Paint paint) {

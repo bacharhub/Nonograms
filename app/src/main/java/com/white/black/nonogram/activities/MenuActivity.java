@@ -295,6 +295,11 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
     }
 
     @Override
+    public void onClaimDailyRewardButtonPressed() {
+
+    }
+
+    @Override
     public void onCloseShopButtonPressed() {
         if (GameState.getGameState().equals(GameState.MENU)) {
             MyMediaPlayer.play("blop");

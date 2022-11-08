@@ -1,6 +1,7 @@
 package com.white.black.nonogram.activities;
 
 import static com.white.black.nonogram.Puzzles.numOfSolvedPuzzles;
+import static com.white.black.nonogram.utils.SharedPreferenceUtils.cluesAvailable;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 import android.app.Activity;
@@ -103,8 +104,7 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
 
     @Override
     public int numOfAvailableClues() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(GameActivity.this);
-        return sharedPreferences.getInt("clue_count", 3);
+        return cluesAvailable(GameActivity.this);
     }
 
     @Override

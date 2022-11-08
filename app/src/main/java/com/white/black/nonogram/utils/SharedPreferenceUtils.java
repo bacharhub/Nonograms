@@ -20,9 +20,15 @@ public class SharedPreferenceUtils {
         prefsEditor.apply();
     }
 
+    public static void addToCoins(Context context, int numOfCoinsToAdd) {
+        SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefsEditor.putInt("coins", coinsAvailable(context) + numOfCoinsToAdd);
+        prefsEditor.apply();
+    }
+
     public static int cluesAvailable(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getInt("clue_count", 3);
+        return sharedPreferences.getInt("clue_count", 0);
     }
 
     public static void addToClueCount(Context context, int numOfCluesToAdd) {
@@ -39,6 +45,29 @@ public class SharedPreferenceUtils {
     public static void addToKeyCount(Context context, int numOfKeysToAdd) {
         SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         prefsEditor.putInt("keys", keysAvailable(context) + numOfKeysToAdd);
+        prefsEditor.apply();
+    }
+
+    public static long lastRewardTimestamp(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        long lastRewardTimestamp = sharedPreferences.getLong("last_reward_timestamp", 0);
+        return System.currentTimeMillis() - lastRewardTimestamp;
+    }
+
+    public static void updateLastRewardTimestamp(Context context) {
+        SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefsEditor.putLong("last_reward_timestamp", System.currentTimeMillis());
+        prefsEditor.apply();
+    }
+
+    public static int lastRewardDay(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getInt("last_reward_day", 1);
+    }
+
+    public static void incrementLastRewardDay(Context context) {
+        SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefsEditor.putLong("last_reward_day", lastRewardDay(context) + 1);
         prefsEditor.apply();
     }
 }
