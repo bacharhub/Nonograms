@@ -48,7 +48,7 @@ public class SharedPreferenceUtils {
         prefsEditor.apply();
     }
 
-    public static long lastRewardTimestamp(Context context) {
+    public static long timePassedSinceLastRewardTimestamp(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         long lastRewardTimestamp = sharedPreferences.getLong("last_reward_timestamp", 0);
         return System.currentTimeMillis() - lastRewardTimestamp;

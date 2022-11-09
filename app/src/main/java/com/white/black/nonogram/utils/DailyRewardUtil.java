@@ -5,7 +5,7 @@ import static com.white.black.nonogram.utils.SharedPreferenceUtils.addToCoins;
 import static com.white.black.nonogram.utils.SharedPreferenceUtils.addToKeyCount;
 import static com.white.black.nonogram.utils.SharedPreferenceUtils.incrementLastRewardDay;
 import static com.white.black.nonogram.utils.SharedPreferenceUtils.lastRewardDay;
-import static com.white.black.nonogram.utils.SharedPreferenceUtils.lastRewardTimestamp;
+import static com.white.black.nonogram.utils.SharedPreferenceUtils.timePassedSinceLastRewardTimestamp;
 import static com.white.black.nonogram.utils.SharedPreferenceUtils.updateLastRewardTimestamp;
 
 import android.content.Context;
@@ -44,7 +44,7 @@ public class DailyRewardUtil {
     }
 
     public boolean isTimeForDailyReward(Context context) {
-        return lastRewardTimestamp(context) > DAILY_REWARD_INTERVAL;
+        return timePassedSinceLastRewardTimestamp(context) > DAILY_REWARD_INTERVAL;
     }
 
     public void claimReward(Context context) {
