@@ -647,12 +647,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         if (multiTouchBrushButtonView.wasPressed()) {
             boardView.editSlotRouter(BoardInputValue.BRUSH, colorInputValueButtonGroup.getCurrentPressedVal());
+            ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.PAINTBRUSH);
         } else if (multiTouchDisqualifyButtonView.wasPressed()) {
             boardView.editSlotRouter(BoardInputValue.DISQUALIFY, colorInputValueButtonGroup.getCurrentPressedVal());
+            ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.DISQUALIFY);
         } else if (multiTouchEraserButtonView.wasPressed()) {
             boardView.editSlotRouter(BoardInputValue.ERASER, colorInputValueButtonGroup.getCurrentPressedVal());
+            ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.ERASER);
         } else if (multiTouchQuestionButtonView.wasPressed()) {
             boardView.editSlotRouter(BoardInputValue.QUESTION_MARK, colorInputValueButtonGroup.getCurrentPressedVal());
+            ((GameMonitoringListener) gameViewListener).onToolbarButtonPressed(GameMonitoring.QUESTION_MARK);
         }
 
         if (multiTouchBrushButtonView.isPressed() || multiTouchDisqualifyButtonView.isPressed() || multiTouchEraserButtonView.isPressed() || multiTouchQuestionButtonView.isPressed()) {

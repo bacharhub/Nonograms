@@ -60,6 +60,10 @@ public class GameMonitoring {
     public static final String CLUE = "clue";
     public static final String UNDO = "undo";
     public static final String REDO = "redo";
+    public static final String PAINTBRUSH = "paintbrush";
+    public static final String DISQUALIFY = "disqualify";
+    public static final String ERASER = "eraser";
+    public static final String QUESTION_MARK = "question_mark";
     public static final String REMOVE_ADS_PURCHASED = "remove_ads_purchased";
     public static final String REMOVE_ADS_ALREADY_OWNED = "remove_ads_already_owned";
     public static final String REMOVE_ADS_CANCELED = "remove_ads_canceled";
