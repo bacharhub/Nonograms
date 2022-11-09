@@ -342,7 +342,13 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                     gameView.render();
                     long end = System.currentTimeMillis();
                     long duration = end - start;
-                    long timeToSleep = Math.max(5, 16 - duration);
+                    long timeToSleep;
+                    if (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isTutorial() || PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isDone()) {
+                        timeToSleep = Math.max(10, 16 - duration);
+                    } else {
+                        timeToSleep = Math.max(10, 50 - duration);
+                    }
+
                     if (timeToSleep > 0) {
                         Thread.sleep(timeToSleep);
                     }

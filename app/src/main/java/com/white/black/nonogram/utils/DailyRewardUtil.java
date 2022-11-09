@@ -15,7 +15,7 @@ import com.white.black.nonogram.RewardType;
 
 public class DailyRewardUtil {
 
-    private final static long DAILY_REWARD_INTERVAL = 3600 * 24;
+    private final static long DAILY_REWARD_INTERVAL = 1000 * 3600 * 24; // 24 hours
 
     public Pair<RewardType, Integer> getTodayReward(Context context) {
         return getRewardByDay(lastRewardDay(context));

@@ -103,7 +103,7 @@ public abstract class ScrollableView extends SurfaceView implements SurfaceHolde
             long lastRenderingTimestamp = PaintManager.INSTANCE.getLastRenderingTime();
             long now = System.currentTimeMillis();
             long duration = now - lastRenderingTimestamp;
-            long timeToSleep = Math.max(5, 16 - duration);
+            long timeToSleep = Math.max(10, 16 - duration);
 
             Thread.sleep(timeToSleep);
             PaintManager.INSTANCE.setLastRenderingTime(now);

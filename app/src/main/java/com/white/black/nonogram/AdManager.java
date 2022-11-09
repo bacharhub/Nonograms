@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AdManager {
 
-    private static final long INTERSTITIAL_POPUP_INTERVAL = 1000 * 150; // 2.5 minutes
+    private static final long INTERSTITIAL_POPUP_INTERVAL = 1000 * 120; // 2 minutes
     private static long lastInterstitialPopupTime;
     private static boolean removeAds;
 
