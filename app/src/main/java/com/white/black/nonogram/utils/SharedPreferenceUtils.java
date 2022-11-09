@@ -67,7 +67,7 @@ public class SharedPreferenceUtils {
 
     public static void incrementLastRewardDay(Context context) {
         SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        prefsEditor.putLong("last_reward_day", lastRewardDay(context) + 1);
+        prefsEditor.putInt("last_reward_day", lastRewardDay(context) + 1);
         prefsEditor.apply();
     }
 }

@@ -64,6 +64,10 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
     private ShopView shopView;
     private DailyRewardView dailyRewardView;
 
+    public DailyRewardView getDailyRewardView() {
+        return this.dailyRewardView;
+    }
+
     public ShopView getShopView() {
         return this.shopView;
     }
@@ -158,6 +162,10 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
         this.shopView.hide();
     }
 
+    public void hideDailyReward() {
+        this.dailyRewardView.hide();
+    }
+
     public void clearBackground() {
         if (background != null) {
             this.background.recycle();
@@ -234,7 +242,10 @@ public class MenuView extends SurfaceView implements SurfaceHolder.Callback {
     public synchronized boolean onTouchEvent(MotionEvent event) {
         if (Puzzles.isFirstLoadingDone() && initDone) {
             menuViewListener.onViewTouched(event);
-            if (shopView.isShown()) {
+            if (dailyRewardView.isShowing()) {
+                dailyRewardView.onTouch();
+                TouchMonitor.INSTANCE.setTouchUp(false);
+            } else if (shopView.isShown()) {
                 shopView.onTouch();
                 TouchMonitor.INSTANCE.setTouchUp(false);
             } else {

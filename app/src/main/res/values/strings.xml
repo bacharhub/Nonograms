@@ -45,6 +45,9 @@
     <string name="click_to_play">Time for a challenge! Click me :)</string>
     <string name="app_id">842719909943</string>
     <string name="most_puzzles_solved">CgkIt7CVsMMYEAIQAQ</string>
+    <string name="claim_daily_reward">Claim!</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
     <string name="use_key_question">Unlock puzzle?</string>
     <string name="reward">Reward:</string>
     <string name="leaderboards_score" translatable="false">leaderboards_score</string>

@@ -19,6 +19,9 @@
     <string name="letter">S</string>
     <string name="joystick">Joystick</string>
     <string name="touch">Tactile</string>
+    <string name="claim_daily_reward">Prétendre!</string>
+    <string name="today">Aujourd\'hui</string>
+    <string name="tomorrow">Demain</string>
     <string name="sound">Son</string>
     <string name="rate">Soutenez-nous!</string>
     <string name="google_play">market://details?id=com.white.black.nonogram</string>

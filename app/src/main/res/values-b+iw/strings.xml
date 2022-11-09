@@ -19,6 +19,9 @@
     <string name="touch">מגע</string>
     <string name="sound">צלילים</string>
     <string name="rate">תמכו בנו!</string>
+    <string name="claim_daily_reward">תודה!</string>
+    <string name="today">היום</string>
+    <string name="tomorrow">מחר</string>
     <string name="google_play">market://details?id=com.white.black.nonogram</string>
     <string name="rate_us_next_time">"תמכו בנו בפעם הבאה :)"</string>
     <string name="wikipedia">https://he.wikipedia.org/wiki/%D7%A9%D7%97%D7%95%D7%A8_%D7%95%D7%A4%D7%AA%D7%95%D7%A8</string>

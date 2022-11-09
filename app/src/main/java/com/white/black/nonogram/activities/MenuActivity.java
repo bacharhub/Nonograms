@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.view.Display;
 import android.view.DisplayCutout;
 import android.view.MotionEvent;
@@ -58,8 +59,10 @@ import com.white.black.nonogram.MyMediaPlayer;
 import com.white.black.nonogram.PuzzleReference;
 import com.white.black.nonogram.Puzzles;
 import com.white.black.nonogram.R;
+import com.white.black.nonogram.RewardType;
 import com.white.black.nonogram.TouchMonitor;
 import com.white.black.nonogram.services.AlarmBroadcastReceiver;
+import com.white.black.nonogram.utils.DailyRewardUtil;
 import com.white.black.nonogram.view.Appearance;
 import com.white.black.nonogram.view.MenuView;
 import com.white.black.nonogram.view.PaintManager;
@@ -79,6 +82,7 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
     private MenuView menuView;
     private SkuDetails removeAdsDetails;
     private BillingClient mBillingClient;
+    private DailyRewardUtil dailyRewardUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,18 +210,24 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
         PaintManager.INSTANCE.init(MenuActivity.this.getApplicationContext());
         menuView.init(MenuActivity.this, PaintManager.INSTANCE.createPaint());
         GameSettings.INSTANCE.initSound(MenuActivity.this.getApplicationContext());
+        dailyRewardUtil = new DailyRewardUtil();
 
+        new Thread(() -> MyMediaPlayer.initialize(MenuActivity.this.getApplicationContext())).start();
         new Thread(() -> {
             Puzzles.init(MenuActivity.this.getApplicationContext());
 
-            if (Puzzles.hasPlayerSolvedAtLeastOnePuzzle(MenuActivity.this)) {
-                continuePuzzleQuestion();
+            if (dailyRewardUtil.isTimeForDailyReward(MenuActivity.this)) {
+                MyMediaPlayer.play("blop");
+                menuView.getDailyRewardView().show();
+                menuView.render();
             } else {
-                goToTutorial();
+                if (Puzzles.hasPlayerSolvedAtLeastOnePuzzle(MenuActivity.this)) {
+                    continuePuzzleQuestion();
+                } else {
+                    goToTutorial();
+                }
             }
         }).start();
-
-        new Thread(() -> MyMediaPlayer.initialize(MenuActivity.this.getApplicationContext())).start();
     }
 
     private void goToTutorial() {
@@ -296,7 +306,20 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
 
     @Override
     public void onClaimDailyRewardButtonPressed() {
+        MyMediaPlayer.play("purchase");
+        menuView.hideDailyReward();
+        dailyRewardUtil.claimReward(MenuActivity.this);
 
+        Pair<RewardType, Integer> claimedReward =  dailyRewardUtil.getTodayReward(MenuActivity.this);
+        Bundle bundle = new Bundle();
+        bundle.putString(GameMonitoring.CLAIMED_DAILY_REWARD, claimedReward.first + "_" + claimedReward.second);
+        mFirebaseAnalytics.logEvent(GameMonitoring.MENU_EVENT, bundle);
+
+        if (Puzzles.hasPlayerSolvedAtLeastOnePuzzle(MenuActivity.this)) {
+            continuePuzzleQuestion();
+        } else {
+            goToTutorial();
+        }
     }
 
     @Override

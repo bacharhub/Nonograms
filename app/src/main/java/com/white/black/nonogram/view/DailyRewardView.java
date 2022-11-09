@@ -38,6 +38,22 @@ public class DailyRewardView {
     private Bitmap clue;
     private int todayRectangleColor;
     private int tomorrowRectangleColor;
+    private BankView bankView;
+    private String todayString;
+    private String tomorrowString;
+    private boolean show;
+
+    public boolean isShowing() {
+        return show;
+    }
+
+    public void show() {
+        this.show = true;
+    }
+
+    public void hide() {
+        this.show = false;
+    }
 
     private ClaimDailyRewardButtonView claimButtonView;
 
@@ -49,6 +65,9 @@ public class DailyRewardView {
                 ApplicationSettings.INSTANCE.getScreenWidth(),
                 ApplicationSettings.INSTANCE.getScreenHeight()
         );
+
+        bankView = new BankView();
+        bankView.init(context);
 
         todayRectangleColor = Color.WHITE;
         tomorrowRectangleColor = ContextCompat.getColor(context, R.color.menuBackground);
@@ -78,10 +97,13 @@ public class DailyRewardView {
                 new float[]{0f, 1f},
                 Shader.TileMode.MIRROR);
 
+        todayString = context.getString(R.string.today);
+        tomorrowString = context.getString(R.string.tomorrow);
+
         Bitmap giftImage = BitmapLoader.INSTANCE.getImage(context, R.drawable.gift_100);
         claimButtonView = new ClaimDailyRewardButtonView(
                 (ViewListener) context,
-                "Claim!",
+                context.getString(R.string.claim_daily_reward),
                 new RectF(
                         windowBounds.centerX() - ApplicationSettings.INSTANCE.getScreenWidth() * 19 / 100,
                         windowBounds.bottom - ApplicationSettings.INSTANCE.getScreenHeight() * 1 / 100,
@@ -121,31 +143,34 @@ public class DailyRewardView {
     }
 
     public void draw(Canvas canvas, Paint paint) {
-        paint.setColor(backgroundColor);
-        canvas.drawRect(backgroundBounds, paint);
-        paint.setShader(windowGradient);
-        canvas.drawRoundRect(windowBounds, 45, 45, paint);
-        paint.setShader(null);
+        if (isShowing()) {
+            paint.setColor(backgroundColor);
+            canvas.drawRect(backgroundBounds, paint);
+            paint.setShader(windowGradient);
+            canvas.drawRoundRect(windowBounds, 45, 45, paint);
+            paint.setShader(null);
 
-        paint.setColor(todayRectangleColor);
-        canvas.drawRoundRect(todayRectangleBounds, 45, 45, paint);
+            paint.setColor(todayRectangleColor);
+            canvas.drawRoundRect(todayRectangleBounds, 45, 45, paint);
 
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(ApplicationSettings.INSTANCE.getScreenHeight() / 40);
-        paint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText("Today", todayRectangleBounds.centerX(), todayRectangleBounds.top + ApplicationSettings.INSTANCE.getScreenHeight() * 38 / 1000, paint);
-        canvas.drawText("Tomorrow", tomorrowRectangleBounds.centerX(), todayRectangleBounds.top + ApplicationSettings.INSTANCE.getScreenHeight() * 38 / 1000, paint);
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(ApplicationSettings.INSTANCE.getScreenHeight() / 40);
+            paint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText(todayString, todayRectangleBounds.centerX(), todayRectangleBounds.top + ApplicationSettings.INSTANCE.getScreenHeight() * 38 / 1000, paint);
+            canvas.drawText(tomorrowString, tomorrowRectangleBounds.centerX(), todayRectangleBounds.top + ApplicationSettings.INSTANCE.getScreenHeight() * 38 / 1000, paint);
 
-        paint.setColor(tomorrowRectangleColor);
-        canvas.drawRoundRect(tomorrowRectangleBounds, 45, 45, paint);
+            paint.setColor(tomorrowRectangleColor);
+            canvas.drawRoundRect(tomorrowRectangleBounds, 45, 45, paint);
 
-        canvas.drawRoundRect(dayAfterTomorrowRectangleBounds, 45, 45, paint);
+            canvas.drawRoundRect(dayAfterTomorrowRectangleBounds, 45, 45, paint);
 
-        drawReward(canvas, paint, todayReward, todayRectangleBounds);
-        drawReward(canvas, paint, tomorrowReward, tomorrowRectangleBounds);
-        drawReward(canvas, paint, dayAfterTomorrowReward, dayAfterTomorrowRectangleBounds);
+            drawReward(canvas, paint, todayReward, todayRectangleBounds);
+            drawReward(canvas, paint, tomorrowReward, tomorrowRectangleBounds);
+            drawReward(canvas, paint, dayAfterTomorrowReward, dayAfterTomorrowRectangleBounds);
 
-        claimButtonView.draw(canvas, paint);
+            claimButtonView.draw(canvas, paint);
+            bankView.draw(canvas, paint);
+        }
     }
 
     private void drawReward(Canvas canvas, Paint paint, Pair<RewardType, Integer> reward, RectF rewardBounds) {
