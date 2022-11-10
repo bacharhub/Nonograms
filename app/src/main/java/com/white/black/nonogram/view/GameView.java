@@ -378,8 +378,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             int cellSize = numbersSize - 14;
             int gapBetweenNumbersAndCells = 10;
             int gapBetweenCellBorderAndMark = 4;
-            int markSize = cellSize - gapBetweenCellBorderAndMark * 2;
-            int markIndex = 0;
             for (int k = 0; k < tutorialInstruction.getMarks().length; k++) {
                 paint.setStyle(Paint.Style.STROKE);
                 RectF cellBounds = new RectF(
