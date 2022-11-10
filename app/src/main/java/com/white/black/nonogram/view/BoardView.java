@@ -348,10 +348,10 @@ class BoardView {
                         canvas.drawRect(slotBounds, paint);
 
                         if (boardInputValue.equals(BoardInputValue.BRUSH)) {
-                            slotBounds.set(slotCenterX - slotSize * 5 / 10,
-                                    slotCenterY - slotSize * 5 / 10,
-                                    slotCenterX + slotSize * 5 / 10,
-                                    slotCenterY + slotSize * 5 / 10);
+                            slotBounds.set(slotCenterX - slotSize * 4 / 10,
+                                    slotCenterY - slotSize * 4 / 10,
+                                    slotCenterX + slotSize * 4 / 10,
+                                    slotCenterY + slotSize * 4 / 10);
                             paint.setAlpha(100);
                             canvas.drawBitmap(colorBitmapMap.get(color), null, slotBounds, paint);
                             paint.setAlpha(255);
@@ -397,10 +397,10 @@ class BoardView {
                 paint.setColor(Color.WHITE);
                 canvas.drawRect(slotBounds, paint);
 
-                slotBounds.set(slotCenterX - slotSize * 5 / 10,
-                        slotCenterY - slotSize * 5 / 10,
-                        slotCenterX + slotSize * 5 / 10,
-                        slotCenterY + slotSize * 5 / 10);
+                slotBounds.set(slotCenterX - slotSize * 4 / 10,
+                        slotCenterY - slotSize * 4 / 10,
+                        slotCenterX + slotSize * 4 / 10,
+                        slotCenterY + slotSize * 4 / 10);
                 paint.setAlpha(100);
                 canvas.drawBitmap(colorBitmapMap.get(color), null, slotBounds, paint);
                 paint.setAlpha(255);
@@ -830,7 +830,7 @@ class BoardView {
     }
 
     private Bitmap createColorBitMap(Paint paint, Integer color) {
-        Bitmap imageBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+        Bitmap imageBitmap = Bitmap.createBitmap(8, 8, Bitmap.Config.RGB_565);
         imageBitmap.setDensity(Bitmap.DENSITY_NONE);
         Canvas canvas = new Canvas(imageBitmap);
         drawGridColor(canvas, paint, color);
@@ -1027,7 +1027,7 @@ class BoardView {
     }
 
     private void drawGridColor(Canvas canvas, Paint paint, int color) {
-        Rect slotBounds = new Rect(1, 1, 9, 9);
+        Rect slotBounds = new Rect(0, 0, 8, 8);
 
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
@@ -1042,17 +1042,17 @@ class BoardView {
         float lessLgt = Math.max(0f, lgt - 0.15f);
 
         Rect moreLgtBounds = new Rect(
-                2,
-                2,
-                8,
-                3
+                slotBounds.left + 1,
+                slotBounds.top + 1,
+                slotBounds.right - 1,
+                slotBounds.top + 2
         );
 
         Rect lessLgtBounds = new Rect(
-                2,
-                2,
-                3,
-                8
+                slotBounds.left + 1,
+                slotBounds.top + 1,
+                slotBounds.left + 2,
+                slotBounds.bottom - 1
         );
 
         paint.setColor(Color.HSVToColor(new float[]{hsv[0], hsv[1], lgt}));
@@ -1074,11 +1074,15 @@ class BoardView {
                     if (puzzle.getBoardInputValue(x, y) != null) {
                         if (puzzle.getBoardInputValue(x, y).equals(BoardInputValue.BRUSH)) {
                             float colorSizeFactor = (brushColor.intValue() == coloringProgress[x][y]) ? 1f : 0.85f;
-                            slotBounds.set((int) (slotCenterX - colorSizeFactor * slotSize * 5 / 10),
-                                    (int) (slotCenterY - colorSizeFactor * slotSize * 5 / 10),
-                                    (int) (slotCenterX + colorSizeFactor * slotSize * 5 / 10),
-                                    (int) (slotCenterY + colorSizeFactor * slotSize * 5 / 10));
-                            canvas.drawBitmap(colorBitmapMap.get(coloringProgress[x][y]), null, slotBounds, paint);
+                            slotBounds.set((int) (
+                                    slotCenterX - colorSizeFactor * slotSize * 4 / 10),
+                                    (int) (slotCenterY - colorSizeFactor * slotSize * 4 / 10),
+                                    (int) (slotCenterX + colorSizeFactor * slotSize * 4 / 10),
+                                    (int) (slotCenterY + colorSizeFactor * slotSize * 4 / 10)
+                            );
+
+                            Bitmap mark = colorBitmapMap.get(coloringProgress[x][y]);
+                            canvas.drawBitmap(mark, null, slotBounds, paint);
                         } else {
                             slotBounds.set(slotCenterX - slotSize * 4 / 10,
                                     slotCenterY - slotSize * 4 / 10,
