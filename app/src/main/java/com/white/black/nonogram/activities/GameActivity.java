@@ -352,12 +352,10 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                     if (PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isTutorial() || PuzzleSelectionView.INSTANCE.getSelectedPuzzle().isDone()) {
                         timeToSleep = Math.max(10, 16 - duration);
                     } else {
-                        timeToSleep = Math.max(10, 50 - duration);
+                        timeToSleep = Math.max(35, 50 - duration);
                     }
 
-                    if (timeToSleep > 0) {
-                        Thread.sleep(timeToSleep);
-                    }
+                    Thread.sleep(timeToSleep);
                 } catch (InterruptedException ignored) {
                 }
             }
@@ -369,7 +367,9 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
         if (pool != null) {
             pool.shutdownNow();
             pool = null;
-            GameState.setGameState(GameState.PAUSED);
+            if (GameState.getGameState().equals(GameState.GAME)) {
+                GameState.setGameState(GameState.PAUSED);
+            }
         }
 
         super.onPause();
@@ -380,7 +380,9 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
         if (pool != null) {
             pool.shutdownNow();
             pool = null;
-            GameState.setGameState(GameState.PAUSED);
+            if (GameState.getGameState().equals(GameState.GAME)) {
+                GameState.setGameState(GameState.PAUSED);
+            }
         }
 
         super.onDestroy();
