@@ -839,10 +839,7 @@ class BoardView {
 
     private void drawBackgroundAndBackgroundOutline(Canvas canvas, Paint paint) {
         paint.setColor(Color.WHITE);
-        paint.setAlpha(200);
         canvas.drawRoundRect(boardBackgroundBounds, curve, curve, paint);
-        paint.setAlpha(255);
-
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.BLACK);
         canvas.drawRoundRect(boardBackgroundBounds, curve, curve, paint);

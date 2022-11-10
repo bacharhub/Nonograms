@@ -199,7 +199,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void drawBackground(Canvas canvas, Paint paint, Rect bounds) {
-        paint.setAlpha(255);
         if (background != null && !background.isRecycled()) {
             canvas.drawBitmap(background, bounds, bounds, null);
         } else {
