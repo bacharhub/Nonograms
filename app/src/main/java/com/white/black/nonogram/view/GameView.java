@@ -102,6 +102,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private Bitmap instructionCorrectIcon;
     private Bitmap instructionIncorrectIcon;
 
+    private Rect screenBounds;
+
     public VipPopup getVipPopup() {
         return popup.getVipPopup();
     }
@@ -167,7 +169,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private void initBackground(Paint paint) {
         if (background == null || background.isRecycled()) {
             Canvas tempCanvas;
-            background = Bitmap.createBitmap(ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), Bitmap.Config.ARGB_8888);
+            background = Bitmap.createBitmap(ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight(), Bitmap.Config.RGB_565);
             background.setDensity(Bitmap.DENSITY_NONE);
             tempCanvas = new Canvas(background);
 
@@ -199,7 +201,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private void drawBackground(Canvas canvas, Paint paint, Rect bounds) {
         paint.setAlpha(255);
         if (background != null && !background.isRecycled()) {
-            canvas.drawBitmap(background, bounds, bounds, paint);
+            canvas.drawBitmap(background, bounds, bounds, null);
         } else {
             paint.setColor(backgroundColor);
             canvas.drawRect(bounds, paint);
@@ -214,11 +216,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         this.puzzleSolvedView.clearBackground();
     }
 
-    private void coverBoardWithBackground(Canvas canvas, Paint paint) {
-        handleBackground(canvas, paint, new Rect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), boardView.getBoardTop()));
-        handleBackground(canvas, paint, new Rect(0, boardView.getBoardBottom(), ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight()));
-    }
-
     private void draw(Canvas canvas, Paint paint) {
         super.draw(canvas);
 
@@ -227,7 +224,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             return;
         }
 
-        handleBackground(canvas, paint, new Rect(0, boardView.getBoardTop(), ApplicationSettings.INSTANCE.getScreenWidth(), boardView.getBoardBottom()));
+        handleBackground(canvas, paint, screenBounds);
 
         if (GameSettings.INSTANCE.getInput().equals(GameSettings.Input.JOYSTICK)) {
             drawOnJoystick(canvas, paint);
@@ -424,7 +421,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         boardView.draw(canvas, paint, boardInputValue, colorInputValueButtonGroup.getCurrentPressedVal());
-        coverBoardWithBackground(canvas, paint);
 
         slideUpButtonView.draw(canvas, paint);
         slideDownButtonView.draw(canvas, paint);
@@ -439,7 +435,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void drawOnTouch(Canvas canvas, Paint paint) {
         boardView.draw(canvas, paint, boardInputValueButtonGroup.getCurrentPressedVal(), colorInputValueButtonGroup.getCurrentPressedVal());
-        coverBoardWithBackground(canvas, paint);
 
         if (!isTutorial) {
             boardInputValueButtonGroup.draw(canvas, paint);
@@ -666,6 +661,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void init(Context context, Paint paint) {
         this.initDone = false;
+
+        screenBounds = new Rect(0, 0, ApplicationSettings.INSTANCE.getScreenWidth(), ApplicationSettings.INSTANCE.getScreenHeight());
         puzzleSolvedView = new PuzzleSolvedView();
         puzzleSolvedView.init(context, paint);
         backgroundColor = ContextCompat.getColor(context, R.color.gameBackground);

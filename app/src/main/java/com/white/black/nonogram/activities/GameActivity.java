@@ -171,8 +171,8 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                     gameView.getPopup().setAnswered(false);
                 }
             } else if (gameView.isShowingExtraCoinsPopup()) {
-                    gameView.getExtraCoinsPopup().doOnNoAnswered();
-                    gameView.getExtraCoinsPopup().setAnswered(false);
+                gameView.getExtraCoinsPopup().doOnNoAnswered();
+                gameView.getExtraCoinsPopup().setAnswered(false);
             } else {
                 GameState.setGameState(GameState.PUZZLE_SELECTION);
                 GameActivity.this.finish();
@@ -329,14 +329,20 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
     @Override
     public void onResume() {
         super.onResume();
-        pool = newCachedThreadPool(r -> {
-            Thread t = Executors.defaultThreadFactory().newThread(r);
-            t.setDaemon(true);
-            return t;
-        });
+
+        GameState.setGameState(GameState.GAME);
+        PuzzleSelectionView.INSTANCE.getSelectedPuzzle().setLastTimeSolvingTimeIncreased(System.currentTimeMillis());
+
+        if (pool == null) {
+            pool = newCachedThreadPool(r -> {
+                Thread t = Executors.defaultThreadFactory().newThread(r);
+                t.setDaemon(true);
+                return t;
+            });
+        }
 
         pool.execute(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
+            while (!Thread.currentThread().isInterrupted() && GameState.getGameState().equals(GameState.GAME)) {
                 try {
                     long start = System.currentTimeMillis();
                     gameView.render();
@@ -356,17 +362,28 @@ public class GameActivity extends Activity implements GameViewListener, GameOpti
                 }
             }
         });
-
-        GameState.setGameState(GameState.GAME);
-        PuzzleSelectionView.INSTANCE.getSelectedPuzzle().setLastTimeSolvingTimeIncreased(System.currentTimeMillis());
     }
 
     @Override
     public void onPause() {
-        super.onPause();
         if (pool != null) {
             pool.shutdownNow();
+            pool = null;
+            GameState.setGameState(GameState.PAUSED);
         }
+
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (pool != null) {
+            pool.shutdownNow();
+            pool = null;
+            GameState.setGameState(GameState.PAUSED);
+        }
+
+        super.onDestroy();
     }
 
     @Override

@@ -12,7 +12,8 @@ public enum GameState {
     PLAYSTORE,
     WIKIPEDIA,
     ICONS8,
-    PRIVACY_POLICY;
+    PRIVACY_POLICY,
+    PAUSED;
 
     private static volatile GameState gameState = GameState.MENU;
 
