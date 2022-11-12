@@ -306,14 +306,14 @@ public class MenuActivity extends Activity implements MenuViewListener, MenuOpti
 
     @Override
     public void onClaimDailyRewardButtonPressed() {
-        MyMediaPlayer.play("purchase");
-        menuView.hideDailyReward();
-        dailyRewardUtil.claimReward(MenuActivity.this);
-
         Pair<RewardType, Integer> claimedReward =  dailyRewardUtil.getTodayReward(MenuActivity.this);
         Bundle bundle = new Bundle();
         bundle.putString(GameMonitoring.CLAIMED_DAILY_REWARD, claimedReward.first + "_" + claimedReward.second);
         mFirebaseAnalytics.logEvent(GameMonitoring.MENU_EVENT, bundle);
+
+        MyMediaPlayer.play("purchase");
+        menuView.hideDailyReward();
+        dailyRewardUtil.claimReward(MenuActivity.this);
 
         if (Puzzles.hasPlayerSolvedAtLeastOnePuzzle(MenuActivity.this)) {
             continuePuzzleQuestion();
