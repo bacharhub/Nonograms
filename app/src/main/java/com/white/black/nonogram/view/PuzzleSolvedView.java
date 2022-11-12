@@ -56,8 +56,6 @@ class PuzzleSolvedView {
     private LinearGradient windowGradient;
 
     private RectF rewardWindowBounds;
-    private RectF coinAdRewardBounds;
-    private RectF rewardAdCheckBounds;
     private Bitmap coin;
     private Bitmap videoAdIcon;
     private WatchAdButtonView watchAdButtonView;
@@ -99,7 +97,7 @@ class PuzzleSolvedView {
     }
 
     public boolean isShowingPopup() {
-        return (!hideRating) && numOfPuzzlesSolved >= 5 && (numOfPuzzlesSolved % 7 == 0);
+        return (!hideRating) && (numOfPuzzlesSolved % 5 == 0);
     }
 
     private void setUpPopup(Context context, Paint paint) {
@@ -251,9 +249,9 @@ class PuzzleSolvedView {
 
         windowBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenWidth() * 28 / 100,
-                ApplicationSettings.INSTANCE.getScreenHeight() * 15 / 100,
+                ApplicationSettings.INSTANCE.getScreenHeight() * 18 / 100,
                 ApplicationSettings.INSTANCE.getScreenWidth() * 72 / 100,
-                ApplicationSettings.INSTANCE.getScreenHeight() * 64 / 100
+                ApplicationSettings.INSTANCE.getScreenHeight() * 67 / 100
         );
 
         radialGradient = new RadialGradient(
@@ -339,24 +337,10 @@ class PuzzleSolvedView {
         completeBounds = new RectF(windowBounds.right - buttonWidth / 2, windowBounds.top - buttonWidth / 2, windowBounds.right + buttonWidth / 2, windowBounds.top + buttonWidth / 2);
 
         rewardWindowBounds = new RectF(
-                ApplicationSettings.INSTANCE.getScreenWidth() * 3 / 10,
+                ApplicationSettings.INSTANCE.getScreenWidth() * 25 / 100,
                 windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 100,
-                ApplicationSettings.INSTANCE.getScreenWidth() * 7 / 10,
-                windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 100 + 150
-        );
-
-        coinAdRewardBounds = new RectF(
-                rewardWindowBounds.left + rewardWindowBounds.width() / 15,
-                rewardWindowBounds.top + rewardWindowBounds.height() * 32 / 100,
-                rewardWindowBounds.left + rewardWindowBounds.width() / 15 + 128,
-                rewardWindowBounds.top + rewardWindowBounds.height() * 32 / 100 + 128
-        );
-
-        rewardAdCheckBounds = new RectF(
-                rewardWindowBounds.left + rewardWindowBounds.width() * 65 / 100,
-                coinAdRewardBounds.top - rewardWindowBounds.height() * 3 / 100,
-                rewardWindowBounds.left + rewardWindowBounds.width() * 65 / 100 + 128,
-                coinAdRewardBounds.bottom - rewardWindowBounds.height() * 3 / 100
+                ApplicationSettings.INSTANCE.getScreenWidth() * 75 / 100,
+                windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 100 + 150 + 64
         );
 
         watchAdButtonView = new WatchAdButtonView(

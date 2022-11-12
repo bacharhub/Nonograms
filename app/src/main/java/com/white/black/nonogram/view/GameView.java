@@ -860,7 +860,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         clueButtonView = new ClueButtonView(
                 (ViewListener) context,
-                PuzzleSelectionView.INSTANCE.getSelectedPuzzle(),
                 clueButtonBounds,
                 ContextCompat.getColor(context, R.color.settingsBrown1),
                 ContextCompat.getColor(context, R.color.settingsBrown2),
@@ -1014,7 +1013,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         clueButtonView = new ClueButtonView(
                 (ViewListener) context,
-                PuzzleSelectionView.INSTANCE.getSelectedPuzzle(),
                 clueButtonBounds,
                 ContextCompat.getColor(context, R.color.settingsBrown1),
                 ContextCompat.getColor(context, R.color.settingsBrown2),

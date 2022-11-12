@@ -9,7 +9,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.white.black.nonogram.AdManager;
-import com.white.black.nonogram.Puzzle;
 import com.white.black.nonogram.view.buttons.PicButtonView;
 import com.white.black.nonogram.view.listeners.ViewListener;
 
@@ -17,13 +16,11 @@ import java.util.function.Supplier;
 
 public class ClueButtonView extends PicButtonView {
 
-    private final Puzzle puzzle;
     private final Supplier<Integer> numOfAvailableClues;
     private final Runnable onClueButtonPressed;
 
     public ClueButtonView(
             ViewListener viewListener,
-            Puzzle puzzle,
             RectF bounds,
             int color1,
             int color2,
@@ -39,7 +36,6 @@ public class ClueButtonView extends PicButtonView {
                 bounds.top + bounds.height() * 1 / 10,
                 bounds.right - bounds.width() * 1 / 10,
                 bounds.top - bounds.height() * 1 / 10 + (bounds.right - bounds.left)), context, paint);
-        this.puzzle = puzzle;
         this.numOfAvailableClues = numOfAvailableClues;
         this.onClueButtonPressed = onClueButtonPressed;
     }
