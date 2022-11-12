@@ -106,9 +106,9 @@ public class DailyRewardView {
                 context.getString(R.string.claim_daily_reward),
                 new RectF(
                         windowBounds.centerX() - ApplicationSettings.INSTANCE.getScreenWidth() * 19 / 100,
-                        windowBounds.bottom - ApplicationSettings.INSTANCE.getScreenHeight() * 1 / 100,
+                        windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100,
                         windowBounds.centerX() + ApplicationSettings.INSTANCE.getScreenWidth() * 19 / 100,
-                        windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 6 / 100
+                        windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 9 / 100
                 ),
                 ContextCompat.getColor(context, R.color.smallPuzzleGreen1), ContextCompat.getColor(context, R.color.smallPuzzleGreen2), ContextCompat.getColor(context, R.color.smallPuzzleGreen3),
                 new Bitmap[]{giftImage},
