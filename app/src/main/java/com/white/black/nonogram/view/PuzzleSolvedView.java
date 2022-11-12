@@ -340,7 +340,7 @@ class PuzzleSolvedView {
                 ApplicationSettings.INSTANCE.getScreenWidth() * 25 / 100,
                 windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 100,
                 ApplicationSettings.INSTANCE.getScreenWidth() * 75 / 100,
-                windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 100 + 150 + 64
+                windowBounds.bottom + ApplicationSettings.INSTANCE.getScreenHeight() * 4 / 100 + 150 + 32
         );
 
         watchAdButtonView = new WatchAdButtonView(
