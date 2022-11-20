@@ -93,8 +93,8 @@ public class AdManager {
     }
     public static void _muteSound(Context context){
         // TODO: check if it was a good idea to add sound to interstitials..
-        // AudioManager aManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        // aManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
+         AudioManager aManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+         aManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
     }
 
     private static void loadInterstitial(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback) {
