@@ -87,14 +87,14 @@ public class AdManager {
         );
     }
 
-    private static void _unmuteSound(Context context){
+    private static void _unmuteSound(Context context) {
         AudioManager aManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         aManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE, 0);
     }
-    public static void _muteSound(Context context){
-        // TODO: check if it was a good idea to add sound to interstitials..
-         AudioManager aManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-         aManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
+
+    public static void _muteSound(Context context) {
+        AudioManager aManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        aManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
     }
 
     private static void loadInterstitial(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback) {
@@ -121,17 +121,22 @@ public class AdManager {
     }
 
     public static void reloadInterstitialAd(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback) {
+        ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
         if (MemoryManager.isLowMemory()) {
-            ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
             ses.schedule(
                     () -> reloadInterstitialAd(context, interstitialAdLoadCallback), 1, TimeUnit.MINUTES
             );
-            ses.shutdown();
         } else {
-            Handler mainHandler = new Handler(context.getMainLooper());
-            mainHandler.post(
-                    () -> loadInterstitial(context, interstitialAdLoadCallback)
+            ses.schedule(
+                    () -> {
+                        Handler mainHandler = new Handler(context.getMainLooper());
+                        mainHandler.post(
+                                () -> loadInterstitial(context, interstitialAdLoadCallback)
+                        );
+                    }, 10, TimeUnit.SECONDS
             );
         }
+
+        ses.shutdown();
     }
 }
