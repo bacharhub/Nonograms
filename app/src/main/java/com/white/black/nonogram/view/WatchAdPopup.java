@@ -1,11 +1,13 @@
 package com.white.black.nonogram.view;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -197,7 +199,12 @@ public class WatchAdPopup {
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                 rewardedInstanceHandler.setLoadingRewardedAd(false);
-                onRewarded.run();
+                Handler mainHandler = new Handler(context.getMainLooper());
+                mainHandler.post(
+                        () -> new AlertDialog.Builder(context).setMessage(R.string.no_internet_connection)
+                                .setNeutralButton(android.R.string.ok, null).show()
+                );
+
                 onRewardedVideoAdClosed(context);
                 onAdFailedToLoad.accept(loadAdError);
 
