@@ -48,7 +48,7 @@ public class MyApplication extends Application {
                 return;
             }
 
-            AdManager.reloadInterstitialAd(MyApplication.this, interstitialAdLoadCallback);
+            AdManager.loadInterstitial(MyApplication.this, interstitialAdLoadCallback);
         }).start();
     }
 

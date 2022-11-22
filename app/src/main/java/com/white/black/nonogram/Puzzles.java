@@ -320,6 +320,7 @@ public enum Puzzles {
         addPuzzleReference(context.getString(R.string.winrar), 96, R.drawable.winrar_96); // 36:54
         addPuzzleReference(context.getString(R.string.steve_jobs), 48, R.drawable.steve_jobs_96); // 42:00
         addPuzzleReference(context.getString(R.string.pizza), 96, R.drawable.pizza_96); // 43:54
+        addPuzzleReference(context.getString(R.string.cool_emoji), 64, R.drawable.cool_64); // 44:57
         addPuzzleReference(context.getString(R.string.avatar), 96, R.drawable.avatar_96); // 57:21
         addPuzzleReference(context.getString(R.string.barcelona_fc), 96, R.drawable.barcelona_fc_96); // 01:48:56
 

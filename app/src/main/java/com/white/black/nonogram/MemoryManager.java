@@ -2,7 +2,7 @@ package com.white.black.nonogram;
 
 public class MemoryManager {
 
-    private static final int LOW_MEMORY_THRESHOLD_IN_MB = 70;
+    private static final int LOW_MEMORY_THRESHOLD_IN_MB = 50;
     private static final int CRITICAL_MEMORY_THRESHOLD_IN_MB = 30;
     private static final int NO_MEMORY_THRESHOLD_IN_MB = 10;
 

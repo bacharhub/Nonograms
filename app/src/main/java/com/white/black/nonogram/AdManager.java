@@ -97,12 +97,15 @@ public class AdManager {
         aManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
     }
 
-    private static void loadInterstitial(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback) {
-        InterstitialAd.load(
-                context,
-                "ca-app-pub-6810954825772230/4958165792",
-                new AdRequest.Builder().build(),
-                interstitialAdLoadCallback
+    public static void loadInterstitial(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback) {
+        Handler mainHandler = new Handler(context.getMainLooper());
+        mainHandler.post(
+                () -> InterstitialAd.load(
+                        context,
+                        "ca-app-pub-6810954825772230/4958165792",
+                        new AdRequest.Builder().build(),
+                        interstitialAdLoadCallback
+                )
         );
     }
 
@@ -128,12 +131,7 @@ public class AdManager {
             );
         } else {
             ses.schedule(
-                    () -> {
-                        Handler mainHandler = new Handler(context.getMainLooper());
-                        mainHandler.post(
-                                () -> loadInterstitial(context, interstitialAdLoadCallback)
-                        );
-                    }, 10, TimeUnit.SECONDS
+                    () -> loadInterstitial(context, interstitialAdLoadCallback), 10, TimeUnit.SECONDS
             );
         }
 
