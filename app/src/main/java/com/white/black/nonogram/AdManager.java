@@ -97,20 +97,20 @@ public class AdManager {
         aManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
     }
 
-    public static void loadInterstitial(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback) {
+    public static void loadInterstitial(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback, String adUnitId) {
         Handler mainHandler = new Handler(context.getMainLooper());
         mainHandler.post(
                 () -> InterstitialAd.load(
                         context,
-                        "ca-app-pub-6810954825772230/4958165792",
+                        adUnitId,
                         new AdRequest.Builder().build(),
                         interstitialAdLoadCallback
                 )
         );
     }
 
-    public static void onInterstitialAdClosed(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback) {
-        reloadInterstitialAd(context, interstitialAdLoadCallback);
+    public static void onInterstitialAdClosed(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback, String adUnitId) {
+        reloadInterstitialAd(context, interstitialAdLoadCallback, adUnitId);
         _unmuteSound(context);
     }
 
@@ -123,15 +123,15 @@ public class AdManager {
         lastInterstitialPopupTime = System.currentTimeMillis();
     }
 
-    public static void reloadInterstitialAd(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback) {
+    public static void reloadInterstitialAd(Context context, InterstitialAdLoadCallback interstitialAdLoadCallback, String adUnitId) {
         ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
         if (MemoryManager.isLowMemory()) {
             ses.schedule(
-                    () -> reloadInterstitialAd(context, interstitialAdLoadCallback), 1, TimeUnit.MINUTES
+                    () -> reloadInterstitialAd(context, interstitialAdLoadCallback, adUnitId), 1, TimeUnit.MINUTES
             );
         } else {
             ses.schedule(
-                    () -> loadInterstitial(context, interstitialAdLoadCallback), 10, TimeUnit.SECONDS
+                    () -> loadInterstitial(context, interstitialAdLoadCallback, adUnitId), 10, TimeUnit.SECONDS
             );
         }
 

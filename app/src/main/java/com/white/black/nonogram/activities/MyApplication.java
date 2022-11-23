@@ -18,6 +18,9 @@ import java.util.List;
 
 public class MyApplication extends Application {
 
+    private static final String FIRST_INTERSTITIAL_AD_ID = "ca-app-pub-6810954825772230/2640411176";
+    private static final String INTERSTITIAL_WITH_ECPM_FLOOR_AD_ID = "ca-app-pub-6810954825772230/8832330725";
+
     private InterstitialAd interstitialAd;
 
     public InterstitialAd getInterstitialAd() {
@@ -48,7 +51,7 @@ public class MyApplication extends Application {
                 return;
             }
 
-            AdManager.loadInterstitial(MyApplication.this, interstitialAdLoadCallback);
+            AdManager.loadInterstitial(MyApplication.this, interstitialAdLoadCallback, FIRST_INTERSTITIAL_AD_ID);
         }).start();
     }
 
@@ -56,7 +59,7 @@ public class MyApplication extends Application {
         @Override
         public void onAdDismissedFullScreenContent() {
             interstitialAd = null;
-            AdManager.onInterstitialAdClosed(MyApplication.this, interstitialAdLoadCallback);
+            AdManager.onInterstitialAdClosed(MyApplication.this, interstitialAdLoadCallback, INTERSTITIAL_WITH_ECPM_FLOOR_AD_ID);
         }
     };
 
@@ -71,7 +74,7 @@ public class MyApplication extends Application {
         @Override
         public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
             // Handle the error
-            AdManager.reloadInterstitialAd(MyApplication.this, interstitialAdLoadCallback);
+            AdManager.reloadInterstitialAd(MyApplication.this, interstitialAdLoadCallback, INTERSTITIAL_WITH_ECPM_FLOOR_AD_ID);
         }
     };
 }

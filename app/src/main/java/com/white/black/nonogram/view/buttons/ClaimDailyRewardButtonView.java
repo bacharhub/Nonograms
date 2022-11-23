@@ -27,7 +27,7 @@ public class ClaimDailyRewardButtonView extends LabeledHorizontalButtonView {
         paint.setColor(backgroundColor);
         paint.setTextSize(labeledPicFontSizeFactor * ApplicationSettings.INSTANCE.getScreenWidth() / 24);
         paint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(description, superBounds.left + superBounds.width() * 60 / 100, superBounds.centerY() + descriptionHeight / 2, paint);
+        canvas.drawText(description, superBounds.left + superBounds.width() * 65 / 100, superBounds.centerY() + descriptionHeight / 2, paint);
     }
 
     @Override

@@ -72,7 +72,7 @@ public class BankView {
         coinsBankWindowBounds = new RectF(
                 ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100,
-                ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100 + ApplicationSettings.INSTANCE.getScreenWidth() * 3 / 10,
+                ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100 + ApplicationSettings.INSTANCE.getScreenWidth() * 32 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100 + 150
         );
 
@@ -106,7 +106,7 @@ public class BankView {
         keysBankWindowBounds = new RectF(
                 coinsBankWindowBounds.right + ApplicationSettings.INSTANCE.getScreenHeight() * 15 / 1000,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100,
-                coinsBankWindowBounds.right + ApplicationSettings.INSTANCE.getScreenHeight() * 15 / 1000 + ApplicationSettings.INSTANCE.getScreenWidth() * 26 / 100,
+                coinsBankWindowBounds.right + ApplicationSettings.INSTANCE.getScreenHeight() * 15 / 1000 + ApplicationSettings.INSTANCE.getScreenWidth() * 27 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100 + 150
         );
 
@@ -140,7 +140,7 @@ public class BankView {
         cluesBankWindowBounds = new RectF(
                 keysBankWindowBounds.right + ApplicationSettings.INSTANCE.getScreenHeight() * 15 / 1000,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100,
-                keysBankWindowBounds.right + ApplicationSettings.INSTANCE.getScreenHeight() * 15 / 1000 + ApplicationSettings.INSTANCE.getScreenWidth() * 26 / 100,
+                ApplicationSettings.INSTANCE.getScreenWidth() - ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100,
                 ApplicationSettings.INSTANCE.getScreenHeight() * 2 / 100 + 150
         );
 
